@@ -5,13 +5,13 @@ plugins {
 }
 
 android {
-    namespace = "com.hora.helloworld"
+    namespace = "com.hora.varisankya"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.hora.helloworld"
+        applicationId = "com.hora.varisankya"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

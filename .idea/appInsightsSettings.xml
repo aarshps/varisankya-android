@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="com.hora.helloworld" />
-                  <option name="mobileSdkAppId" value="1:663138385072:android:b6f3dad122bd1a3e6e0f75" />
-                  <option name="projectId" value="helloworld-92567418" />
-                  <option name="projectNumber" value="663138385072" />
+                  <option name="appId" value="PLACEHOLDER" />
+                  <option name="mobileSdkAppId" value="" />
+                  <option name="projectId" value="" />
+                  <option name="projectNumber" value="" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

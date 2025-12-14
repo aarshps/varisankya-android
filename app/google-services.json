@@ -12,7 +12,20 @@
           "package_name": "com.hora.helloworld"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "663138385072-dls8hd0j3b2mu2bvtrcjvua372nfaf1k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hora.helloworld",
+            "certificate_hash": "2b2a3169ef99488ef78ecb66a2f3aee5101bd92a"
+          }
+        },
+        {
+          "client_id": "663138385072-bke7f5oflsl2cg0e5maks0ef3n6o113u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB6DeDde9f4Gz3JYdACY0xFPn6paeY3LHY"
@@ -20,7 +33,49 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "663138385072-bke7f5oflsl2cg0e5maks0ef3n6o113u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:663138385072:android:dfcdd7f25c0171c56e0f75",
+        "android_client_info": {
+          "package_name": "com.hora.varisankya"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "663138385072-paigrjmugtr7buuae16hnhfr7up8mvud.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hora.varisankya",
+            "certificate_hash": "2b2a3169ef99488ef78ecb66a2f3aee5101bd92a"
+          }
+        },
+        {
+          "client_id": "663138385072-bke7f5oflsl2cg0e5maks0ef3n6o113u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6DeDde9f4Gz3JYdACY0xFPn6paeY3LHY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "663138385072-bke7f5oflsl2cg0e5maks0ef3n6o113u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
