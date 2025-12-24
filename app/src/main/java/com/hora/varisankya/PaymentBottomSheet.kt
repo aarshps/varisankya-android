@@ -76,16 +76,13 @@ class PaymentBottomSheet(
         historyRecycler.layoutManager = LinearLayoutManager(context)
 
         btnPayCurrent.setOnClickListener {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                it.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
-            } else {
-                it.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-            }
+            val haptic = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) HapticFeedbackConstants.CONFIRM else HapticFeedbackConstants.LONG_PRESS
+            PreferenceHelper.performHaptics(it, haptic)
             recordPayment(currentDueDate!!, projectedNextDate)
         }
 
         btnPayCustom.setOnClickListener {
-            it.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+            PreferenceHelper.performHaptics(it, HapticFeedbackConstants.CLOCK_TICK)
             val datePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Select Payment Date")
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
@@ -171,7 +168,6 @@ class PaymentBottomSheet(
             .addOnSuccessListener { snapshots ->
                 if (!isAdded) return@addOnSuccessListener
                 
-                // M3E Smooth Fade-out for loader
                 val fadeOut = AlphaAnimation(1f, 0f).apply { duration = 200 }
                 progressHistory.startAnimation(fadeOut)
                 progressHistory.visibility = View.GONE
@@ -180,14 +176,12 @@ class PaymentBottomSheet(
                 if (payments.isEmpty()) {
                     historyRecycler.visibility = View.GONE
                     noHistoryContainer.visibility = View.VISIBLE
-                    // Smooth Fade-in for Empty State
                     val fadeIn = AlphaAnimation(0f, 1f).apply { duration = 300 }
                     noHistoryContainer.startAnimation(fadeIn)
                     textNoHistory.text = "No Payment History"
                 } else {
                     noHistoryContainer.visibility = View.GONE
                     historyRecycler.visibility = View.VISIBLE
-                    // Smooth Fade-in for Recycler
                     val fadeIn = AlphaAnimation(0f, 1f).apply { duration = 300 }
                     historyRecycler.startAnimation(fadeIn)
                     historyRecycler.adapter = PaymentAdapter(payments, subscription.currency, 
@@ -305,7 +299,11 @@ class PaymentBottomSheet(
 
         val payment = PaymentRecord(
             date = paymentDate,
-            amount = subscription.cost
+            amount = subscription.cost,
+            subscriptionName = subscription.name,
+            subscriptionId = subId,
+            currency = subscription.currency,
+            userId = userId
         )
 
         val batch = firestore.batch()
@@ -334,7 +332,7 @@ class PaymentBottomSheet(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+        PreferenceHelper.performHaptics(view, HapticFeedbackConstants.CONTEXT_CLICK)
     }
 
     override fun onStart() {
@@ -344,7 +342,7 @@ class PaymentBottomSheet(
         behavior?.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    bottomSheet.performHapticFeedback(HapticFeedbackConstants.GESTURE_END)
+                    PreferenceHelper.performHaptics(bottomSheet, HapticFeedbackConstants.GESTURE_END)
                 }
             }
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}

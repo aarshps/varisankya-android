@@ -51,12 +51,12 @@ class PaymentAdapter(
 
         // Make entire row clickable for edit
         holder.itemView.setOnClickListener {
-            it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+            PreferenceHelper.performHaptics(it, HapticFeedbackConstants.VIRTUAL_KEY)
             onEditClicked(payment)
         }
 
         holder.btnDelete.setOnClickListener {
-            it.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+            PreferenceHelper.performHaptics(it, HapticFeedbackConstants.LONG_PRESS)
             onDeleteClicked(payment)
         }
     }

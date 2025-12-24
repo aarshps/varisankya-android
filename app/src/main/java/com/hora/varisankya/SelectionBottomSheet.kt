@@ -49,7 +49,7 @@ class SelectionBottomSheet(
             chip.setEnsureMinTouchTargetSize(false)
             
             chip.setOnClickListener { v ->
-                v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                PreferenceHelper.performHaptics(v, HapticFeedbackConstants.VIRTUAL_KEY)
                 onOptionSelected(option)
                 dismiss()
             }
@@ -82,7 +82,7 @@ class SelectionBottomSheet(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+        PreferenceHelper.performHaptics(view, HapticFeedbackConstants.CONTEXT_CLICK)
     }
 
     override fun onStart() {
@@ -92,7 +92,7 @@ class SelectionBottomSheet(
         behavior?.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    bottomSheet.performHapticFeedback(HapticFeedbackConstants.GESTURE_END)
+                    PreferenceHelper.performHaptics(bottomSheet, HapticFeedbackConstants.GESTURE_END)
                 }
             }
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}

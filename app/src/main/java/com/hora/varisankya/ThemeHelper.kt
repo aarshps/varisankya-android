@@ -4,8 +4,6 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 
 object ThemeHelper {
-    // Font customization removed. This helper is deprecated/unused.
-    
     fun applyTheme(activity: AppCompatActivity) {
         // No-op
     }

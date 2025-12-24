@@ -10,7 +10,9 @@
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="true"
+        app:elevation="0dp"
+        app:liftOnScroll="true">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -35,18 +37,17 @@
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_gravity="end"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <ImageView
+                <ImageButton
                     android:id="@+id/settings_button"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:layout_marginEnd="4dp"
                     android:background="?attr/actionBarItemBackground"
                     android:contentDescription="Settings"
-                    android:padding="12dp"
                     android:src="@drawable/ic_settings"
                     app:tint="?attr/colorOnSurface" />
 
@@ -54,7 +55,7 @@
                     android:id="@+id/profile_image"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="8dp"
                     android:layout_marginEnd="16dp"
                     app:shapeAppearanceOverlay="@style/App.ShapeAppearanceOverlay.Rounded"
                     tools:src="@tools:sample/avatars" />
@@ -80,7 +81,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:paddingTop="8dp"
+                android:paddingTop="0dp"
                 android:paddingBottom="100dp"
                 tools:listitem="@layout/item_subscription" />
 
@@ -176,5 +177,43 @@
         android:layout_marginBottom="32dp"
         android:text="Add New"
         app:icon="@drawable/ic_add" />
+
+    <com.google.android.material.search.SearchView
+        android:id="@+id/search_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:hint="Search subscriptions"
+        app:backgroundTint="?attr/colorSurface"
+        app:dividerColor="@android:color/transparent"
+        app:elevation="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/search_category_chip_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    app:singleSelection="false"
+                    app:chipSpacingHorizontal="8dp" />
+            </HorizontalScrollView>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/search_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="16dp" />
+
+        </LinearLayout>
+    </com.google.android.material.search.SearchView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

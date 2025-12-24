@@ -57,16 +57,11 @@ class AddSubscriptionBottomSheet(
         titleTextView.text = if (subscription == null) "Add Subscription" else "Edit Subscription"
 
         val addHaptic = { v: View -> 
-            v.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-            Unit
+            PreferenceHelper.performHaptics(v, HapticFeedbackConstants.CLOCK_TICK)
         }
         val addStrongHaptic = { v: View -> 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                v.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
-            } else {
-                v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-            }
-            Unit
+            val haptic = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) HapticFeedbackConstants.CONFIRM else HapticFeedbackConstants.LONG_PRESS
+            PreferenceHelper.performHaptics(v, haptic)
         }
 
         nameEditText.setOnFocusChangeListener { v, hasFocus -> if(hasFocus) addHaptic(v) }
@@ -93,7 +88,7 @@ class AddSubscriptionBottomSheet(
 
         val currencies = PreferenceHelper.getPersonalizedList(requireContext(), "currency", arrayOf("USD", "EUR", "GBP", "INR"))
         val recurrenceOptions = PreferenceHelper.getPersonalizedList(requireContext(), "recurrence", arrayOf("Monthly", "Yearly", "Weekly", "Daily", "Custom"))
-        val categories = PreferenceHelper.getPersonalizedList(requireContext(), "category", arrayOf("Entertainment", "Utilities", "Work", "Loan", "Software", "Family", "Investment", "Insurance", "Other"))
+        val categories = PreferenceHelper.getPersonalizedList(requireContext(), "category", Constants.CATEGORIES)
 
         setupSelection(currencyAutoComplete, "Select Currency", currencies, addHaptic)
         setupSelection(recurrenceAutoComplete, "Select Recurrence", recurrenceOptions, addHaptic) { selected ->
@@ -223,7 +218,7 @@ class AddSubscriptionBottomSheet(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+        PreferenceHelper.performHaptics(view, HapticFeedbackConstants.CONTEXT_CLICK)
     }
 
     override fun onStart() {
@@ -233,7 +228,7 @@ class AddSubscriptionBottomSheet(
         behavior?.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    bottomSheet.performHapticFeedback(HapticFeedbackConstants.GESTURE_END)
+                    PreferenceHelper.performHaptics(bottomSheet, HapticFeedbackConstants.GESTURE_END)
                 }
             }
             override fun onSlide(bottomSheet: View, slideOffset: Float) {}

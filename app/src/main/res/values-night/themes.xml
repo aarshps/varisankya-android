@@ -5,5 +5,19 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <!-- Ensure status bar icons are light in dark mode -->
         <item name="android:windowLightStatusBar">false</item>
+        
+        <!-- SearchView styling to remove dividers -->
+        <item name="searchViewStyle">@style/Widget.App.SearchView</item>
+    </style>
+
+    <style name="Widget.App.SearchView" parent="Widget.Material3.SearchView">
+        <item name="dividerColor">@android:color/transparent</item>
+    </style>
+
+    <!-- Splash Screen Theme -->
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#1C1B1F</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_icon_centered</item>
+        <item name="postSplashScreenTheme">@style/Theme.Varisankya</item>
     </style>
 </resources>
