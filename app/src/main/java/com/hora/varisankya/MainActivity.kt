@@ -300,6 +300,7 @@ class MainActivity : AppCompatActivity() {
         if (isLoggedIn) {
             loginContainer.visibility = View.GONE
             appBar.visibility = View.VISIBLE
+            fabAddSubscription.visibility = View.VISIBLE
             
             profileImage.visibility = View.VISIBLE
             searchTriggerLayout.visibility = View.VISIBLE
