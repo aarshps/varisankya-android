@@ -3,6 +3,7 @@ package com.hora.varisankya
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.color.DynamicColors
+import com.google.android.material.color.DynamicColorsOptions
 
 open class BaseActivity : AppCompatActivity() {
     
@@ -20,7 +21,16 @@ open class BaseActivity : AppCompatActivity() {
         }
         
         // 2. Apply Dynamic Colors Overlay ON TOP of the base theme
-        DynamicColors.applyToActivityIfAvailable(this)
+        val optionsBuilder = DynamicColorsOptions.Builder()
+        
+        // Try to find the Expressive overlay at runtime to avoid compile-time issues
+        // It might be named differently or not exposed in R class in alpha version
+        val overlayId = resources.getIdentifier("ThemeOverlay_Material3_DynamicColors_Expressive", "style", packageName)
+        if (overlayId != 0) {
+            optionsBuilder.setThemeOverlay(overlayId)
+        }
+        
+        DynamicColors.applyToActivityIfAvailable(this, optionsBuilder.build())
         
         super.onCreate(savedInstanceState)
     }

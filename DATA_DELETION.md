@@ -1,6 +1,6 @@
 # Data Deletion Request for Varisankya
 
-**Last updated: December 25, 2025**
+**Last updated: January 1, 2026**
 
 If you wish to delete your account and all associated data from the Varisankya app, please follow these steps:
 

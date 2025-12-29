@@ -2,11 +2,18 @@
 
 Varisankya is a modern, high-performance Android application designed to help users track and manage their recurring subscriptions with ease. Built with a focus on the **Material 3 Expressive (M3E)** design language, it offers a tactile, personalized, and visually stunning experience.
 
-## ✨ Latest Release: v2.4
+## ✨ Latest Release: v2.6
 
-This release introduces a major visual overhaul to the typography system and enhanced user customization.
+This release introduces a refined visual identity for subscription items, focusing on clarity, legibility, and expressive motion.
 
-### What's New in v2.4
+### What's New in v2.6
+*   **Expressive Status Pills**: Reimagined the status indicator as a "fattier" and rounder pill using Material 3 Expressive container colors (Tertiary, Secondary, Error) for immediate visual recognition.
+*   **Decoupled Progress Bar**: Separated the progress bar from the status text, placing it below the pill for a cleaner, less cluttered look.
+*   **Enhanced Legibility**: Optimized text colors to ensure perfect contrast against pastel container backgrounds, adhering to accessibility standards.
+*   **Refined Layout**: Increased padding and spacing within list items (20dp/24dp) to create a more spacious, premium feel consistent with M3E guidelines.
+*   **Smooth Animations**: Added smooth deceleration animations for progress bar fills when loading the list.
+
+### Previous Highlights (v2.4)
 *   **Typography Overhaul**: Adopted **Google Sans Flex** with maximum roundness across the entire application for a softer, more modern, and approachable aesthetic.
 *   **Font Customization**: Added a new **Typography** setting, allowing users to switch between the custom rounded font and the system default font seamlessly.
 *   **Dynamic Theming Engine**: Improved the base activity architecture to support instant theme switching across all screens without restarting the app.
@@ -48,7 +55,7 @@ This release introduces a major visual overhaul to the typography system and enh
 
 *   **Platform**: Android 15+ (API 35+)
 *   **Language**: 100% Kotlin
-*   **UI Framework**: Material Components 1.13.0 (Material 3)
+*   **UI Framework**: Material Components 1.14.0-alpha08 (Material 3)
 *   **Backend**: Firebase (Auth & Firestore)
 
 ## 📦 Build & Release
@@ -59,13 +66,13 @@ To build the debug APK manually, run:
 ```
 The APK will be generated at: `app/build/outputs/apk/debug/app-debug.apk`
 
-### Tagging Version v2.4
+### Tagging Version v2.6
 To freeze this state in Git:
 ```bash
 git add .
-git commit -m "chore: release version 2.4"
-git tag -a v2.4 -m "Release version 2.4"
-git push origin v2.4
+git commit -m "chore: release version 2.6"
+git tag -a v2.6 -m "Release version 2.6"
+git push origin v2.6
 ```
 
 ## ⚙️ Setup

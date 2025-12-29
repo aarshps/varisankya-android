@@ -1,6 +1,6 @@
 # Privacy Policy for Varisankya
 
-**Last Updated: December 24, 2025**
+**Last Updated: January 1, 2026**
 
 Varisankya ("we," "us," or "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and disclose information when you use our mobile application (the "App").
 

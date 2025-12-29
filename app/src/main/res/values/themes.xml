@@ -36,7 +36,6 @@
         <!-- Apply unified header style -->
         <item name="appBarLayoutStyle">@style/Widget.App.AppBarLayout</item>
         <item name="toolbarStyle">@style/Widget.App.Toolbar</item>
-        <item name="colorError">@color/error_color</item>
     </style>
 
     <!-- System Font Theme -->
@@ -77,7 +76,8 @@
 
     <!-- Splash Screen Theme -->
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">#FCFCFC</item>
+        <!-- Removed hardcoded background color to support dynamic/system defaults -->
+        <!-- <item name="windowSplashScreenBackground">#FCFCFC</item> -->
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_icon_centered</item>
         <item name="postSplashScreenTheme">@style/Theme.Varisankya</item>
     </style>
