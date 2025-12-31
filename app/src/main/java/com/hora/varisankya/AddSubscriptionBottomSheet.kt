@@ -55,6 +55,14 @@ class AddSubscriptionBottomSheet(
         val saveButton = view.findViewById<Button>(R.id.button_save)
         val deleteButton = view.findViewById<Button>(R.id.button_delete)
         val markPaidButton = view.findViewById<Button>(R.id.button_mark_paid)
+        val dragHandle = view.findViewById<View>(R.id.drag_handle)
+
+        dragHandle.setOnClickListener {
+            PreferenceHelper.performHaptics(it, HapticFeedbackConstants.CLOCK_TICK)
+            it.animate().scaleX(0.9f).scaleY(0.9f).setDuration(100).withEndAction {
+                it.animate().scaleX(1f).scaleY(1f).setDuration(100).start()
+            }.start()
+        }
 
         titleTextView.text = if (subscription == null) "Add Subscription" else "Edit Subscription"
 
@@ -225,6 +233,41 @@ class AddSubscriptionBottomSheet(
         }
 
         return view
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val bottomSheet = (dialog as? BottomSheetDialog)?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+        val behavior = (dialog as? BottomSheetDialog)?.behavior
+        val dragHandle = view?.findViewById<View>(R.id.drag_handle)
+
+        if (bottomSheet != null && behavior != null && dragHandle != null) {
+            behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    when (newState) {
+                        BottomSheetBehavior.STATE_EXPANDED -> {
+                            dragHandle.animate().scaleX(1.2f).scaleY(1.2f).setDuration(150)
+                                .withEndAction { dragHandle.animate().scaleX(1f).scaleY(1f).start() }
+                                .start()
+                            PreferenceHelper.performHaptics(dragHandle, HapticFeedbackConstants.CONFIRM)
+                        }
+                        BottomSheetBehavior.STATE_DRAGGING -> {
+                            dragHandle.animate().scaleX(0.9f).scaleY(0.9f).setDuration(100).start()
+                            PreferenceHelper.performHaptics(dragHandle, HapticFeedbackConstants.CLOCK_TICK)
+                        }
+                        BottomSheetBehavior.STATE_SETTLING, BottomSheetBehavior.STATE_COLLAPSED -> {
+                            dragHandle.animate().scaleX(1f).scaleY(1f).setDuration(150).start()
+                        }
+                    }
+                }
+
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                }
+            })
+            
+            // Add scroll listener to provide dragging haptics only on initial start of drag if handled by touch listener
+            // logic above in click listener handles simple touch, but callback handles sheet drag
+        }
     }
 
     private fun clearCurrentFocus() {

@@ -177,6 +177,7 @@
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="32dp"
         android:text="Add New"
+        android:fontFamily="sans-serif-medium"
         app:icon="@drawable/ic_add"
         app:shapeAppearanceOverlay="@style/App.ShapeAppearanceOverlay.Pill" />
 

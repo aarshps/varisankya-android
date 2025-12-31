@@ -1,24 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:fillViewport="true">
+    android:orientation="vertical">
+
+    <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+        android:id="@+id/drag_handle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-12dp"
+        android:fillViewport="true">
 
     <LinearLayout
         android:id="@+id/payment_sheet_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:paddingHorizontal="24dp"
+        android:paddingBottom="24dp">
 
-        <TextView
-            style="@style/TextAppearance.Material3.HeadlineSmall"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            android:text="Payment History" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/TextAppearance.Material3.HeadlineSmall"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Payment History" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_toggle_view"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_show_chart" />
+
+        </LinearLayout>
 
         <FrameLayout
             android:id="@+id/history_container"
@@ -62,6 +90,21 @@
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:gravity="center" />
             </LinearLayout>
+
+            <HorizontalScrollView
+                android:id="@+id/chart_scroll_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                android:visibility="gone">
+
+                <com.hora.varisankya.PaymentHistoryChart
+                    android:id="@+id/payment_chart_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="220dp"
+                    android:paddingTop="24dp"
+                    android:layout_marginBottom="8dp" />
+            </HorizontalScrollView>
 
             <ProgressBar
                 android:id="@+id/progress_history"
@@ -108,6 +151,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16dp"
+            android:textStyle="bold"
             android:text="Mark Paid" />
 
         <Button
@@ -117,6 +161,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:padding="12dp"
+            android:textStyle="bold"
             android:text="Change Schedule" />
 
         <View
@@ -124,4 +169,5 @@
             android:layout_height="24dp" />
 
     </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

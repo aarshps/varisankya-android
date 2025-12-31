@@ -12,7 +12,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
+
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -271,11 +271,6 @@ class MainActivity : BaseActivity() {
                 firebaseAuthWithGoogle(googleIdTokenCredential.idToken)
             } catch (e: Exception) {
                 Log.e("Auth", "Credential Manager Error", e)
-                if (e is NoCredentialException) {
-                    Toast.makeText(this@MainActivity, "No accounts found. Please add a Google account.", Toast.LENGTH_LONG).show()
-                } else if (e is GetCredentialException) {
-                     Toast.makeText(this@MainActivity, "Sign in failed: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
                 updateUI(false)
             }
         }
@@ -291,7 +286,6 @@ class MainActivity : BaseActivity() {
                     loadSubscriptions() // Reload data for new user
                 } else {
                     updateUI(false)
-                    Toast.makeText(this, "Firebase Auth Failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                 }
             }
     }

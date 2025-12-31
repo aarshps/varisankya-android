@@ -13,6 +13,8 @@ object PreferenceHelper {
     private const val KEY_NOTIF_MINUTE = "notification_minute"
     private const val KEY_USE_GOOGLE_FONT = "use_google_font"
     private const val KEY_NOTIF_DAYS = "notification_days"
+    private const val KEY_PAYMENT_VIEW_MODE = "payment_view_mode" // "list" or "chart" (current session)
+    private const val KEY_DEFAULT_PAYMENT_VIEW = "default_payment_view" // "list" or "chart" (user setting)
 
     fun recordUsage(context: Context, preferenceKey: String, value: String) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -76,6 +78,27 @@ object PreferenceHelper {
     fun setNotificationDays(context: Context, days: Int) {
         val prefs = context.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
         prefs.edit().putInt(KEY_NOTIF_DAYS, days).apply()
+    }
+
+    fun getDefaultPaymentView(context: Context): String {
+        val prefs = context.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
+        return prefs.getString(KEY_DEFAULT_PAYMENT_VIEW, "chart") ?: "chart"
+    }
+
+    fun setDefaultPaymentView(context: Context, mode: String) {
+        val prefs = context.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_DEFAULT_PAYMENT_VIEW, mode).apply()
+    }
+
+    fun getPaymentViewMode(context: Context): String {
+        val prefs = context.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
+        // If no session override exists, return the user's default setting
+        return prefs.getString(KEY_PAYMENT_VIEW_MODE, null) ?: getDefaultPaymentView(context)
+    }
+
+    fun setPaymentViewMode(context: Context, mode: String) {
+        val prefs = context.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_PAYMENT_VIEW_MODE, mode).apply()
     }
 
     fun performHaptics(view: View, feedbackConstant: Int) {

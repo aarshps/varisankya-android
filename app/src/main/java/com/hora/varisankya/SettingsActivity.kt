@@ -39,6 +39,26 @@ class SettingsActivity : BaseActivity() {
         setupNotificationDaysSetting()
         setupHapticsToggle()
         setupPrivacyPolicy()
+        setupPaymentViewToggle()
+    }
+
+    private fun setupPaymentViewToggle() {
+        val paymentViewToggleGroup = findViewById<ChipGroup>(R.id.payment_view_toggle_group)
+        val currentDefault = PreferenceHelper.getDefaultPaymentView(this)
+        
+        if (currentDefault == "chart") {
+            paymentViewToggleGroup.check(R.id.view_chart)
+        } else {
+            paymentViewToggleGroup.check(R.id.view_list)
+        }
+
+        paymentViewToggleGroup.setOnCheckedStateChangeListener { group, checkedIds ->
+            if (checkedIds.isNotEmpty()) {
+                PreferenceHelper.performHaptics(group, HapticFeedbackConstants.KEYBOARD_TAP)
+                val mode = if (checkedIds[0] == R.id.view_chart) "chart" else "list"
+                PreferenceHelper.setDefaultPaymentView(this, mode)
+            }
+        }
     }
 
     private fun setupLogoutButton() {

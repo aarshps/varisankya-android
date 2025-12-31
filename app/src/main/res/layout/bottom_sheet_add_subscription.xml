@@ -1,17 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:fillViewport="true">
+    android:orientation="vertical">
+
+    <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+        android:id="@+id/drag_handle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-12dp"
+        android:fillViewport="true">
 
     <LinearLayout
         android:id="@+id/bottom_sheet_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="24dp"
+        android:paddingTop="0dp"
         android:paddingBottom="24dp">
 
         <RelativeLayout
@@ -181,6 +192,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
                     android:padding="16dp"
+                    android:textStyle="bold"
                     android:text="Save Subscription" />
 
                 <LinearLayout
@@ -208,6 +220,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:padding="12dp"
+                        android:textStyle="bold"
                         android:text="Mark as Paid"
                         android:visibility="gone"
                         tools:visibility="visible" />
@@ -217,4 +230,5 @@
         </LinearLayout>
 
     </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

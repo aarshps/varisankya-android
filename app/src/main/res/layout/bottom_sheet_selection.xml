@@ -3,8 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="24dp">
+    android:orientation="vertical">
+
+    <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+        android:id="@+id/drag_handle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-12dp"
+        android:orientation="vertical"
+        android:paddingHorizontal="24dp"
+        android:paddingBottom="24dp">
 
     <TextView
         android:id="@+id/selection_title"
@@ -49,4 +61,5 @@
         </com.google.android.material.chip.ChipGroup>
     </androidx.core.widget.NestedScrollView>
 
+    </LinearLayout>
 </LinearLayout>
