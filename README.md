@@ -13,12 +13,17 @@ Varisankya is a modern, high-performance Android application designed to help us
 *   **Immersive Haptics**: Tactile feedback integrated throughout the core user journey for a responsive touch experience.
 *   **Themed Branding**: Intelligent logo adaptation that responds to system light/dark mode changes.
 
-### 📊 Smart Management
-*   **Comprehensive Tracking**: Effortlessly manage costs, currencies, recurrence cycles, and due dates for all your subscriptions.
+### 📊 Smart Analytics & History
+*   **Premium Charting**: Totally redesigned Payment History featuring a horizontally scrollable **Column Chart**.
+    *   **Visuals**: Thick, rounded bars with "Chip" styled labels for effortless readability.
+    *   **Interactive**: Auto-scrolls to the latest data and scales dynamically.
+*   **Comprehensive Tracking**: Effortlessly manage costs, currencies, recurrence cycles, and due dates.
 *   **Intelligent Search**: Full-screen search interface to quickly locate specific subscriptions.
 *   **Usage-Based Personalization**: The app learns from your inputs, automatically prioritizing your frequently used categories and currencies.
 
 ### 🔔 Notification & Settings
+*   **Unified Settings**: A streamlined Settings experience with "Chart" vs "List" view preferences integrated directly into the Appearance controls.
+*   **Interactive Bottom Sheets**: Tactile drag handles that respond with scale animations and haptic feedback (`CLOCK_TICK`, `CONFIRM`) for a living, breathing UI.
 *   **Customizable Reminders**: Schedule daily notifications at a time that suits your routine using a native Material 3 Time Picker.
 *   **Non-Intrusive Alerts**: Notifications are designed with `IMPORTANCE_LOW` priority to provide timely reminders without cluttering your status bar.
 *   **Dynamic Theming Engine**: Switch themes instantly across the entire app without needing a restart.
