@@ -125,6 +125,7 @@ class UnifiedHistoryActivity : BaseActivity() {
                     onDataReady(emptyList())
                     return@addOnSuccessListener
                 }
+                
 
                 loadingStatus.text = "Analysing Payment History..."
 
@@ -248,17 +249,8 @@ class UnifiedHistoryActivity : BaseActivity() {
             val date = payments.firstOrNull()?.date ?: Date()
             val monthLabel = dateFormatMonth.format(date)
             
-            // Unique label: "Oct $", "Oct ₹" if multiple exist for same month?
-            // Or just "Oct" and let the user see the symbol above the bar.
-            // If we have multiple bars for Oct, we must differentiate them or they look like dupes.
-            // Let's append symbol to label if there are multiple currencies in that month?
-            // Simple approach: Always append symbol
-            // "Oct" bar ($) and "Oct" bar (₹) side by side.
-            
-            val label = monthLabel
-            
             PaymentHistoryChart.ChartItem(
-                label, 
+                monthLabel, 
                 total, 
                 symbol, 
                 ViewLevel.MonthDetail(monthKey, monthLabel, payments)
@@ -338,7 +330,7 @@ class UnifiedHistoryActivity : BaseActivity() {
         if (backButton.visibility != View.VISIBLE) {
             backButton.alpha = 0f
             backButton.visibility = View.VISIBLE
-            backButton.animate().alpha(1f).setDuration(200).start()
+            backButton.animate().alpha(1f).setDuration(200).setInterpolator(androidx.interpolator.view.animation.FastOutSlowInInterpolator()).start()
         }
     }
 
@@ -373,7 +365,7 @@ class UnifiedHistoryActivity : BaseActivity() {
         if (backButton.visibility != View.VISIBLE) {
             backButton.alpha = 0f
             backButton.visibility = View.VISIBLE
-            backButton.animate().alpha(1f).setDuration(200).start()
+            backButton.animate().alpha(1f).setDuration(200).setInterpolator(androidx.interpolator.view.animation.FastOutSlowInInterpolator()).start()
         }
     }
 

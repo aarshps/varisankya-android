@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Varisankya</string>
+    
+    <!-- Shortcuts -->
+    <string name="shortcut_add_new">Add New</string>
+    <string name="shortcut_add_subscription">Add Subscription</string>
+    <string name="shortcut_history">History</string>
+    <string name="shortcut_payment_history">Payment History</string>
 </resources>

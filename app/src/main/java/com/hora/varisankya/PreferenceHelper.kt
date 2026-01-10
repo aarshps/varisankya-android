@@ -16,6 +16,10 @@ object PreferenceHelper {
     private const val KEY_PAYMENT_VIEW_MODE = "payment_view_mode" // "list" or "chart" (current session)
     private const val KEY_DEFAULT_PAYMENT_VIEW = "default_payment_view" // "list" or "chart" (user setting)
 
+    fun customPreference(context: Context, name: String): android.content.SharedPreferences {
+        return context.getSharedPreferences(name, Context.MODE_PRIVATE)
+    }
+
     fun recordUsage(context: Context, preferenceKey: String, value: String) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val currentCount = prefs.getInt("${preferenceKey}_${value}", 0)
@@ -50,6 +54,18 @@ object PreferenceHelper {
     fun setGoogleFontEnabled(context: Context, enabled: Boolean) {
         val prefs = context.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
         prefs.edit().putBoolean(KEY_USE_GOOGLE_FONT, enabled).apply()
+    }
+
+    private const val KEY_BIOMETRIC_ENABLED = "biometric_enabled"
+
+    fun isBiometricEnabled(context: Context): Boolean {
+        val prefs = context.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
+        return prefs.getBoolean(KEY_BIOMETRIC_ENABLED, false)
+    }
+
+    fun setBiometricEnabled(context: Context, enabled: Boolean) {
+        val prefs = context.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
+        prefs.edit().putBoolean(KEY_BIOMETRIC_ENABLED, enabled).apply()
     }
 
     fun getNotificationHour(context: Context): Int {

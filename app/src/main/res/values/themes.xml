@@ -147,4 +147,31 @@
         <item name="chipStrokeWidth">1dp</item>
     </style>
 
+    <!-- Grouped List Item Shapes -->
+    <style name="ShapeAppearance.App.FirstItem" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">@dimen/card_corner_radius_large</item>
+        <item name="cornerSizeTopRight">@dimen/card_corner_radius_large</item>
+        <item name="cornerSizeBottomLeft">@dimen/card_corner_radius_small</item>
+        <item name="cornerSizeBottomRight">@dimen/card_corner_radius_small</item>
+    </style>
+
+    <style name="ShapeAppearance.App.MiddleItem" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/card_corner_radius_small</item>
+    </style>
+
+    <style name="ShapeAppearance.App.LastItem" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">@dimen/card_corner_radius_small</item>
+        <item name="cornerSizeTopRight">@dimen/card_corner_radius_small</item>
+        <item name="cornerSizeBottomLeft">@dimen/card_corner_radius_large</item>
+        <item name="cornerSizeBottomRight">@dimen/card_corner_radius_large</item>
+    </style>
+
+    <style name="ShapeAppearance.App.SingleItem" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/card_corner_radius_large</item>
+    </style>
+
 </resources>

@@ -8,13 +8,13 @@ import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.DecelerateInterpolator
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.color.MaterialColors
+import com.google.android.material.shape.ShapeAppearanceModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -23,6 +23,12 @@ import java.util.concurrent.TimeUnit
 import com.hora.varisankya.R
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
+
+// Pre-calculate shapes to avoid building them on every scroll
+private var singleShape: ShapeAppearanceModel? = null
+private var firstShape: ShapeAppearanceModel? = null
+private var middleShape: ShapeAppearanceModel? = null
+private var lastShape: ShapeAppearanceModel? = null
 
 class SubscriptionAdapter(
     private var subscriptions: List<Subscription>,
@@ -59,6 +65,33 @@ class SubscriptionAdapter(
         }
         holder.amountTextView.text = "$symbol ${formatCost(subscription.cost)}"
         
+        // Dynamic Grouping Logic
+        val cardView = holder.itemView as MaterialCardView
+        val isFirst = position == 0
+        val isLast = position == subscriptions.size - 1
+        val isSingle = isFirst && isLast
+
+        if (singleShape == null) {
+            singleShape = ShapeAppearanceModel.builder(context, R.style.ShapeAppearance_App_SingleItem, 0).build()
+            firstShape = ShapeAppearanceModel.builder(context, R.style.ShapeAppearance_App_FirstItem, 0).build()
+            middleShape = ShapeAppearanceModel.builder(context, R.style.ShapeAppearance_App_MiddleItem, 0).build()
+            lastShape = ShapeAppearanceModel.builder(context, R.style.ShapeAppearance_App_LastItem, 0).build()
+        }
+
+        val shapeModel = when {
+            isSingle -> singleShape
+            isFirst -> firstShape
+            isLast -> lastShape
+            else -> middleShape
+        }
+
+        cardView.shapeAppearanceModel = shapeModel!!
+
+        val layoutParams = cardView.layoutParams as ViewGroup.MarginLayoutParams
+        val bottomMarginRes = if (isLast || isSingle) R.dimen.group_section_spacing else R.dimen.group_item_spacing
+        layoutParams.bottomMargin = context.resources.getDimensionPixelSize(bottomMarginRes)
+        cardView.layoutParams = layoutParams
+
         if (!subscription.active) {
             holder.itemView.alpha = 0.6f
             holder.nameTextView.setTextColor(MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnSurfaceVariant, Color.GRAY))
@@ -133,10 +166,26 @@ class SubscriptionAdapter(
                 }
                 
                 // Animate progress change
-                val animator = ObjectAnimator.ofInt(holder.progressView, "progress", 0, progress)
-                animator.duration = Constants.ANIM_DURATION_LONG // Smooth standard duration
-                animator.interpolator = androidx.interpolator.view.animation.FastOutSlowInInterpolator() // Standard easing
-                animator.start()
+                // Always animate for M3 Motion compliance per user request
+                val progressAnimator = ObjectAnimator.ofInt(holder.progressView, "progress", 0, progress)
+                progressAnimator.duration = 1000 // Smooth standard duration
+                progressAnimator.interpolator = FastOutSlowInInterpolator()
+                progressAnimator.start()
+
+                // Animate Amount Pill Slide-out (from behind status pill)
+                // Initial state: shifted right by ~50dp (approx 150px) to hide behind status pill
+                holder.amountPill.translationX = 150f
+                val amountAnimator = ObjectAnimator.ofFloat(holder.amountPill, "translationX", 0f)
+                amountAnimator.duration = 1000
+                amountAnimator.interpolator = FastOutSlowInInterpolator()
+                amountAnimator.start()
+
+                // Subtle Haptic Feedback on appearance
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    holder.itemView.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                } else {
+                    holder.itemView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                }
 
                 // Resolve Colors
                 val secondary = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSecondary, Color.LTGRAY)
@@ -206,22 +255,9 @@ class SubscriptionAdapter(
     override fun getItemCount() = subscriptions.size
 
     fun updateData(newSubscriptions: List<Subscription>) {
-        val diffCallback = object : DiffUtil.Callback() {
-            override fun getOldListSize(): Int = subscriptions.size
-            override fun getNewListSize(): Int = newSubscriptions.size
-
-            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return subscriptions[oldItemPosition].id == newSubscriptions[newItemPosition].id
-            }
-
-            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return subscriptions[oldItemPosition] == newSubscriptions[newItemPosition]
-            }
-        }
-
-        val diffResult = DiffUtil.calculateDiff(diffCallback)
         this.subscriptions = newSubscriptions
-        diffResult.dispatchUpdatesTo(this)
+        // We do NOT clear animatedItems here to preserve "animates once" behavior across updates
+        notifyDataSetChanged()
     }
 
     private fun formatCost(amount: Double): String {

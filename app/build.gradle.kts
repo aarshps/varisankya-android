@@ -12,8 +12,8 @@ android {
         applicationId = "com.hora.varisankya"
         minSdk = 35
         targetSdk = 36
-        versionCode = 30
-        versionName = "3.0"
+        versionCode = 31
+        versionName = "3.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -59,6 +59,9 @@ dependencies {
     implementation("androidx.credentials:credentials:1.2.0")
     implementation("androidx.credentials:credentials-play-services-auth:1.2.0")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
+    
+    // Biometric
+    implementation("androidx.biometric:biometric:1.2.0-alpha05")
     
     // Images
     implementation("com.squareup.picasso:picasso:2.8")

@@ -18,6 +18,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
+import com.hora.varisankya.receiver.NotificationActionReceiver
+import com.hora.varisankya.widget.UpcomingWidgetProvider
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 
 class SubscriptionNotificationWorker(
     appContext: Context,
@@ -66,7 +70,12 @@ class SubscriptionNotificationWorker(
                         sendNotification(sub, daysLeft)
                     }
                 }
+
             }
+
+            // --- Widget Update Logic ---
+            com.hora.varisankya.widget.WidgetUpdateHelper.updateWidgetData(applicationContext, subscriptions)
+            // ---------------------------
 
             return Result.success()
         } catch (e: Exception) {
@@ -109,12 +118,25 @@ class SubscriptionNotificationWorker(
 
         val message = "${subscription.name}: ${subscription.currency} ${subscription.cost}"
 
+        val markPaidIntent = Intent(context, NotificationActionReceiver::class.java).apply {
+            action = NotificationActionReceiver.ACTION_MARK_PAID
+            putExtra(NotificationActionReceiver.EXTRA_SUB_ID, subscription.id)
+            putExtra(NotificationActionReceiver.EXTRA_NOTIF_ID, notifId)
+        }
+        val markPaidPendingIntent = PendingIntent.getBroadcast(
+            context,
+            notifId,
+            markPaidIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground) // Discrete foreground icon
             .setContentTitle(title)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_LOW) // Keeps it out of the status bar
             .setContentIntent(pendingIntent)
+            .addAction(R.drawable.ic_check, "Mark Paid", markPaidPendingIntent)
             .setAutoCancel(true)
             .setGroup(GROUP_KEY_SUBSCRIPTIONS)
             // No summary notification here to prevent perceived duplicates in the drawer

@@ -41,6 +41,10 @@ import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
+import com.hora.varisankya.util.BiometricAuthManager
+import android.widget.Toast
+import android.widget.FrameLayout
+
 
 class MainActivity : BaseActivity() {
 
@@ -61,19 +65,67 @@ class MainActivity : BaseActivity() {
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var adapter: SubscriptionAdapter
 
+
+
+    // Root layout for content hiding
+    private lateinit var mainContentRoot: View
+    private var isAuthSuccessful = false
+
     private val WEB_CLIENT_ID = "663138385072-bke7f5oflsl2cg0e5maks0ef3n6o113u.apps.googleusercontent.com"
 
     private var lastFirstVisibleItem = -1
     private var isDataLoaded = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         val splashScreen = installSplashScreen()
-        splashScreen.setKeepOnScreenCondition { !isDataLoaded }
+        
+        // Keep splash visible until BOTH biometric auth is successful (if enabled) AND data is loaded
+        splashScreen.setKeepOnScreenCondition { 
+            !isAuthSuccessful || !isDataLoaded 
+        }
         
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Capture root view for content hiding logic
+        mainContentRoot = findViewById(android.R.id.content)
+
+        // Biometric App Lock Check
+        if (PreferenceHelper.isBiometricEnabled(this)) {
+            // Hide content while authenticating - splash screen covers the app
+            mainContentRoot.visibility = View.INVISIBLE
+            
+            // Pre-initialize app in background so it's ready when auth succeeds
+            initializeApp()
+            
+            BiometricAuthManager.authenticate(this,
+                onSuccess = {
+                    isAuthSuccessful = true
+                    
+                    // Haptic feedback on successful unlock
+                    val haptic = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) 
+                        HapticFeedbackConstants.CONFIRM else HapticFeedbackConstants.VIRTUAL_KEY
+                    mainContentRoot.performHapticFeedback(haptic)
+                    
+                    // Show content - splash will dismiss automatically via condition
+                    mainContentRoot.visibility = View.VISIBLE
+                },
+                onError = {
+                    // On error, close the app
+                    finish()
+                }
+            )
+        } else {
+            // No auth needed
+             isAuthSuccessful = true
+             initializeApp()
+        }
+    }
+
+    private fun initializeApp() {
         // Initialize views
+
         // Initialize views
         btnSignIn = findViewById(R.id.btnSignIn)
         profileImage = findViewById(R.id.profile_image)
@@ -105,7 +157,11 @@ class MainActivity : BaseActivity() {
             loadSubscriptions() // Start loading data
         } else {
             isDataLoaded = true
+            isDataLoaded = true
         }
+
+        // Handle App Shortcuts
+        handleIntent(intent)
 
         // Setup Swipe Refresh
         setupSwipeRefresh()
@@ -165,6 +221,7 @@ class MainActivity : BaseActivity() {
         appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
             swipeRefreshLayout.isEnabled = verticalOffset == 0
         }
+
     }
 
     private fun setupSwipeRefresh() {
@@ -253,6 +310,9 @@ class MainActivity : BaseActivity() {
                         // Update existing adapter
                         adapter.updateData(sortedSubscriptions)
                     }
+
+                    // Update Home Screen Widget
+                    com.hora.varisankya.widget.WidgetUpdateHelper.updateWidgetData(applicationContext, subscriptions)
                 }
         } ?: run {
             isDataLoaded = true
@@ -319,6 +379,7 @@ class MainActivity : BaseActivity() {
             appBar.visibility = View.VISIBLE
             fabAddSubscription.visibility = View.VISIBLE
             fabHistory.visibility = View.VISIBLE
+            subscriptionsRecyclerView.visibility = View.VISIBLE
             
             profileImage.visibility = View.VISIBLE
 
@@ -331,6 +392,38 @@ class MainActivity : BaseActivity() {
             subscriptionsRecyclerView.visibility = View.GONE
             fabAddSubscription.visibility = View.GONE
             fabHistory.visibility = View.GONE
+            emptyStateContainer.visibility = View.GONE
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent?) {
+        if (intent == null) return
+        
+        when (intent.action) {
+            ACTION_ADD_SUBSCRIPTION -> {
+                // Delay slightly to allow UI to settle if coming from cold start
+                mainContentRoot.postDelayed({
+                    showAddSubscriptionSheet(null) 
+                }, 300)
+            }
+            ACTION_VIEW_HISTORY -> {
+                mainContentRoot.postDelayed({
+                    val intentHistory = Intent(this, UnifiedHistoryActivity::class.java)
+                    startActivity(intentHistory)
+                }, 300)
+            }
+        }
+    }
+
+
+    companion object {
+        const val ACTION_ADD_SUBSCRIPTION = "com.hora.varisankya.ACTION_ADD_SUBSCRIPTION"
+        const val ACTION_VIEW_HISTORY = "com.hora.varisankya.ACTION_VIEW_HISTORY"
     }
 }

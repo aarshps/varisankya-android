@@ -18,7 +18,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.Math.abs
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.ChipGroup
+import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.slider.Slider
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
@@ -26,6 +28,10 @@ import com.google.firebase.auth.FirebaseAuth
 import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+
+import androidx.biometric.BiometricManager
+import com.google.android.material.materialswitch.MaterialSwitch
+import com.hora.varisankya.util.BiometricAuthManager
 
 class SettingsActivity : BaseActivity() {
 
@@ -48,8 +54,48 @@ class SettingsActivity : BaseActivity() {
         setupNotificationDaysSetting()
         setupHapticsToggle()
         setupPrivacyPolicy()
-        setupPrivacyPolicy()
         setupScrollHaptics()
+        setupBiometricToggle()
+        setupCardGrouping()
+    }
+    
+    private fun setupBiometricToggle() {
+        val biometricSwitch = findViewById<MaterialSwitch>(R.id.switch_biometric)
+        val context = this
+        
+        // Initial state
+        biometricSwitch.isChecked = PreferenceHelper.isBiometricEnabled(context)
+        
+        // Listen for changes
+        // Use setOnClickListener instead of setOnCheckedChangeListener to intercept the UX
+        biometricSwitch.setOnClickListener {
+            val isTurningOn = biometricSwitch.isChecked
+            
+            PreferenceHelper.performHaptics(biometricSwitch, HapticFeedbackConstants.CLOCK_TICK)
+            
+            if (isTurningOn) {
+                // If turning ON, must verify compatibility and then authenticate to confirm
+                if (BiometricAuthManager.isBiometricAvailable(context)) {
+                    // Try to authenticate to prove they can use it
+                    BiometricAuthManager.authenticate(this,
+                        onSuccess = {
+                            // Success: Actually enable it
+                            PreferenceHelper.setBiometricEnabled(context, true)
+                        },
+                        onError = {
+                            // Fail: Revert switch
+                            biometricSwitch.isChecked = false
+                        }
+                    )
+                } else {
+                    // Biometrics not available
+                    biometricSwitch.isChecked = false
+                }
+            } else {
+                // Turning OFF: Just disable it (or could auth here too, but usually simple off is okay)
+                PreferenceHelper.setBiometricEnabled(context, false)
+            }
+        }
     }
 
     private fun setupScrollHaptics() {
@@ -62,6 +108,31 @@ class SettingsActivity : BaseActivity() {
                 lastScrollY = scrollY
             }
         })
+    }
+
+    private fun setupCardGrouping() {
+        val cards = listOf(
+            findViewById<MaterialCardView>(R.id.card_security),
+            findViewById<MaterialCardView>(R.id.card_appearance),
+            findViewById<MaterialCardView>(R.id.card_typography),
+            findViewById<MaterialCardView>(R.id.card_notifications),
+            findViewById<MaterialCardView>(R.id.card_haptics),
+            findViewById<MaterialCardView>(R.id.card_legal)
+        )
+
+        cards.forEachIndexed { index, card ->
+            val isFirst = index == 0
+            val isLast = index == cards.size - 1
+            val isSingle = cards.size == 1
+
+            val styleRes = when {
+                isSingle -> R.style.ShapeAppearance_App_SingleItem
+                isFirst -> R.style.ShapeAppearance_App_FirstItem
+                isLast -> R.style.ShapeAppearance_App_LastItem
+                else -> R.style.ShapeAppearance_App_MiddleItem
+            }
+            card.shapeAppearanceModel = ShapeAppearanceModel.builder(this, styleRes, 0).build()
+        }
     }
 
 

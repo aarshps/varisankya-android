@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="card_corner_radius_large">28dp</dimen>
+    <dimen name="card_corner_radius_small">4dp</dimen>
+    <dimen name="group_item_spacing">2dp</dimen>
+    <dimen name="group_section_spacing">12dp</dimen>
+    <dimen name="card_margin_horizontal">16dp</dimen>
+    <dimen name="card_padding_horizontal">20dp</dimen>
+    <dimen name="card_padding_vertical">20dp</dimen>
+</resources>

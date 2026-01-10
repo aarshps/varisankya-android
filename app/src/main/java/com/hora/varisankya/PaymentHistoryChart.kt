@@ -12,6 +12,8 @@ import com.google.android.material.color.MaterialColors
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
+import com.hora.varisankya.util.ThemeHelper
 import kotlin.math.max
 
 class PaymentHistoryChart @JvmOverloads constructor(
@@ -34,6 +36,7 @@ class PaymentHistoryChart @JvmOverloads constructor(
     private val barPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
     }
+
 
     private val labelBgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
@@ -116,12 +119,15 @@ class PaymentHistoryChart @JvmOverloads constructor(
         
         val availableHeight = height - chartPaddingTop - chartPaddingBottom
 
-        // Resolve Colors
-        val colorPrimary = MaterialColors.getColor(context, android.R.attr.colorPrimary, Color.BLUE)
-        val colorSecondaryContainer = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSecondaryContainer, Color.LTGRAY)
-        val colorOnSecondaryContainer = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnSecondaryContainer, Color.BLACK)
+        // Resolve Colors via ThemeHelper
+        val colorPrimary = ThemeHelper.getPrimaryColor(context)
+        val colorTertiary = ThemeHelper.getTertiaryColor(context)
+        val resolvedErrorColor = ThemeHelper.getErrorColor(context)
+
+        // M3 colors
+        val colorSecondaryContainer = ThemeHelper.getSecondaryContainerColor(context)
+        val colorOnSecondaryContainer = ThemeHelper.getOnSecondaryContainerColor(context)
         
-        barPaint.color = colorPrimary
         datePaint.color = colorOnSecondaryContainer
         labelBgPaint.color = colorSecondaryContainer
         textPaint.color = colorOnSecondaryContainer
@@ -145,7 +151,8 @@ class PaymentHistoryChart @JvmOverloads constructor(
             val rawAmount = item.value.toFloat()
             val symbol = item.symbol
             
-            // Animation Logic
+            // Use Primary color for all bars
+            barPaint.color = colorPrimary
             val amount = if (isAnimating) rawAmount * animationProgress else rawAmount
 
             // Calculate Position

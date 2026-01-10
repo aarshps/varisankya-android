@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="add_subscription"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_add"
+        android:shortcutShortLabel="@string/shortcut_add_new"
+        android:shortcutLongLabel="@string/shortcut_add_subscription">
+        <intent
+            android:action="com.hora.varisankya.ACTION_ADD_SUBSCRIPTION"
+            android:targetPackage="com.hora.varisankya"
+            android:targetClass="com.hora.varisankya.MainActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="payment_history"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_history"
+        android:shortcutShortLabel="@string/shortcut_history"
+        android:shortcutLongLabel="@string/shortcut_payment_history">
+        <intent
+            android:action="com.hora.varisankya.ACTION_VIEW_HISTORY"
+            android:targetPackage="com.hora.varisankya"
+            android:targetClass="com.hora.varisankya.MainActivity" />
+    </shortcut>
+</shortcuts>
