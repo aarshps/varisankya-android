@@ -62,10 +62,9 @@ class SelectionBottomSheet(
             // Ensure spacing is visually balanced by disabling automatic vertical expansion
             chip.setEnsureMinTouchTargetSize(false)
 
-            // M3E Styling: Selected = Less Rounded (16dp), Unselected = Fully Rounded (Pill/50dp)
-            // Using 16dp for "less rounded" (approx 44px on xxhdpi) and 100dp for full pill
+            // M3E Styling: Selected = Less Rounded (6dp), Unselected = Fully Rounded (Pill/50dp)
             val r = requireContext().resources.displayMetrics.density
-            val selectedRadius = 12f * r
+            val selectedRadius = 6f * r  // Less rounded when selected
             val unselectedRadius = 100f * r
             
             chip.shapeAppearanceModel = chip.shapeAppearanceModel.toBuilder()

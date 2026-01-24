@@ -151,8 +151,8 @@ class PaymentHistoryChart @JvmOverloads constructor(
             val rawAmount = item.value.toFloat()
             val symbol = item.symbol
             
-            // Use Primary color for all bars
-            barPaint.color = colorPrimary
+            // Use Tertiary color (20% contrast-reduced) for all bars
+            barPaint.color = colorTertiary
             val amount = if (isAnimating) rawAmount * animationProgress else rawAmount
 
             // Calculate Position

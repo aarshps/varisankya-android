@@ -22,6 +22,8 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.slider.Slider
+import com.google.android.material.chip.Chip
+import android.content.res.ColorStateList
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import com.google.firebase.auth.FirebaseAuth
@@ -135,22 +137,39 @@ class SettingsActivity : BaseActivity() {
         }
     }
 
-
-
-    private fun updateChipShape(chip: com.google.android.material.chip.Chip) {
-        val r = resources.displayMetrics.density
-        val selectedRadius = 12f * r
-        val unselectedRadius = 100f * r
-        
-        chip.shapeAppearanceModel = chip.shapeAppearanceModel.toBuilder()
-            .setAllCornerSizes(if (chip.isChecked) selectedRadius else unselectedRadius)
-            .build()
-    }
-
     private fun updateGroupShapes(group: ChipGroup) {
         for (i in 0 until group.childCount) {
             val chip = group.getChildAt(i) as? com.google.android.material.chip.Chip
             chip?.let { updateChipShape(it) }
+        }
+    }
+    
+    private fun updateChipShape(chip: com.google.android.material.chip.Chip) {
+        val r = resources.displayMetrics.density
+        val selectedRadius = 6f * r  // Less rounded when selected
+        val unselectedRadius = 100f * r  // Fully pill-shaped
+        
+        chip.shapeAppearanceModel = chip.shapeAppearanceModel.toBuilder()
+            .setAllCornerSizes(if (chip.isChecked) selectedRadius else unselectedRadius)
+            .build()
+        
+        // Apply M3 Dynamic Colors using ThemeHelper
+        if (chip.isChecked) {
+            chip.chipBackgroundColor = android.content.res.ColorStateList.valueOf(
+                com.hora.varisankya.util.ThemeHelper.getTertiaryColor(this)
+            )
+            chip.setTextColor(com.hora.varisankya.util.ThemeHelper.getOnTertiaryColor(this))
+            chip.chipIconTint = android.content.res.ColorStateList.valueOf(
+                com.hora.varisankya.util.ThemeHelper.getOnTertiaryColor(this)
+            )
+        } else {
+            chip.chipBackgroundColor = android.content.res.ColorStateList.valueOf(
+                com.hora.varisankya.util.ThemeHelper.getSurfaceVariantColor(this)
+            )
+            chip.setTextColor(com.hora.varisankya.util.ThemeHelper.getOnSurfaceColor(this))
+            chip.chipIconTint = android.content.res.ColorStateList.valueOf(
+                com.hora.varisankya.util.ThemeHelper.getOnSurfaceColor(this)
+            )
         }
     }
 
@@ -233,12 +252,18 @@ class SettingsActivity : BaseActivity() {
 
     private fun setupNotificationTimeSetting() {
         val timeSettingLayout = findViewById<View>(R.id.notification_time_setting)
-        val timeTextView = findViewById<TextView>(R.id.notification_time_text)
+        val timeChip = findViewById<Chip>(R.id.notification_time_text)
 
         val currentHour = PreferenceHelper.getNotificationHour(this)
         val currentMinute = PreferenceHelper.getNotificationMinute(this)
         
-        updateTimeText(timeTextView, currentHour, currentMinute)
+        updateTimeText(timeChip, currentHour, currentMinute)
+        
+        // Apply 20% contrast-reduced Tertiary color (consistent with chips)
+        val tertiaryColor = com.hora.varisankya.util.ThemeHelper.getTertiaryColor(this)
+        val onTertiaryColor = com.hora.varisankya.util.ThemeHelper.getOnTertiaryColor(this)
+        timeChip.chipBackgroundColor = ColorStateList.valueOf(tertiaryColor)
+        timeChip.setTextColor(onTertiaryColor)
 
         timeSettingLayout.setOnClickListener {
             PreferenceHelper.performHaptics(it, HapticFeedbackConstants.CLOCK_TICK)
@@ -252,7 +277,7 @@ class SettingsActivity : BaseActivity() {
 
             picker.addOnPositiveButtonClickListener {
                 PreferenceHelper.setNotificationTime(this, picker.hour, picker.minute)
-                updateTimeText(timeTextView, picker.hour, picker.minute)
+                updateTimeText(timeChip, picker.hour, picker.minute)
                 rescheduleNotifications()
             }
 
@@ -268,6 +293,11 @@ class SettingsActivity : BaseActivity() {
         // Ensure slider value is within bounds (0-10)
         slider.value = currentDays.toFloat().coerceIn(0f, 10f)
         label.text = "$currentDays days before"
+        
+        // Apply 20% contrast-reduced Tertiary color (consistent with app hierarchy)
+        val tertiaryColor = com.hora.varisankya.util.ThemeHelper.getTertiaryColor(this)
+        slider.thumbTintList = ColorStateList.valueOf(tertiaryColor)
+        slider.trackActiveTintList = ColorStateList.valueOf(tertiaryColor)
 
         slider.addOnChangeListener { _, value, fromUser ->
             if (fromUser) {

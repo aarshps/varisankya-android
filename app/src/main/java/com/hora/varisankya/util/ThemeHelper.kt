@@ -2,18 +2,22 @@ package com.hora.varisankya.util
 
 import android.content.Context
 import android.graphics.Color
+import androidx.core.graphics.ColorUtils
 import com.google.android.material.color.MaterialColors
 
-
-
 object ThemeHelper {
+    
+    // Contrast reduction factor (20% = 0.20f blend towards surface)
+    private const val CONTRAST_REDUCTION = 0.20f
 
     fun getPrimaryColor(context: Context): Int {
-        return resolveColor(context, "colorPrimary", Color.BLUE)
+        val raw = resolveColor(context, "colorPrimary", Color.BLUE)
+        return blendTowardsSurface(context, raw, CONTRAST_REDUCTION)
     }
 
     fun getTertiaryColor(context: Context): Int {
-        return resolveColor(context, "colorTertiary", Color.MAGENTA)
+        val raw = resolveColor(context, "colorTertiary", Color.MAGENTA)
+        return blendTowardsSurface(context, raw, CONTRAST_REDUCTION)
     }
 
     fun getErrorColor(context: Context): Int {
@@ -33,11 +37,13 @@ object ThemeHelper {
     }
     
     fun getOnPrimaryColor(context: Context): Int {
-        return resolveColor(context, "colorOnPrimary", Color.WHITE)
+        val raw = resolveColor(context, "colorOnPrimary", Color.WHITE)
+        return blendTowardsSurface(context, raw, CONTRAST_REDUCTION)
     }
     
     fun getOnTertiaryColor(context: Context): Int {
-        return resolveColor(context, "colorOnTertiary", Color.WHITE)
+        val raw = resolveColor(context, "colorOnTertiary", Color.WHITE)
+        return blendTowardsSurface(context, raw, CONTRAST_REDUCTION)
     }
     
     fun getSurfaceVariantColor(context: Context): Int {
@@ -54,6 +60,15 @@ object ThemeHelper {
     
     fun getOutlineVariantColor(context: Context): Int {
         return resolveColor(context, "colorOutlineVariant", Color.LTGRAY)
+    }
+    
+    /**
+     * Blends a color towards the surface color by the given ratio.
+     * ratio = 0.0 means no change, ratio = 1.0 means fully surface color.
+     */
+    private fun blendTowardsSurface(context: Context, color: Int, ratio: Float): Int {
+        val surface = getSurfaceColor(context)
+        return ColorUtils.blendARGB(color, surface, ratio)
     }
 
     private fun resolveColor(context: Context, attrName: String, defaultColor: Int): Int {

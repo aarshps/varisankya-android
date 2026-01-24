@@ -115,7 +115,7 @@ class SearchActivity : BaseActivity() {
 
     private fun updateChipShape(chip: Chip) {
         val r = resources.displayMetrics.density
-        val selectedRadius = 12f * r
+        val selectedRadius = 6f * r  // Less rounded when selected
         val unselectedRadius = 100f * r
         
         chip.shapeAppearanceModel = chip.shapeAppearanceModel.toBuilder()

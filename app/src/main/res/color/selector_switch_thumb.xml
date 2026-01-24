@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Checked: OnTertiaryContainer for max contrast against TertiaryContainer track -->
+    <item android:color="?attr/colorOnTertiaryContainer" android:state_checked="true"/>
+    <!-- Unchecked: Outline -->
+    <item android:color="?attr/colorOutline"/>
+</selector>

@@ -145,10 +145,24 @@
     <style name="App.Button.Success" parent="Widget.Material3.Button.TonalButton">
         <!-- Uses default secondary/tertiary colors -->
     </style>
+    
+    <!-- MaterialSwitch Style with Tertiary Color (matches chips) -->
+    <style name="Widget.App.Switch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+        <item name="thumbTint">@color/selector_switch_thumb</item>
+        <item name="trackTint">@color/selector_switch_track</item>
+    </style>
+    
+    <!-- Filled Button with Tertiary Color -->
+    <style name="Widget.App.Button.Tertiary" parent="Widget.Material3.Button">
+        <item name="backgroundTint">?attr/colorTertiary</item>
+        <item name="android:textColor">?attr/colorOnTertiary</item>
+    </style>
 
-    <!-- Slider Style with Dynamic Colors -->
+    <!-- Slider Style with Dynamic Colors (Tier 2 - Tertiary) -->
     <style name="Widget.App.Slider" parent="Widget.Material3.Slider">
         <item name="labelStyle">@style/Widget.App.Slider.Tooltip</item>
+        <item name="thumbColor">?attr/colorTertiary</item>
+        <item name="trackColorActive">?attr/colorTertiary</item>
     </style>
 
     <style name="Widget.App.Slider.Tooltip" parent="Widget.Material3.Tooltip">
