@@ -55,22 +55,23 @@ class SubscriptionNotificationWorker(
 
             subscriptions.forEach { sub ->
                 sub.dueDate?.let { dueDate ->
-                    val dueCal = Calendar.getInstance()
-                    dueCal.time = dueDate
-                    dueCal.set(Calendar.HOUR_OF_DAY, 0)
-                    dueCal.set(Calendar.MINUTE, 0)
-                    dueCal.set(Calendar.SECOND, 0)
-                    dueCal.set(Calendar.MILLISECOND, 0)
+                    // Convert stored Date (UTC Instant) to LocalDate in UTC
+                    // We treat the stored date as a "canonical date" irrespective of time
+                    val dueInstant = dueDate.toInstant()
+                    val dueZoned = dueInstant.atZone(java.time.ZoneId.of("UTC"))
+                    val dueLocalDate = dueZoned.toLocalDate()
 
-                    val diff = dueCal.timeInMillis - today.timeInMillis
-                    val daysLeft = TimeUnit.MILLISECONDS.toDays(diff).toInt()
+                    // Get today's local date
+                    val todayLocalDate = java.time.LocalDate.now()
+
+                    // Calculate days remaining
+                    val daysLeft = java.time.temporal.ChronoUnit.DAYS.between(todayLocalDate, dueLocalDate).toInt()
 
                     // Notify if due today or in the next N days (user preference)
                     if (daysLeft in 0..notificationWindow) {
                         sendNotification(sub, daysLeft)
                     }
                 }
-
             }
 
             // --- Widget Update Logic ---

@@ -137,6 +137,23 @@ class SettingsActivity : BaseActivity() {
 
 
 
+    private fun updateChipShape(chip: com.google.android.material.chip.Chip) {
+        val r = resources.displayMetrics.density
+        val selectedRadius = 12f * r
+        val unselectedRadius = 100f * r
+        
+        chip.shapeAppearanceModel = chip.shapeAppearanceModel.toBuilder()
+            .setAllCornerSizes(if (chip.isChecked) selectedRadius else unselectedRadius)
+            .build()
+    }
+
+    private fun updateGroupShapes(group: ChipGroup) {
+        for (i in 0 until group.childCount) {
+            val chip = group.getChildAt(i) as? com.google.android.material.chip.Chip
+            chip?.let { updateChipShape(it) }
+        }
+    }
+
     private fun setupLogoutButton() {
         val logoutButton = findViewById<View>(R.id.logout_button)
         logoutButton.setOnClickListener {
@@ -169,6 +186,7 @@ class SettingsActivity : BaseActivity() {
             AppCompatDelegate.MODE_NIGHT_YES -> themeToggleGroup.check(R.id.theme_dark)
             else -> themeToggleGroup.check(R.id.theme_device)
         }
+        updateGroupShapes(themeToggleGroup)
 
         themeToggleGroup.setOnCheckedStateChangeListener { group, checkedIds ->
             if (checkedIds.isNotEmpty()) {
@@ -178,6 +196,7 @@ class SettingsActivity : BaseActivity() {
                     R.id.theme_dark -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                     R.id.theme_device -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
                 }
+                updateGroupShapes(group)
             }
         }
     }
@@ -190,6 +209,7 @@ class SettingsActivity : BaseActivity() {
         } else {
             fontToggleGroup.check(R.id.font_system)
         }
+        updateGroupShapes(fontToggleGroup)
 
         fontToggleGroup.setOnCheckedStateChangeListener { group, checkedIds ->
             if (checkedIds.isNotEmpty()) {
@@ -206,6 +226,7 @@ class SettingsActivity : BaseActivity() {
                     startActivity(intent)
                     overrideActivityTransition(android.app.Activity.OVERRIDE_TRANSITION_OPEN, android.R.anim.fade_in, android.R.anim.fade_out)
                 }
+                updateGroupShapes(group)
             }
         }
     }
@@ -318,12 +339,14 @@ class SettingsActivity : BaseActivity() {
         } else {
             hapticsToggleGroup.check(R.id.haptics_off)
         }
+        updateGroupShapes(hapticsToggleGroup)
         
         hapticsToggleGroup.setOnCheckedStateChangeListener { group, checkedIds ->
             if (checkedIds.isNotEmpty()) {
                 PreferenceHelper.performHaptics(group, HapticFeedbackConstants.KEYBOARD_TAP)
                 val enableHaptics = checkedIds[0] == R.id.haptics_on
                 PreferenceHelper.setHapticsEnabled(this, enableHaptics)
+                updateGroupShapes(group)
             }
         }
     }

@@ -163,9 +163,11 @@ class PaymentBottomSheet(
     }
 
     private fun calculateNextDueDate(fromDate: Date, recurrence: String): Date? {
-        val cal = Calendar.getInstance()
+        // Use UTC to match MaterialDatePicker and avoid DST shifts/timezone drift
+        val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
         cal.time = fromDate
-        cal.set(Calendar.HOUR_OF_DAY, 12)
+        // Reset to Midnight UTC
+        cal.set(Calendar.HOUR_OF_DAY, 0)
         cal.set(Calendar.MINUTE, 0)
         cal.set(Calendar.SECOND, 0)
         cal.set(Calendar.MILLISECOND, 0)

@@ -37,6 +37,21 @@
         <item name="appBarLayoutStyle">@style/Widget.App.AppBarLayout</item>
         <item name="toolbarStyle">@style/Widget.App.Toolbar</item>
         
+        <!-- Semantic M3 Contrast Tokens (Authentic Tiered Mapping) -->
+        <item name="vibrant">?attr/colorPrimary</item>
+        <item name="vibrantOn">?attr/colorOnPrimary</item>
+        
+        <item name="alert">?attr/colorTertiary</item>
+        <item name="alertOn">?attr/colorOnTertiary</item>
+        
+        <item name="medium">?attr/colorSecondaryContainer</item>
+        <item name="mediumOn">?attr/colorOnSecondaryContainer</item>
+        
+        <item name="low">?attr/colorSurfaceVariant</item>
+        <item name="lowOn">?attr/colorOnSurfaceVariant</item>
+
+        <item name="neutral">?attr/colorOutlineVariant</item>
+
         <!-- Global Chip Style -->
         <item name="chipStyle">@style/Widget.App.Chip</item>
     </style>
@@ -141,10 +156,14 @@
         <item name="android:textColor">?attr/colorSurface</item>
     </style>
 
-    <!-- Unified Chip Style with Standard Borders -->
+    <!-- Unified Chip Style with Standard Borders and Higher Contrast Background -->
     <style name="Widget.App.Chip" parent="Widget.Material3.Chip.Filter">
         <item name="chipStrokeColor">@color/chip_stroke_app</item>
         <item name="chipStrokeWidth">1dp</item>
+        <!-- High Contrast: 'low' (Grey) for unselected, 'alert' for selected -->
+        <item name="chipBackgroundColor">@color/selector_chip_background_high_contrast</item>
+        <item name="android:textColor">@color/selector_chip_text_high_contrast</item>
+        <item name="chipIconTint">@color/selector_chip_text_high_contrast</item>
     </style>
 
     <!-- Grouped List Item Shapes -->

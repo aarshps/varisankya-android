@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.HapticFeedbackConstants
 import android.view.View
+import androidx.core.view.isVisible
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -111,12 +112,28 @@ class UnifiedHistoryActivity : BaseActivity() {
         val contentContainer = findViewById<View>(R.id.content_container)
         
         // Hide EVERYTHING except loading
-        loadingContainer.visibility = View.VISIBLE
-        contentContainer.visibility = View.GONE
+        loadingContainer.isVisible = true
+        contentContainer.isVisible = false
         
-        loadingStatus.text = "Syncing Subscriptions..."
+        loadingStatus.text = "Syncing History..."
         
-        // Step 1: Fetch all subscriptions
+        // OPTIMIZATION: Use Collection Group Query to fetch ALL "payments" sub-collections 
+        // that match the userId in a SINGLE network request.
+        firestore.collectionGroup("payments")
+            .whereEqualTo("userId", userId)
+            .get()
+            .addOnSuccessListener { snapshots ->
+                val allFetchedPayments = snapshots.toObjects(PaymentRecord::class.java)
+                processPayments(allFetchedPayments)
+            }
+            .addOnFailureListener { e ->
+                // Fallback to legacy method silently if index is missing
+                loadAllPaymentsLegacy(userId)
+            }
+    }
+
+    private fun loadAllPaymentsLegacy(userId: String) {
+         // Step 1: Fetch all subscriptions
         firestore.collection("users").document(userId).collection("subscriptions")
             .get()
             .addOnSuccessListener { subSnapshots ->
@@ -125,7 +142,6 @@ class UnifiedHistoryActivity : BaseActivity() {
                     onDataReady(emptyList())
                     return@addOnSuccessListener
                 }
-                
 
                 loadingStatus.text = "Analysing Payment History..."
 
@@ -149,31 +165,34 @@ class UnifiedHistoryActivity : BaseActivity() {
                 com.google.android.gms.tasks.Tasks.whenAllSuccess<List<PaymentRecord>>(paymentTasks)
                     .addOnSuccessListener { paymentLists ->
                         val allFetchedPayments = paymentLists.flatten()
-                        
-                        // Check for invalid records (missing subscription name)
-                        val invalidPayments = allFetchedPayments.filter { it.subscriptionName.isNullOrEmpty() }
-                        val validPayments = allFetchedPayments.filter { !it.subscriptionName.isNullOrEmpty() }
-                        
-                        // Always load valid content so it's visible behind the sheet
-                        onDataReady(validPayments)
-                        
-                        if (invalidPayments.isNotEmpty()) {
-                            val cleanupSheet = CleanupBottomSheet(invalidPayments.size) {
-                                deleteInvalidRecords(invalidPayments)
-                            }
-                            cleanupSheet.isCancelable = true
-                            cleanupSheet.show(supportFragmentManager, "CleanupBottomSheet")
-                        }
+                        processPayments(allFetchedPayments)
                     }
                     .addOnFailureListener { e ->
-                        loadingContainer.visibility = View.GONE
+                        loadingContainer.isVisible = false
                         e.printStackTrace()
                     }
             }
             .addOnFailureListener { e ->
-                loadingContainer.visibility = View.GONE
+                loadingContainer.isVisible = false
                 e.printStackTrace()
             }
+    }
+
+    private fun processPayments(allFetchedPayments: List<PaymentRecord>) {
+        // Check for invalid records (missing subscription name)
+        val invalidPayments = allFetchedPayments.filter { it.subscriptionName.isNullOrEmpty() }
+        val validPayments = allFetchedPayments.filter { !it.subscriptionName.isNullOrEmpty() }
+        
+        // Always load valid content so it's visible behind the sheet
+        onDataReady(validPayments)
+        
+        if (invalidPayments.isNotEmpty()) {
+            val cleanupSheet = CleanupBottomSheet(invalidPayments.size) {
+                deleteInvalidRecords(invalidPayments)
+            }
+            cleanupSheet.isCancelable = true
+            cleanupSheet.show(supportFragmentManager, "CleanupBottomSheet")
+        }
     }
 
     private fun onDataReady(payments: List<PaymentRecord>) {
@@ -184,18 +203,19 @@ class UnifiedHistoryActivity : BaseActivity() {
         
         // Prepare content
         contentContainer.alpha = 0f
-        contentContainer.visibility = View.VISIBLE
+        contentContainer.isVisible = true
         
         // Show/Hide Empty State
+        // Show/Hide Empty State
         if (allPayments.isEmpty()) {
-            noHistoryContainer.visibility = View.VISIBLE
-            contentContainer.visibility = View.GONE
+            noHistoryContainer.isVisible = true
+            contentContainer.isVisible = false
         } else {
-            noHistoryContainer.visibility = View.GONE
-            contentContainer.visibility = View.VISIBLE
-            findViewById<View>(R.id.chart_scroll_container).visibility = View.VISIBLE
-            chartView.visibility = View.VISIBLE
-            recyclerView.visibility = View.VISIBLE
+            noHistoryContainer.isVisible = false
+            contentContainer.isVisible = true
+            findViewById<View>(R.id.chart_scroll_container).isVisible = true
+            chartView.isVisible = true
+            recyclerView.isVisible = true
         }
 
         loadingContainer.animate()
@@ -203,7 +223,7 @@ class UnifiedHistoryActivity : BaseActivity() {
             .setDuration(Constants.ANIM_DURATION_MEDIUM)
             .setInterpolator(androidx.interpolator.view.animation.FastOutSlowInInterpolator())
             .withEndAction { 
-                loadingContainer.visibility = View.GONE 
+                loadingContainer.isVisible = false 
                 loadingContainer.alpha = 1f // Reset for next time if needed
             }
             .start()
@@ -261,12 +281,12 @@ class UnifiedHistoryActivity : BaseActivity() {
         updateList(allPayments)
         
         // Hide Back Button
-        if (backButton.visibility == View.VISIBLE) {
+        if (backButton.isVisible) {
             backButton.animate().alpha(0f)
                 .setDuration(Constants.ANIM_DURATION_SHORT)
                 .setInterpolator(androidx.interpolator.view.animation.FastOutLinearInInterpolator())
                 .withEndAction {
-                    backButton.visibility = View.GONE
+                    backButton.isVisible = false
                 }.start()
         }
 
@@ -327,9 +347,9 @@ class UnifiedHistoryActivity : BaseActivity() {
         scrollToEnd()
         
         // Show Back Button
-        if (backButton.visibility != View.VISIBLE) {
+        if (!backButton.isVisible) {
             backButton.alpha = 0f
-            backButton.visibility = View.VISIBLE
+            backButton.isVisible = true
             backButton.animate().alpha(1f).setDuration(200).setInterpolator(androidx.interpolator.view.animation.FastOutSlowInInterpolator()).start()
         }
     }
@@ -337,7 +357,7 @@ class UnifiedHistoryActivity : BaseActivity() {
     private fun showDayDetail(level: ViewLevel.DayDetail) {
         currentLevel = level
 
-        val groupedSub = level.payments.groupBy { "${it.subscriptionName ?: "Unknown"}|${it.currency}" }
+        val groupedSub = level.payments.groupBy { "${it.subscriptionName}|${it.currency}" }
         
         val chartData = groupedSub.map { entry ->
             val parts = entry.key.split("|")
@@ -362,9 +382,9 @@ class UnifiedHistoryActivity : BaseActivity() {
         scrollToEnd()
 
         // Show Back Button
-        if (backButton.visibility != View.VISIBLE) {
+        if (!backButton.isVisible) {
             backButton.alpha = 0f
-            backButton.visibility = View.VISIBLE
+            backButton.isVisible = true
             backButton.animate().alpha(1f).setDuration(200).setInterpolator(androidx.interpolator.view.animation.FastOutSlowInInterpolator()).start()
         }
     }
@@ -430,7 +450,7 @@ class UnifiedHistoryActivity : BaseActivity() {
     }
 
     private fun deleteInvalidRecords(invalidPayments: List<PaymentRecord>) {
-        loadingContainer.visibility = View.VISIBLE
+        loadingContainer.isVisible = true
         loadingStatus.text = "Cleaning up..."
         
         val batch = firestore.batch()
@@ -456,7 +476,7 @@ class UnifiedHistoryActivity : BaseActivity() {
                 loadAllPayments()
             }
             .addOnFailureListener { e ->
-                loadingContainer.visibility = View.GONE
+                loadingContainer.isVisible = false
                 loadAllPayments()
             }
     }

@@ -19,10 +19,11 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.TimeUnit
-// Explicitly using the app's R class to access all merged attributes
-import com.hora.varisankya.R
+// Explicitly using the app's R class is not needed when in the same package
+// import com.hora.varisankya.R
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
+import com.hora.varisankya.util.ThemeHelper
 
 // Pre-calculate shapes to avoid building them on every scroll
 private var singleShape: ShapeAppearanceModel? = null
@@ -100,17 +101,16 @@ class SubscriptionAdapter(
             holder.daysLeftTextView.text = "Inactive"
             holder.progressView.visibility = View.GONE
             
-            // Inactive style
-            val surfaceContainer = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSurfaceContainerHigh, Color.LTGRAY)
-            val onSurfaceVariant = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnSurfaceVariant, Color.GRAY)
-            val outlineVariant = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOutlineVariant, Color.LTGRAY)
+            // Inactive style: SurfaceVariant (Direct M3 Dynamic via ThemeHelper)
+            val surfaceVariant = ThemeHelper.getSurfaceVariantColor(context)
+            val onSurfaceVariant = ThemeHelper.getOnSurfaceVariantColor(context)
             
-            holder.pillContainer.setCardBackgroundColor(surfaceContainer)
+            holder.pillContainer.setCardBackgroundColor(surfaceVariant)
             holder.pillContainer.strokeWidth = 0
             holder.daysLeftTextView.setTextColor(onSurfaceVariant)
             
             // Sync Amount Pill & Patch
-            holder.amountPill.setCardBackgroundColor(surfaceContainer)
+            holder.amountPill.setCardBackgroundColor(surfaceVariant)
             holder.amountPill.strokeWidth = 0
             
             // Sync Text Color
@@ -187,56 +187,56 @@ class SubscriptionAdapter(
                     holder.itemView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
                 }
 
-                // Resolve Colors
-                val secondary = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSecondary, Color.LTGRAY)
-                val outlineVariant = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOutlineVariant, Color.LTGRAY)
-                
-                val secondaryContainer = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSecondaryContainer, Color.LTGRAY)
-                val onSecondaryContainer = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnSecondaryContainer, Color.BLACK)
-                
-                val surfaceContainerHigh = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSurfaceContainerHigh, Color.LTGRAY)
-                val onSurface = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnSurface, Color.BLACK)
+                // Resolve Colors DIRECTLY from M3 Dynamic Theme using ThemeHelper
+                val primary = ThemeHelper.getPrimaryColor(context)
+                val onPrimary = ThemeHelper.getOnPrimaryColor(context)
 
+                val tertiary = ThemeHelper.getTertiaryColor(context)
+                val onTertiary = ThemeHelper.getOnTertiaryColor(context)
+
+                val secondaryContainer = ThemeHelper.getSecondaryContainerColor(context)
+                val onSecondaryContainer = ThemeHelper.getOnSecondaryContainerColor(context)
+
+                val surfaceVariant = ThemeHelper.getSurfaceVariantColor(context)
+                val onSurfaceVariant = ThemeHelper.getOnSurfaceVariantColor(context)
+
+                val outlineVariant = ThemeHelper.getOutlineVariantColor(context)
+                
                 // Track Color: Always OutlineVariant
                 holder.progressView.pillBackgroundColor = outlineVariant
 
-                // SIMPLIFIED STYLING (2 Styles Only)
-                // Remove stroke usage as per new "floating button" design
+                // 4-Tier M3 Dynamic Styling
                 holder.pillContainer.strokeWidth = 0
                 holder.amountPill.strokeWidth = 0
 
-                // Style 1: Notification Triggered (<= notificationWindow) -> Active/Secondary Style
-                // Style 2: Notification Not Triggered (> notificationWindow) -> Neutral Style
-                
-                if (daysLeft <= notificationWindow) {
-                    // TRIGGERED STATE (Active)
-                    // Uses Secondary Container (Gray/Blue) which user said was "fine".
-                    holder.pillContainer.setCardBackgroundColor(secondaryContainer)
-                    holder.daysLeftTextView.setTextColor(onSecondaryContainer)
-                    
-                    holder.progressView.progressColor = secondary
-                    holder.progressView.visibility = View.VISIBLE
-                    
-                    // Sync Amount Pill & Patch
-                    holder.amountPill.setCardBackgroundColor(secondaryContainer)
-                    
-                    // Sync Text Color
-                    holder.amountTextView.setTextColor(onSecondaryContainer)
-                    
-                } else {
-                    // NOT TRIGGERED STATE (Neutral)
-                    holder.pillContainer.setCardBackgroundColor(surfaceContainerHigh)
-                    holder.daysLeftTextView.setTextColor(onSurface)
-                    
-                    holder.progressView.progressColor = secondary
-                    // Keep visible as per "users should be able to understand the progress bar is empty"
-                    holder.progressView.visibility = View.VISIBLE
-                    
-                    // Sync Amount Pill & Patch
-                    holder.amountPill.setCardBackgroundColor(surfaceContainerHigh)
-                    
-                    // Sync Text Color
-                    holder.amountTextView.setTextColor(onSurface)
+                when {
+                    daysLeft <= 0 -> {
+                        // TIER 1: OVERDUE - Primary (Boldest M3 color)
+                        holder.pillContainer.setCardBackgroundColor(primary)
+                        holder.daysLeftTextView.setTextColor(onPrimary)
+                        holder.progressView.progressColor = primary
+                        holder.progressView.visibility = View.VISIBLE
+                        holder.amountPill.setCardBackgroundColor(primary)
+                        holder.amountTextView.setTextColor(onPrimary)
+                    }
+                    daysLeft <= notificationWindow -> {
+                        // TIER 2: NEAR DUE - Tertiary (Distinct M3 accent)
+                        holder.pillContainer.setCardBackgroundColor(tertiary)
+                        holder.daysLeftTextView.setTextColor(onTertiary)
+                        holder.progressView.progressColor = tertiary
+                        holder.progressView.visibility = View.VISIBLE
+                        holder.amountPill.setCardBackgroundColor(tertiary)
+                        holder.amountTextView.setTextColor(onTertiary)
+                    }
+                    else -> {
+                        // TIER 3: FUTURE - SecondaryContainer (Soft M3 tonal)
+                        holder.pillContainer.setCardBackgroundColor(secondaryContainer)
+                        holder.daysLeftTextView.setTextColor(onSecondaryContainer)
+                        holder.progressView.progressColor = secondaryContainer
+                        holder.progressView.visibility = View.VISIBLE
+                        holder.amountPill.setCardBackgroundColor(secondaryContainer)
+                        holder.amountTextView.setTextColor(onSecondaryContainer)
+                    }
                 }
 
             } ?: run {

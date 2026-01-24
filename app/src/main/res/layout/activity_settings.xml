@@ -167,7 +167,7 @@
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/theme_device"
-                            style="@style/Widget.Material3.Chip.Filter"
+                            style="@style/Widget.App.Chip"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="System"
@@ -175,7 +175,7 @@
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/theme_light"
-                            style="@style/Widget.Material3.Chip.Filter"
+                            style="@style/Widget.App.Chip"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Light"
@@ -183,7 +183,7 @@
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/theme_dark"
-                            style="@style/Widget.Material3.Chip.Filter"
+                            style="@style/Widget.App.Chip"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Dark"
@@ -230,7 +230,7 @@
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/font_google"
-                            style="@style/Widget.Material3.Chip.Filter"
+                            style="@style/Widget.App.Chip"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Google Sans"
@@ -238,7 +238,7 @@
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/font_system"
-                            style="@style/Widget.Material3.Chip.Filter"
+                            style="@style/Widget.App.Chip"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="System"
@@ -308,7 +308,7 @@
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/notification_time_text"
-                            style="@style/Widget.Material3.Chip.Filter"
+                            style="@style/Widget.App.Chip"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checkable="true"
@@ -401,7 +401,7 @@
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/haptics_on"
-                            style="@style/Widget.Material3.Chip.Filter"
+                            style="@style/Widget.App.Chip"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="On"
@@ -409,7 +409,7 @@
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/haptics_off"
-                            style="@style/Widget.Material3.Chip.Filter"
+                            style="@style/Widget.App.Chip"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Off"

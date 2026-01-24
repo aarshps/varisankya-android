@@ -53,7 +53,7 @@ class SelectionBottomSheet(
         titleTextView.text = title
 
         options.forEach { option ->
-            val chip = Chip(context)
+            val chip = Chip(android.view.ContextThemeWrapper(requireContext(), R.style.Widget_App_Chip))
             chip.text = option
             chip.isCheckable = true
             chip.isCheckedIconVisible = false
@@ -61,6 +61,36 @@ class SelectionBottomSheet(
             
             // Ensure spacing is visually balanced by disabling automatic vertical expansion
             chip.setEnsureMinTouchTargetSize(false)
+
+            // M3E Styling: Selected = Less Rounded (16dp), Unselected = Fully Rounded (Pill/50dp)
+            // Using 16dp for "less rounded" (approx 44px on xxhdpi) and 100dp for full pill
+            val r = requireContext().resources.displayMetrics.density
+            val selectedRadius = 12f * r
+            val unselectedRadius = 100f * r
+            
+            chip.shapeAppearanceModel = chip.shapeAppearanceModel.toBuilder()
+                .setAllCornerSizes(if (chip.isChecked) selectedRadius else unselectedRadius)
+                .build()
+            
+            // Apply M3 Dynamic Colors using ThemeHelper
+            val ctx = requireContext()
+            if (chip.isChecked) {
+                chip.chipBackgroundColor = android.content.res.ColorStateList.valueOf(
+                    com.hora.varisankya.util.ThemeHelper.getTertiaryColor(ctx)
+                )
+                chip.setTextColor(com.hora.varisankya.util.ThemeHelper.getOnTertiaryColor(ctx))
+                chip.chipIconTint = android.content.res.ColorStateList.valueOf(
+                    com.hora.varisankya.util.ThemeHelper.getOnTertiaryColor(ctx)
+                )
+            } else {
+                chip.chipBackgroundColor = android.content.res.ColorStateList.valueOf(
+                    com.hora.varisankya.util.ThemeHelper.getSurfaceVariantColor(ctx)
+                )
+                chip.setTextColor(com.hora.varisankya.util.ThemeHelper.getOnSurfaceColor(ctx))
+                chip.chipIconTint = android.content.res.ColorStateList.valueOf(
+                    com.hora.varisankya.util.ThemeHelper.getOnSurfaceColor(ctx)
+                )
+            }
             
             chip.setOnClickListener { v ->
                 PreferenceHelper.performHaptics(v, HapticFeedbackConstants.VIRTUAL_KEY)

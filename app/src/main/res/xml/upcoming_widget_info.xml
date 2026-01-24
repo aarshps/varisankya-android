@@ -7,5 +7,5 @@
     android:targetCellHeight="2"
     android:previewLayout="@layout/widget_upcoming_preview"
     android:resizeMode="none"
-    android:updatePeriodMillis="86400000"
+    android:updatePeriodMillis="3600000"
     android:widgetCategory="home_screen" />

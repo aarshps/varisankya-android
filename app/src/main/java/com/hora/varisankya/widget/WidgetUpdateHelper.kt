@@ -13,22 +13,21 @@ import java.util.concurrent.TimeUnit
 object WidgetUpdateHelper {
 
     fun updateWidgetData(context: Context, subscriptions: List<Subscription>) {
-        val today = Calendar.getInstance()
-        today.set(Calendar.HOUR_OF_DAY, 0)
-        today.set(Calendar.MINUTE, 0)
-        today.set(Calendar.SECOND, 0)
-        today.set(Calendar.MILLISECOND, 0)
-        val todayTime = today.timeInMillis
-        
-        // Get notification window from settings
+        val today = java.time.LocalDate.now()
         val windowDays = com.hora.varisankya.PreferenceHelper.getNotificationDays(context)
-        // Add 23h 59m to make the window inclusive of the target day's end
-        val windowMillis = (windowDays * 24L * 60L * 60L * 1000L) + (23L * 60L * 60L * 1000L) + (59L * 60L * 1000L)
-        val maxDueTime = todayTime + windowMillis
+        val maxDate = today.plusDays(windowDays.toLong())
 
         // Filter for active subscriptions within the notification window
         val upcomingFiltered = subscriptions.filter { sub ->
-            sub.active && sub.dueDate != null && sub.dueDate!!.time <= maxDueTime
+            if (!sub.active || sub.dueDate == null) return@filter false
+            
+            // Convert stored UTC date to LocalDate
+            val dueInstant = sub.dueDate!!.toInstant()
+            val dueZoned = dueInstant.atZone(java.time.ZoneId.of("UTC"))
+            val dueLocalDate = dueZoned.toLocalDate()
+            
+            // Include if due date is NOT after maxDate (so past dates + dates up to limit are included)
+            !dueLocalDate.isAfter(maxDate)
         }.sortedBy { it.dueDate!!.time }
 
         val totalUpcomingCount = upcomingFiltered.size
@@ -37,21 +36,17 @@ object WidgetUpdateHelper {
         val displayList = upcomingFiltered.take(3)
 
         val widgetItems = displayList.map { sub ->
-            val dueTime = sub.dueDate!!.time
-            val diff = dueTime - todayTime
-            val daysDiff = (diff / (1000 * 60 * 60 * 24)).toInt()
+            val dueInstant = sub.dueDate!!.toInstant()
+            val dueZoned = dueInstant.atZone(java.time.ZoneId.of("UTC"))
+            val dueLocalDate = dueZoned.toLocalDate()
+            
+            val daysDiff = java.time.temporal.ChronoUnit.DAYS.between(today, dueLocalDate).toInt()
 
             val dateStr = when {
-                daysDiff < 0 -> {
-                     val dateFormat = SimpleDateFormat("MMM dd", Locale.getDefault())
-                     dateFormat.format(sub.dueDate!!)
-                }
+                daysDiff < 0 -> "${-daysDiff}d Overdue"
                 daysDiff == 0 -> "Today"
                 daysDiff == 1 -> "Tomorrow"
-                else -> {
-                    val dateFormat = SimpleDateFormat("MMM dd", Locale.getDefault())
-                    dateFormat.format(sub.dueDate!!)
-                }
+                else -> "$daysDiff Days"
             }
             Pair(sub.name, dateStr)
         }

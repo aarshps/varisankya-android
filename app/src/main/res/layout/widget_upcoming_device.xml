@@ -23,7 +23,6 @@
             android:layout_weight="1"
             android:text="—"
             android:textSize="14sp"
-            android:textStyle="bold"
 
             android:textColor="@color/widget_text_primary"
             android:maxLines="1"
@@ -63,7 +62,6 @@
             android:layout_weight="1"
             android:text="—"
             android:textSize="14sp"
-            android:textStyle="bold"
 
             android:textColor="@color/widget_text_primary"
             android:maxLines="1"
@@ -104,7 +102,6 @@
             android:layout_weight="1"
             android:text="—"
             android:textSize="14sp"
-            android:textStyle="bold"
             android:textColor="@color/widget_text_primary"
             android:maxLines="1"
             android:ellipsize="end" />

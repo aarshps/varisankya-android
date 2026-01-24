@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Semantic M3 Contrast Tokens -->
+    <attr name="vibrant" format="color"/>
+    <attr name="vibrantOn" format="color"/>
+    
+    <attr name="alert" format="color"/>
+    <attr name="alertOn" format="color"/>
+    
+    <attr name="medium" format="color"/>
+    <attr name="mediumOn" format="color"/>
+    
+    <attr name="low" format="color"/>
+    <attr name="lowOn" format="color"/>
+
+    <attr name="neutral" format="color"/>
+</resources>

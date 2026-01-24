@@ -31,6 +31,30 @@ object ThemeHelper {
     fun getSurfaceColor(context: Context): Int {
         return resolveColor(context, "colorSurface", Color.WHITE)
     }
+    
+    fun getOnPrimaryColor(context: Context): Int {
+        return resolveColor(context, "colorOnPrimary", Color.WHITE)
+    }
+    
+    fun getOnTertiaryColor(context: Context): Int {
+        return resolveColor(context, "colorOnTertiary", Color.WHITE)
+    }
+    
+    fun getSurfaceVariantColor(context: Context): Int {
+        return resolveColor(context, "colorSurfaceVariant", Color.LTGRAY)
+    }
+    
+    fun getOnSurfaceVariantColor(context: Context): Int {
+        return resolveColor(context, "colorOnSurfaceVariant", Color.DKGRAY)
+    }
+    
+    fun getOnSurfaceColor(context: Context): Int {
+        return resolveColor(context, "colorOnSurface", Color.BLACK)
+    }
+    
+    fun getOutlineVariantColor(context: Context): Int {
+        return resolveColor(context, "colorOutlineVariant", Color.LTGRAY)
+    }
 
     private fun resolveColor(context: Context, attrName: String, defaultColor: Int): Int {
         // Try finding the attribute ID in the app's package (merged attributes)

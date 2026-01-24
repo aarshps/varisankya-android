@@ -101,11 +101,45 @@ class SearchActivity : BaseActivity() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        categoryChipGroup.setOnCheckedStateChangeListener { _, _ ->
+        categoryChipGroup.setOnCheckedStateChangeListener { group, _ ->
+            // Update shapes dynamically on selection change
+            for (i in 0 until group.childCount) {
+                val chip = group.getChildAt(i) as? Chip
+                chip?.let { updateChipShape(it) }
+            }
             performSearch()
         }
         
         searchEditText.requestFocus()
+    }
+
+    private fun updateChipShape(chip: Chip) {
+        val r = resources.displayMetrics.density
+        val selectedRadius = 12f * r
+        val unselectedRadius = 100f * r
+        
+        chip.shapeAppearanceModel = chip.shapeAppearanceModel.toBuilder()
+            .setAllCornerSizes(if (chip.isChecked) selectedRadius else unselectedRadius)
+            .build()
+        
+        // Apply M3 Dynamic Colors using ThemeHelper
+        if (chip.isChecked) {
+            chip.chipBackgroundColor = android.content.res.ColorStateList.valueOf(
+                com.hora.varisankya.util.ThemeHelper.getTertiaryColor(this)
+            )
+            chip.setTextColor(com.hora.varisankya.util.ThemeHelper.getOnTertiaryColor(this))
+            chip.chipIconTint = android.content.res.ColorStateList.valueOf(
+                com.hora.varisankya.util.ThemeHelper.getOnTertiaryColor(this)
+            )
+        } else {
+            chip.chipBackgroundColor = android.content.res.ColorStateList.valueOf(
+                com.hora.varisankya.util.ThemeHelper.getSurfaceVariantColor(this)
+            )
+            chip.setTextColor(com.hora.varisankya.util.ThemeHelper.getOnSurfaceColor(this))
+            chip.chipIconTint = android.content.res.ColorStateList.valueOf(
+                com.hora.varisankya.util.ThemeHelper.getOnSurfaceColor(this)
+            )
+        }
     }
 
     private fun setupCategories() {
@@ -114,6 +148,8 @@ class SearchActivity : BaseActivity() {
             val chip = Chip(ContextThemeWrapper(this, R.style.Widget_App_Chip)).apply {
                 text = category
                 isCheckable = true
+                isChecked = false
+                updateChipShape(this)
                 setOnClickListener {
                     PreferenceHelper.performHaptics(it, HapticFeedbackConstants.CLOCK_TICK)
                 }
