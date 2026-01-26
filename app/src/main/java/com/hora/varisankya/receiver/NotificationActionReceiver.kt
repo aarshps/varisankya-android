@@ -78,9 +78,6 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 // 5. Cancel Notification
                 val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 notificationManager.cancel(notifId)
-                
-                // 6. Update Widget
-                com.hora.varisankya.widget.WidgetUpdateHelper.refreshFromFirestore(context)
             }
         }
     }

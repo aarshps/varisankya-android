@@ -60,6 +60,11 @@
         
         <!-- Global Bottom Sheet Style -->
         <item name="bottomSheetStyle">@style/Widget.App.BottomSheet.Modal</item>
+
+        <!-- M3E Expressive Button Styles -->
+        <item name="materialButtonStyle">@style/Widget.App.Button</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.App.Button.Outlined</item>
+        <item name="materialButtonTonalStyle">@style/Widget.App.Button.Tonal</item>
     </style>
 
     <!-- System Font Theme -->
@@ -114,7 +119,12 @@
     <!-- Custom Shape Appearance for fully rounded corners (Profile, Buttons) -->
     <style name="App.ShapeAppearanceOverlay.Rounded" parent="">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">16dp</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="ShapeAppearance.App.Button" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">28dp</item>
     </style>
     
     <!-- M3 Standard Input Field Shape (4dp) -->
@@ -160,9 +170,10 @@
     </style>
 
     <!-- Style for Destructive/Delete Buttons (Outlined Error) -->
-    <style name="App.Button.Destructive" parent="Widget.Material3.Button.OutlinedButton">
+    <style name="App.Button.Destructive" parent="Widget.App.Button.Outlined">
         <item name="android:textColor">?attr/colorError</item>
-        <item name="strokeColor">?attr/colorOutline</item>
+        <item name="strokeColor">?attr/colorError</item>
+        <item name="rippleColor">?attr/colorError</item>
     </style>
 
     <!-- Destructive Icon Button (Outlined circle with error tint) -->
@@ -176,8 +187,30 @@
     </style>
 
     <!-- Style for Mark Paid Buttons (Standard Tonal - uses Secondary colors) -->
-    <style name="App.Button.Success" parent="Widget.Material3.Button.TonalButton">
+    <style name="App.Button.Success" parent="Widget.App.Button.Tonal">
         <!-- Uses default secondary/tertiary colors -->
+    </style>
+
+    <!-- Global M3E Button Widgets -->
+    <style name="Widget.App.Button" parent="Widget.Material3.Button">
+        <item name="shapeAppearance">@style/ShapeAppearance.App.Button</item>
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.App.Button</item>
+    </style>
+
+    <style name="Widget.App.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="shapeAppearance">@style/ShapeAppearance.App.Button</item>
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.App.Button</item>
+    </style>
+
+    <style name="Widget.App.Button.Tonal" parent="Widget.Material3.Button.TonalButton">
+        <item name="shapeAppearance">@style/ShapeAppearance.App.Button</item>
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.App.Button</item>
     </style>
     
     <!-- MaterialSwitch Style with Tertiary Color (matches chips) -->

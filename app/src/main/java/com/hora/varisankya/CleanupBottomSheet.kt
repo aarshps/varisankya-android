@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.hora.varisankya.util.AnimationHelper
 
 class CleanupBottomSheet(
     private val invalidCount: Int,
@@ -37,12 +38,16 @@ class CleanupBottomSheet(
         confirmButton.text = "Delete $invalidCount Record${if (invalidCount > 1) "s" else ""}"
 
         confirmButton.setOnClickListener {
+            PreferenceHelper.performErrorHaptic(it)
             dismiss()
             onConfirm()
         }
+        AnimationHelper.applySpringOnTouch(confirmButton)
 
         cancelButton.setOnClickListener {
+            PreferenceHelper.performClickHaptic(it)
             dismiss()
         }
+        AnimationHelper.applySpringOnTouch(cancelButton)
     }
 }

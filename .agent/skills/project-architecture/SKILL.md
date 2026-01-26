@@ -40,17 +40,16 @@ Subscription expense tracking application that helps users monitor recurring pay
  
 ### Hero Insights (Cashflow)
  
-The `MainActivity` Hero Card implements a **"Remaining Monthly Liability"** logic, calculating the sum of all future bills in the current month to provide a cashflow forecast.
+The `MainActivity` Hero Card implements a **"Remaining Monthly Liability"** logic, calculating the sum of **all Overdue bills + future bills in the current month** to provide a strict cashflow forecast.
 
 ### Utilities
 
-| Utility | Purpose |
-|---------|---------|
-| `ThemeHelper` | M3 Dynamic Color resolution |
-| `ChipHelper` | Centralized High-Contrast Chip styling |
-| `PreferenceHelper` | SharedPreferences access |
-
-| `Constants` | App-wide constants (categories, recurrences) |
+**util/**: Functional and visual core:
+  - `AnimationHelper.kt`: **M3E Ultra-Expressive** central. Staggered entrances, tactile springs, and logo orchestrations.
+  - `PreferenceHelper.kt`: Centralized **Haptic Engine**. Directs all TICK, CONFIRM, and segment feedback.
+  - `ThemeHelper.kt`: M3 Dynamic Color resolution Bridge.
+  - `ChipHelper.kt`: High-contrast chip orchestration.
+  - `Constants.kt`: App-wide constants (categories, recurrences).
 
 ### Custom Views
 
@@ -72,20 +71,22 @@ The `MainActivity` Hero Card implements a **"Remaining Monthly Liability"** logi
   ```
 
 ## Theme System
-
-- **M3 Dynamic Colors** - Wallpaper-based theming
+ 
+- **Brand Monochrome Identity** - Strict Black/Gray/White palette for a premium, unified experience.
+- **M3E Expressive Standards** - 28dp card corners, multi-layered surfaceContainers, and high-contrast highlights.
 - **Theme file:** `res/values/themes.xml`
-- **Color resolution:** via `ThemeHelper.kt`
-
+- **Color resolution:** via `ThemeHelper.kt`, with manual resource mapping for widgets.
+ 
 ## Widget
-
-- **WidgetProvider** - Home screen widget
+ 
+- **UpcomingWidgetProvider** - Redesigned for M3E (detached cards, Hero area).
+- **Hero Priority**: The most upcoming bill is featured in a prominent card (`bg_widget_item_hero`) with unique styling.
 - **WidgetUpdateHelper** - Widget data refresh
 - Update frequency: 1 hour
-
+ 
 ## Key Preferences
-
+ 
 - `notification_days` - Days before due date to notify
 - `theme_mode` - System/Light/Dark
-- `haptics_enabled` - Haptic feedback toggle
-- `font_family` - Google Sans/System
+- `haptics_enabled` - Haptic feedback toggle (Mechanical Tick enabled)
+- `font_family` - Google Sans Flex / System

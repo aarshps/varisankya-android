@@ -51,6 +51,73 @@
             android:visibility="gone"
             tools:visibility="visible">
 
+            <!-- Expressive Hero: Payment History "Insight" Island -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/hero_history_card"
+                style="?attr/materialCardViewFilledStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+                app:cardCornerRadius="28dp"
+                app:strokeWidth="0dp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="20dp">
+
+                    <LinearLayout
+                        android:id="@+id/history_hero_text_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <TextView
+                            android:id="@+id/text_total_spent_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="TOTAL SPENT"
+                            android:textAppearance="?attr/textAppearanceLabelLarge"
+                            android:textColor="?attr/colorPrimary"
+                            android:letterSpacing="0.1"
+                            android:alpha="0.8"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/text_total_spent_amount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:includeFontPadding="false"
+                            android:textAppearance="?attr/textAppearanceDisplayMedium"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textStyle="bold"
+                            android:letterSpacing="-0.01"
+                            tools:text="₹45,280" />
+
+                        <TextView
+                            android:id="@+id/history_subtitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Financial Insight"
+                            android:textAppearance="?attr/textAppearanceBodyMedium"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:alpha="0.9" />
+
+                    </LinearLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+        
             <!-- Top: Chart Section -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -61,26 +128,6 @@
                 android:paddingBottom="16dp"
                 android:clipChildren="false"
                 android:clipToPadding="false">
-
-                <TextView
-                    android:id="@+id/text_total_spent_label"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Total Spent"
-                    android:gravity="center"
-                    android:textAppearance="?attr/textAppearanceLabelMedium"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:alpha="0.8" />
-
-                <TextView
-                    android:id="@+id/text_total_spent_amount"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="-"
-                    android:gravity="center"
-                    android:textAppearance="?attr/textAppearanceDisplayMedium"
-                    android:textColor="?attr/colorOnSurface"
-                    android:layout_marginBottom="24dp" />
         
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"

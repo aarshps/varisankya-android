@@ -24,6 +24,11 @@
         <!-- Global Bottom Sheet Style -->
         <item name="bottomSheetStyle">@style/Widget.App.BottomSheet.Modal</item>
 
+        <!-- M3E Expressive Button Styles -->
+        <item name="materialButtonStyle">@style/Widget.App.Button</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.App.Button.Outlined</item>
+        <item name="materialButtonTonalStyle">@style/Widget.App.Button.Tonal</item>
+
         
         <!-- Default Font Family (Both namespaces) -->
         <item name="android:fontFamily">@font/google_sans_flex</item>

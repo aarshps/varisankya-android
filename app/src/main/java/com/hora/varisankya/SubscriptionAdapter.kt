@@ -23,6 +23,8 @@ import java.util.concurrent.TimeUnit
 import com.hora.varisankya.util.ThemeHelper
 import com.hora.varisankya.util.AnimationHelper
 
+private val DATE_FORMAT = SimpleDateFormat("MMM dd", Locale.getDefault())
+
 // Pre-calculate shapes to avoid building them on every scroll
 private var singleShape: ShapeAppearanceModel? = null
 private var firstShape: ShapeAppearanceModel? = null
@@ -53,8 +55,10 @@ class SubscriptionAdapter(
         val subscription = subscriptions[position]
         val context = holder.itemView.context
         
-        // Staggered Entrance
-        AnimationHelper.animateEntrance(holder.itemView, position)
+        // Entrance Animation - Only for the first few items to keep it buttery smooth
+        if (position < 12) {
+            AnimationHelper.animateEntrance(holder.itemView, position)
+        }
         
         holder.nameTextView.text = subscription.name
         
@@ -89,10 +93,11 @@ class SubscriptionAdapter(
 
         cardView.shapeAppearanceModel = shapeModel!!
 
-        val layoutParams = cardView.layoutParams as ViewGroup.MarginLayoutParams
-        val bottomMarginRes = if (isLast || isSingle) R.dimen.group_section_spacing else R.dimen.group_item_spacing
-        layoutParams.bottomMargin = context.resources.getDimensionPixelSize(bottomMarginRes)
-        cardView.layoutParams = layoutParams
+        cardView.shapeAppearanceModel = shapeModel!!
+
+        // Margin manipulation removed to prevent layout jitter during scroll
+        // Standard spacing is handled by cardVerticalMargin in XML
+
 
         if (!subscription.active) {
             holder.itemView.alpha = 0.6f
@@ -121,8 +126,7 @@ class SubscriptionAdapter(
             holder.nameTextView.setTextColor(MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnSurface, Color.BLACK))
             
             subscription.dueDate?.let { dueDate ->
-                val format = SimpleDateFormat("MMM dd", Locale.getDefault())
-                holder.detailsTextView.text = "Due ${format.format(dueDate)} • ${subscription.recurrence}"
+                holder.detailsTextView.text = "Due ${DATE_FORMAT.format(dueDate)} • ${subscription.recurrence}"
 
                 // Days left logic
                 val today = Calendar.getInstance()
@@ -152,12 +156,7 @@ class SubscriptionAdapter(
                 holder.pillContainer.visibility = View.VISIBLE
 
 
-                // Subtle Haptic Feedback on appearance
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    holder.itemView.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
-                } else {
-                    holder.itemView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-                }
+
 
                 // Resolve Colors DIRECTLY from M3 Dynamic Theme using ThemeHelper
                 // Semantic Roles:

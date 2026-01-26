@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="haptic_scroll_listener_tag" type="id" />
+</resources>

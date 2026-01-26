@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/card_margin_horizontal"
-    android:layout_marginVertical="6dp"
+    android:layout_marginVertical="8dp"
     app:cardBackgroundColor="?attr/colorSurfaceContainer"
     app:cardCornerRadius="@dimen/card_corner_radius_large"
     app:strokeWidth="0dp">
@@ -14,21 +14,18 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="16dp"
-        android:paddingTop="16dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="16dp">
-
-
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="20dp">
 
         <TextView
             android:id="@+id/subscription_name"
-            style="@style/TextAppearance.Material3.TitleMedium"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="12dp"
             android:ellipsize="end"
             android:singleLine="true"
+            android:textAppearance="?attr/textAppearanceTitleLarge"
+            android:textStyle="bold"
             android:textColor="?attr/colorOnSurface"
             app:layout_constraintBottom_toTopOf="@+id/subscription_details"
             app:layout_constraintEnd_toStartOf="@+id/amount_pill"
@@ -47,18 +44,20 @@
             app:cardElevation="0dp"
             app:strokeWidth="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginEnd="12dp"
             app:layout_constraintEnd_toStartOf="@+id/unified_status_pill"
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:id="@+id/subscription_amount"
-                style="@style/TextAppearance.Material3.LabelSmall"
+                style="@style/TextAppearance.Material3.LabelMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingStart="12dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="12dp"
-                android:paddingBottom="8dp"
+                android:paddingStart="14dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="14dp"
+                android:paddingBottom="10dp"
+                android:textStyle="bold"
                 android:textColor="?attr/colorOnSurfaceVariant"
                 tools:text="$ 12.99" />
 
@@ -67,12 +66,13 @@
 
         <TextView
             android:id="@+id/subscription_details"
-            style="@style/TextAppearance.Material3.BodyMedium"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_marginEnd="16dp"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
             android:textColor="?attr/colorOnSurfaceVariant"
+            android:alpha="0.8"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/unified_status_pill"
             app:layout_constraintStart_toStartOf="parent"
@@ -90,16 +90,18 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:strokeWidth="0dp">
+            app:strokeWidth="0.8dp"
+            app:strokeColor="?attr/colorTertiary">
 
             <TextView
                 android:id="@+id/subscription_days_left"
-                style="@style/TextAppearance.Material3.LabelLarge"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:paddingHorizontal="4dp"
-                android:paddingVertical="10dp"
+                android:paddingVertical="12dp"
+                android:textAppearance="?attr/textAppearanceLabelLarge"
+                android:textStyle="bold"
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="13sp"
                 tools:text="5 Days" />

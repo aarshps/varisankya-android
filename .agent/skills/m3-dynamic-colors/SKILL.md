@@ -5,10 +5,41 @@ description: How to properly resolve Material 3 Dynamic Colors in this Android/K
 
 # M3 Dynamic Color Resolution
  
- > [!NOTE]
- > **Dynamic Colors (Android 12+) are ENABLED** in this project via `VarisankyaApplication`. The app uses Material You (wallpaper-based) theming.
+ > [!IMPORTANT]
+ > **Hybrid Design System**:
+ > - **App**: Uses strict **MONOCHROME** (Black/Gray/White) identity.
+ > - **Widget**: Uses **Wallpaper Orchestration** (Dynamic Colors) to natively integrate with the user's Home Screen (API 31+).
  
- This skill explains how to correctly resolve Material 3 (M3) Dynamic Color theme attributes in this Android project.
+ This skill explains how to resolve these two distinct systems.
+ 
+ ## Theme Resolution logic
+ 
+ The app uses a strict mapping in `colors.xml` and `ThemeHelper.kt` to ensure color consistency across Activities, Bottom Sheets, and Widgets.
+ 
+ ### Widget "Wallpaper Orchestration" (API 31+)
+
+Widgets MUST use the `dynamic_*` color aliases located in `res/values/colors.xml` and `res/values-v31/colors.xml`. These aliases resolve to wallpaper-based system tokens on Android 12+.
+
+| Logical Role | Resource Name | Purpose |
+|--------------|---------------|---------|
+| Root Surface | `@color/dynamic_widget_background` | Widget container base |
+| Hero Surface | `@color/dynamic_hero_background` | Elevated "Next Payment" block |
+| Pill Accent | `@color/dynamic_pill_background` | High-contrast status pill |
+| Text Primary | `@color/dynamic_text_primary` | Names and titles |
+| Text Accent | `@color/dynamic_text_accent` | Sub-labels and dates |
+
+**Night Mode Parity**: Ensure `values-night` and `values-night-v31` provide sufficient contrast (e.g. Hero Light -> Pill Dark).
+ 
+ ### Surface Hierarchy (Tonal Layering)
+ 
+ To achieve the "Breezy" M3E look, use the correct container role for the background:
+ 
+ | Role | Attribute | Usage |
+ |------|-----------|-------|
+ | **Base** | `colorSurfaceContainerLow` | Main screen window background. |
+ | **Card** | `colorSurfaceContainer` | Subscription items (Standard). |
+ | **Pill** | `colorSurfaceContainerHigh` | Highlight bubbles inside cards. |
+ | **Hero** | `colorPrimary` | Highest impact highlights (Active/Urgent). |
  
  ## Problem: BaseActivity Theme Override
  

@@ -19,8 +19,6 @@ import kotlinx.coroutines.tasks.await
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 import com.hora.varisankya.receiver.NotificationActionReceiver
-import com.hora.varisankya.widget.UpcomingWidgetProvider
-import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 
 class SubscriptionNotificationWorker(
@@ -74,9 +72,7 @@ class SubscriptionNotificationWorker(
                 }
             }
 
-            // --- Widget Update Logic ---
-            com.hora.varisankya.widget.WidgetUpdateHelper.updateWidgetData(applicationContext, subscriptions)
-            // ---------------------------
+
 
             return Result.success()
         } catch (e: Exception) {

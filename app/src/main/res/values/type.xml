@@ -77,4 +77,13 @@
         <item name="android:fontFamily">@font/google_sans_flex</item>
         <item name="fontFamily">@font/google_sans_flex</item>
     </style>
+
+    <!-- Expressive Button Typography -->
+    <style name="TextAppearance.App.Button" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:fontFamily">@font/google_sans_flex</item>
+        <item name="fontFamily">@font/google_sans_flex</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:letterSpacing">0.05</item>
+    </style>
 </resources>

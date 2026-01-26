@@ -30,10 +30,14 @@ Do NOT create these file types in the repository:
 Run cleanup check:
 ```powershell
 # Check for stray files
-Get-ChildItem -Path . -File | Where-Object { $_.Name -match "(build_log|output|temp|tmp)" }
+Get-ChildItem -Path . -File | Where-Object { $_.Name -match "(build_log|output|temp|tmp|detailed_build)" }
 
 # Remove if found
 Remove-Item -Path "build_log*.txt" -Force -ErrorAction SilentlyContinue
+Remove-Item -Path "detailed_build_log.txt" -Force -ErrorAction SilentlyContinue
+Remove-Item -Path "*.log" -Force -ErrorAction SilentlyContinue
+Remove-Item -Path "*.txt" -Force -ErrorAction SilentlyContinue
+Remove-Item -Path "build_final*.txt" -Force -ErrorAction SilentlyContinue
 ```
 
 ## .gitignore Already Excludes
@@ -45,6 +49,18 @@ The `.gitignore` should already exclude:
 - `*.log`
 - `*.hprof`
 
+### User-Generated Temporary Files
+- `*.log` (Build and compilation logs)
+- `*.txt` (Temporary execution captures)
+- `build_final*.txt` (Final validation logs)
+ 
+### Android Specific
+- `app/build/`
+- `.gradle/`
+- `local.properties` (unless required for CI)
+- `*.hprof`
+
 ## Best Practice
 
 Capture build output in memory or terminal, not files. Use tools that return output directly rather than redirecting to files in the repo.
+```

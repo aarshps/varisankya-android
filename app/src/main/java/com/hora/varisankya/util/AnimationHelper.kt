@@ -27,25 +27,33 @@ object AnimationHelper {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     v.animate()
-                        .scaleX(0.95f) // Subtle squish (was 0.92)
-                        .scaleY(0.95f)
-                        .setDuration(100)
+                        .scaleX(0.96f)
+                        .scaleY(0.96f)
+                        .setDuration(80)
                         .setInterpolator(EMPHASIZED_DECELERATE)
                         .start()
-                    // Allow click events to propagate
+                    // We must return true to receive ACTION_UP/CANCEL
+                    // But if it's a card/button we don't want to block the click
+                    // Solution: View must be clickable
                     false 
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     v.animate()
                         .scaleX(1f)
                         .scaleY(1f)
-                        .setDuration(400) // Longer settle time for premium feel
-                        .setInterpolator(EMPHASIZED) // Smooth settle, no wobble
+                        .setDuration(300)
+                        .setInterpolator(EMPHASIZED)
                         .start()
                     false
                 }
                 else -> false
             }
+        }
+        
+        // Ensure the view is clickable so it receives the full gesture sequence
+        if (!view.isClickable) {
+            view.isClickable = true
+            view.isFocusable = true
         }
     }
 

@@ -12,144 +12,128 @@
         android:layout_height="wrap_content" />
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/payment_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="-12dp"
+        android:layout_marginTop="-8dp"
         android:fillViewport="true">
 
-    <LinearLayout
-        android:id="@+id/payment_sheet_root"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingHorizontal="24dp"
-        android:paddingBottom="24dp">
-
         <LinearLayout
+            android:id="@+id/payment_sheet_root"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:paddingBottom="32dp">
 
             <TextView
-                style="@style/TextAppearance.Material3.HeadlineSmall"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Payment History" />
-
-
-
-        </LinearLayout>
-
-        <FrameLayout
-            android:id="@+id/history_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_history"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:visibility="gone"
-                tools:itemCount="3"
-                tools:listitem="@layout/item_payment_timeline"
-                tools:visibility="visible" />
+                android:paddingHorizontal="24dp"
+                android:layout_marginBottom="16dp"
+                android:text="Payment History"
+                android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                android:textStyle="bold" />
 
-            <LinearLayout
-                android:id="@+id/no_history_container"
+            <FrameLayout
+                android:id="@+id/history_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="24dp"
-                android:visibility="gone">
+                android:paddingHorizontal="8dp">
 
-                <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:alpha="0.4"
-                    android:src="@drawable/ic_history"
-                    app:tint="?attr/colorOnSurfaceVariant" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_history"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:visibility="gone"
+                    tools:itemCount="3"
+                    tools:listitem="@layout/item_payment_timeline"
+                    tools:visibility="visible" />
 
-                <TextView
-                    android:id="@+id/text_no_history"
-                    style="@style/TextAppearance.Material3.BodyLarge"
+                <LinearLayout
+                    android:id="@+id/no_history_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="32dp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:alpha="0.3"
+                        android:src="@drawable/ic_history"
+                        app:tint="?attr/colorOnSurfaceVariant" />
+
+                    <TextView
+                        android:id="@+id/text_no_history"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="No payments recorded"
+                        android:textAppearance="?attr/textAppearanceBodyLarge"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:gravity="center" />
+                </LinearLayout>
+
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/progress_history"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="No payments recorded"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:gravity="center" />
-            </LinearLayout>
+                    android:indeterminate="true"
+                    app:indicatorColor="?attr/colorPrimary"
+                    android:layout_gravity="center"
+                    android:layout_margin="24dp" />
+            </FrameLayout>
 
 
-
-            <com.google.android.material.progressindicator.CircularProgressIndicator
-                android:id="@+id/progress_history"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:indeterminate="true"
-                app:indicatorColor="?attr/colorPrimary"
-                android:layout_gravity="center" />
-        </FrameLayout>
-
-        <com.google.android.material.card.MaterialCardView
-            style="?attr/materialCardViewFilledStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="32dp"
-            app:cardCornerRadius="28dp">
-
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
+                style="?attr/materialCardViewFilledStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="24dp">
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+                app:cardCornerRadius="28dp"
+                app:strokeWidth="0dp">
 
-                <TextView
-                    android:id="@+id/text_due_date_info"
-                    style="@style/TextAppearance.Material3.TitleLarge"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Due: ..." />
+                    android:orientation="vertical"
+                    android:padding="24dp">
 
-                <TextView
-                    android:id="@+id/text_next_due_date_preview"
-                    style="@style/TextAppearance.Material3.BodyLarge"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="..."
-                    android:textColor="?attr/colorOnSurfaceVariant" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+                    <TextView
+                        android:id="@+id/text_due_date_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Due: ..."
+                        android:textAppearance="?attr/textAppearanceTitleLarge"
+                        android:textStyle="bold" />
 
-        <Button
-            android:id="@+id/btn_pay_current"
-            style="@style/Widget.Material3.Button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:padding="16dp"
-            android:text="Mark as Paid" />
+                    <TextView
+                        android:id="@+id/text_next_due_date_preview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="..."
+                        android:textAppearance="?attr/textAppearanceBodyLarge"
+                        android:textColor="?attr/colorSecondary" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-        <Button
-            android:id="@+id/btn_pay_custom"
-            style="@style/Widget.Material3.Button.TonalButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:padding="12dp"
-            app:cornerRadius="32dp"
-            android:text="Change Schedule" />
+            <Button
+                android:id="@+id/btn_pay_current"
+                style="@style/Widget.App.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:padding="16dp"
+                android:text="Mark as Paid" />
 
-
-
-    </LinearLayout>
+        </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>

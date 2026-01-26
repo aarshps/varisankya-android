@@ -13,54 +13,37 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="-12dp"
+        android:layout_marginTop="-8dp"
         android:orientation="vertical"
-        android:paddingHorizontal="24dp"
-        android:paddingBottom="24dp">
+        android:paddingBottom="32dp">
 
-    <TextView
-        android:id="@+id/selection_title"
-        style="@style/TextAppearance.Material3.HeadlineSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:text="Select Option" />
+        <TextView
+            android:id="@+id/selection_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="24dp"
+            android:layout_marginBottom="16dp"
+            android:text="Select Option"
+            android:textAppearance="?attr/textAppearanceHeadlineSmall"
+            android:textStyle="bold" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/til_search"
-        style="@style/App.TextInputLayout.Rounded"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:hint="Search"
-        app:endIconMode="clear_text">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/edit_text_search"
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/selection_scroll_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:imeOptions="actionSearch"
-            android:inputType="text"
-            android:singleLine="true" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:paddingHorizontal="24dp"
+            app:layout_constrainedHeight="true">
 
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constrainedHeight="true">
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/selection_chip_group"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:chipSpacingHorizontal="8dp"
-            app:chipSpacingVertical="8dp"
-            app:selectionRequired="false"
-
-            app:singleSelection="true">
-
-        </com.google.android.material.chip.ChipGroup>
-    </androidx.core.widget.NestedScrollView>
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/selection_chip_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:chipSpacingHorizontal="8dp"
+                app:chipSpacingVertical="8dp"
+                app:selectionRequired="false"
+                app:singleSelection="true" />
+        </androidx.core.widget.NestedScrollView>
 
     </LinearLayout>
 </LinearLayout>

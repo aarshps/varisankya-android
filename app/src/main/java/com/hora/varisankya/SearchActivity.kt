@@ -70,17 +70,7 @@ class SearchActivity : BaseActivity() {
         searchRecyclerView.adapter = adapter
         
         // Scroll Haptics
-        searchRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                val layoutManager = recyclerView.layoutManager as? LinearLayoutManager
-                val firstVisibleItem = layoutManager?.findFirstVisibleItemPosition() ?: -1
-                
-                if (firstVisibleItem != lastFirstVisibleItem && firstVisibleItem != -1) {
-                    PreferenceHelper.performHaptics(recyclerView, HapticFeedbackConstants.SEGMENT_FREQUENT_TICK)
-                    lastFirstVisibleItem = firstVisibleItem
-                }
-            }
-        })
+        PreferenceHelper.attachScrollHaptics(searchRecyclerView)
         
         setupCategories()
         

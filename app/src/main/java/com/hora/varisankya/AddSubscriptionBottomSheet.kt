@@ -63,6 +63,10 @@ class AddSubscriptionBottomSheet(
         val deleteButton = view.findViewById<Button>(R.id.button_delete)
         val markPaidButton = view.findViewById<Button>(R.id.button_mark_paid)
         val dragHandle = view.findViewById<View>(R.id.drag_handle)
+        val scrollView = view.findViewById<androidx.core.widget.NestedScrollView>(R.id.add_subscription_scroll_view)
+        
+        // M3E Mechanical Scroll Feel
+        PreferenceHelper.attachNestedScrollHaptics(scrollView)
         
         // Expressive Buttons
         AnimationHelper.applySpringOnTouch(saveButton)
@@ -113,6 +117,7 @@ class AddSubscriptionBottomSheet(
 
         setupSelection(currencyAutoComplete, "Select Currency", currencies, addHaptic)
         setupSelection(recurrenceAutoComplete, "Select Recurrence", recurrenceOptions, addHaptic) { selected ->
+             PreferenceHelper.performHaptics(view, HapticFeedbackConstants.SEGMENT_TICK)
              if (selected == "Custom") {
                  tilFrequency.visibility = View.GONE
                  frequencyEditText.setText("")

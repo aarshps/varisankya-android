@@ -54,6 +54,10 @@
     <!-- Outline = Gray lines/borders -->
     <color name="mono_outline">#79747E</color>
     <color name="mono_outline_variant">#C4C4C4</color>
+    <!-- M3 Mappings for Drawables -->
+    <color name="surface_container_low">@color/mono_surface_container_low</color>
+    <color name="surface_container_high">@color/mono_surface_container_high</color>
+    <color name="tertiary_container">@color/mono_tertiary_container</color>
 </resources>
 
 

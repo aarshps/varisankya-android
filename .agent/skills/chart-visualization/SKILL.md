@@ -31,11 +31,16 @@ private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
 ```
 
 ## Drawing Standards
-
+ 
 - **Corner Radius:** All chart-related shapes (bars, bubbles) must use at least **12dp** (or `24dp` for large containers) to match the M3E aesthetic.
 - **Spacing:** Minimum **16dp** padding between chart elements and labels.
 - **Antialiasing:** Always enabled for smooth, premium curves.
-
-## Implementation: PaymentHistoryChart.kt
-
+ 
+## Interaction Standards
+ 
+- **Labels**: Horizontal Axis (Activity) and Legend (Bottom).
+- **Interactive Haptics**: Every bar tap MUST trigger `PreferenceHelper.performClickHaptic()`. A confirmed navigation (Drill Down) MUST trigger `performSuccessHaptic()`.
+ 
+## Implementation ExamplentHistoryChart.kt
+ 
 Always resolve colors via `ThemeHelper` in `onDraw` to ensure the chart respects the app's monochrome tonal policy.

@@ -64,6 +64,7 @@ class MainActivity : BaseActivity() {
     private lateinit var subscriptionsRecyclerView: RecyclerView
     private lateinit var fabAddSubscription: FloatingActionButton
     private lateinit var emptyStateContainer: View
+    private lateinit var mainNestedScrollView: androidx.core.widget.NestedScrollView
 
 
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
@@ -74,6 +75,7 @@ class MainActivity : BaseActivity() {
     private lateinit var heroLabel: TextView
     private lateinit var totalExpenseText: TextView
     private lateinit var expenseSubtitle: TextView
+    private lateinit var heroSubtitlePill: com.google.android.material.card.MaterialCardView
 
 
 
@@ -148,12 +150,14 @@ class MainActivity : BaseActivity() {
         emptyStateContainer = findViewById(R.id.empty_state_container)
 
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout)
+        mainNestedScrollView = findViewById(R.id.main_nested_scroll_view) // Need to add ID to XML
         
         // Hero Init
         heroSection = findViewById(R.id.hero_section)
         heroLabel = findViewById(R.id.hero_label)
         totalExpenseText = findViewById(R.id.total_expense_text)
         expenseSubtitle = findViewById(R.id.expense_subtitle)
+        heroSubtitlePill = findViewById(R.id.subtitle_pill)
 
 
         // Initialize Firebase and Credential Manager
@@ -167,6 +171,9 @@ class MainActivity : BaseActivity() {
         }
         subscriptionsRecyclerView.layoutManager = LinearLayoutManager(this)
         subscriptionsRecyclerView.adapter = adapter
+        
+        // M3E Mechanical Scroll Feel - Attached to the scrolling container
+        PreferenceHelper.attachNestedScrollHaptics(mainNestedScrollView)
 
         // Check current user and update UI
         updateUI(auth.currentUser != null)
@@ -187,18 +194,27 @@ class MainActivity : BaseActivity() {
         // Set click listeners
         profileImage.setOnClickListener { view ->
             PreferenceHelper.performClickHaptic(view)
+            // Premium Logo Shake
+            view.animate().rotationBy(15f).setDuration(100).withEndAction {
+                view.animate().rotationBy(-30f).setDuration(200).withEndAction {
+                    view.animate().rotation(0f).setDuration(100).start()
+                }.start()
+            }.start()
             startActivity(Intent(this, SettingsActivity::class.java))
         }
+        AnimationHelper.applySpringOnTouch(profileImage)
 
         searchTriggerLayout.setOnClickListener { view ->
             PreferenceHelper.performClickHaptic(view)
             startActivity(Intent(this, SearchActivity::class.java))
         }
+        AnimationHelper.applySpringOnTouch(searchTriggerLayout)
 
         btnSignIn.setOnClickListener { view ->
             PreferenceHelper.performSuccessHaptic(view)
             signInWithGoogle()
         }
+        AnimationHelper.applySpringOnTouch(btnSignIn)
 
         fabAddSubscription.setOnClickListener { view ->
             PreferenceHelper.performSuccessHaptic(view)
@@ -214,19 +230,6 @@ class MainActivity : BaseActivity() {
         // Expressive Touch
         AnimationHelper.applySpringOnTouch(heroSection)
 
-
-        // Scroll Behavior and Haptics
-        subscriptionsRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                val layoutManager = recyclerView.layoutManager as? LinearLayoutManager
-                val firstVisibleItem = layoutManager?.findFirstVisibleItemPosition() ?: -1
-                
-                if (firstVisibleItem != lastFirstVisibleItem && firstVisibleItem != -1) {
-                    PreferenceHelper.performHaptics(recyclerView, HapticFeedbackConstants.SEGMENT_FREQUENT_TICK)
-                    lastFirstVisibleItem = firstVisibleItem
-                }
-            }
-        })
 
         checkNotificationPermission()
 
@@ -330,8 +333,7 @@ class MainActivity : BaseActivity() {
 
                     val subscriptions = snapshots?.toObjects(Subscription::class.java) ?: emptyList()
                     
-                    // M3E Mechanical Scroll Feel
-                    PreferenceHelper.attachScrollHaptics(subscriptionsRecyclerView)
+                    // Mechanical Scroll Haptics are attached once in initializeApp() for efficiency
                     
                     // Sort: Active first, then by due date
                     val sortedSubscriptions = subscriptions.sortedWith(compareByDescending<Subscription> { it.active }.thenBy { it.dueDate })
@@ -347,10 +349,6 @@ class MainActivity : BaseActivity() {
                     }
                     
                     updateHeroSection(subscriptions)
-
-
-                    // Update Home Screen Widget
-                    com.hora.varisankya.widget.WidgetUpdateHelper.updateWidgetData(applicationContext, subscriptions)
                 }
         } ?: run {
             isDataLoaded = true
@@ -396,11 +394,15 @@ class MainActivity : BaseActivity() {
             
             // So simply: Is `sub.dueDate` in the current month and >= today?
             
-            if (!subDate.before(today)) {
-                // It is in the future (or today)
-                if (subDate.get(Calendar.MONTH) == currentMonth && subDate.get(Calendar.YEAR) == currentYear) {
-                    remainingLiability += sub.cost
-                }
+            // Calculate Liability:
+            // 1. Overdue Items (Before Today)
+            // 2. Upcoming Items (After/On Today AND In Current Month)
+            
+            val isOverdue = subDate.before(today)
+            val isCurrentMonth = subDate.get(Calendar.MONTH) == currentMonth && subDate.get(Calendar.YEAR) == currentYear
+            
+            if (isOverdue || isCurrentMonth) {
+                remainingLiability += sub.cost
             }
         }
         
@@ -420,18 +422,24 @@ class MainActivity : BaseActivity() {
         // Update UI
         val currentMonthName = java.text.SimpleDateFormat("MMM", java.util.Locale.getDefault()).format(today.time)
         heroLabel.text = "Remaining in $currentMonthName"
+        heroLabel.setTextColor(ThemeHelper.getOnSurfaceVariantColor(this)) // Reset
         
         val symbol = try {
             if (activeSubs.isNotEmpty()) java.util.Currency.getInstance(activeSubs[0].currency).symbol else "₹"
         } catch (e: Exception) { "₹" }
         
+        // Use a stable color by default
+        totalExpenseText.setTextColor(ThemeHelper.getOnSurfaceColor(this))
+        heroSubtitlePill.setCardBackgroundColor(ThemeHelper.getSurfaceContainerHighestColor(this))
+        heroSubtitlePill.strokeColor = ThemeHelper.getOutlineVariantColor(this)
+
         // Animate Count Up
         AnimationHelper.animateTextCountUp(totalExpenseText, remainingLiability, "$symbol ")
-        // totalExpenseText.text = "$symbol ${if(remainingLiability % 1.0 == 0.0) String.format("%.0f", remainingLiability) else remainingLiability}"
 
         if (nextPayment != null) {
             val format = java.text.SimpleDateFormat("MMM dd", java.util.Locale.getDefault())
             expenseSubtitle.text = "Next: ${nextPayment.name} on ${format.format(nextPayment.dueDate!!)}"
+            expenseSubtitle.setTextColor(ThemeHelper.getSecondaryColor(this))
         } else {
              // If no FUTURE payment found, check for OVERDUE items
              val overdueSubs = activeSubs.filter { 
@@ -447,6 +455,7 @@ class MainActivity : BaseActivity() {
              if (overdueSubs.isNotEmpty()) {
                  // Priority Alert State
                  heroLabel.text = "Overdue Actions"
+                 heroLabel.setTextColor(ThemeHelper.getErrorColor(this))
                  
                  // Show total overdue amount
                  val overdueAmount = overdueSubs.sumOf { it.cost }
@@ -455,19 +464,23 @@ class MainActivity : BaseActivity() {
                  totalExpenseText.text = "$sym ${if(overdueAmount % 1.0 == 0.0) String.format("%.0f", overdueAmount) else overdueAmount}"
                  expenseSubtitle.text = "${overdueSubs.size} payments are past due"
                  
-                 // Make text Red for urgency
+                 // Urgent Styling
                  totalExpenseText.setTextColor(ThemeHelper.getErrorColor(this))
+                 expenseSubtitle.setTextColor(ThemeHelper.getErrorColor(this))
+                 heroSubtitlePill.setCardBackgroundColor(android.graphics.Color.TRANSPARENT)
+                 heroSubtitlePill.strokeColor = ThemeHelper.getErrorColor(this)
              } else if (activeSubs.isNotEmpty()) {
-                 // Active subs exist but nothing overdue and nothing this month?
-                 // This means everything is paid for current month and due next month/year.
+                 // All Clear
                  totalExpenseText.text = "All Clear"
                  expenseSubtitle.text = "Relax! No payments left via $currentMonthName"
                  totalExpenseText.setTextColor(ThemeHelper.getPrimaryColor(this))
+                 expenseSubtitle.setTextColor(ThemeHelper.getPrimaryColor(this))
              } else {
                  val symbol = try { java.util.Currency.getInstance("INR").symbol } catch (e: Exception) { "₹" }
                  heroLabel.text = "Monthly Expenses"
                  totalExpenseText.text = "${symbol}0"
                  expenseSubtitle.text = "No active subscriptions"
+                 expenseSubtitle.setTextColor(ThemeHelper.getSecondaryColor(this))
              }
         }
     }
@@ -549,9 +562,8 @@ class MainActivity : BaseActivity() {
         if (isLoggedIn) {
             loginContainer.visibility = View.GONE
             appBar.visibility = View.VISIBLE
+            swipeRefreshLayout.visibility = View.VISIBLE
             fabAddSubscription.visibility = View.VISIBLE
-
-            subscriptionsRecyclerView.visibility = View.VISIBLE
             
             profileImage.visibility = View.VISIBLE
 
@@ -561,7 +573,7 @@ class MainActivity : BaseActivity() {
         } else {
             loginContainer.visibility = View.VISIBLE
             appBar.visibility = View.GONE
-            subscriptionsRecyclerView.visibility = View.GONE
+            swipeRefreshLayout.visibility = View.GONE
             fabAddSubscription.visibility = View.GONE
 
             emptyStateContainer.visibility = View.GONE

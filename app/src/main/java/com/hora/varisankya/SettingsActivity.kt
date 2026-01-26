@@ -46,8 +46,9 @@ class SettingsActivity : BaseActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_back)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
-
+        supportActionBar?.setDisplayShowTitleEnabled(true)
+        supportActionBar?.title = "Settings"
+        
         auth = FirebaseAuth.getInstance()
 
         setupLogoutButton()
@@ -103,18 +104,11 @@ class SettingsActivity : BaseActivity() {
 
     private fun setupScrollHaptics() {
         val scrollView = findViewById<NestedScrollView>(R.id.settings_scroll_view)
-        var lastScrollY = 0
-
-        scrollView.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { v, _, scrollY, _, _ ->
-            if (abs(scrollY - lastScrollY) > 150) {
-                PreferenceHelper.performHaptics(v, HapticFeedbackConstants.SEGMENT_FREQUENT_TICK)
-                lastScrollY = scrollY
-            }
-        })
+        PreferenceHelper.attachNestedScrollHaptics(scrollView)
     }
 
     private fun setupCardGrouping() {
-        val cards = listOf(
+        val cards = listOfNotNull(
             findViewById<MaterialCardView>(R.id.card_security),
             findViewById<MaterialCardView>(R.id.card_appearance),
             findViewById<MaterialCardView>(R.id.card_typography),
@@ -139,6 +133,12 @@ class SettingsActivity : BaseActivity() {
             // Expressive Touch
             AnimationHelper.applySpringOnTouch(card)
         }
+
+        // Hero Spring & Haptic
+        findViewById<View>(R.id.card_settings_hero)?.let {
+            it.setOnClickListener { v -> PreferenceHelper.performClickHaptic(v) }
+            AnimationHelper.applySpringOnTouch(it)
+        }
     }
 
     private fun updateGroupShapes(group: ChipGroup) {
@@ -151,28 +151,32 @@ class SettingsActivity : BaseActivity() {
 
 
     private fun setupLogoutButton() {
-        val logoutButton = findViewById<View>(R.id.logout_button)
-        logoutButton.setOnClickListener {
-            PreferenceHelper.performSuccessHaptic(window.decorView)
-            
-            // Fire and forget: Clear system credential state in background
-            // We use a detached scope because the activity will die immediately
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    val credentialManager = CredentialManager.create(applicationContext)
-                    credentialManager.clearCredentialState(ClearCredentialStateRequest())
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-            
-            // Instant navigation
-            auth.signOut()
-            val intent = Intent(this@SettingsActivity, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-            finish()
+        val logoutCard = findViewById<View>(R.id.logout_card)
+        logoutCard.setOnClickListener {
+            performLogout()
         }
+        AnimationHelper.applySpringOnTouch(logoutCard)
+    }
+
+    private fun performLogout() {
+        PreferenceHelper.performSuccessHaptic(window.decorView)
+        
+        // Fire and forget: Clear system credential state in background
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val credentialManager = CredentialManager.create(applicationContext)
+                credentialManager.clearCredentialState(ClearCredentialStateRequest())
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        
+        // Instant navigation
+        auth.signOut()
+        val intent = Intent(this@SettingsActivity, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
     }
 
     private fun setupThemeToggle() {

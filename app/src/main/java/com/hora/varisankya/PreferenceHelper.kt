@@ -168,26 +168,59 @@ object PreferenceHelper {
      */
     fun attachScrollHaptics(recyclerView: androidx.recyclerview.widget.RecyclerView) {
         if (!isHapticsEnabled(recyclerView.context)) return
+        
+        // Prevent duplicate listeners
+        if (recyclerView.getTag(R.id.haptic_scroll_listener_tag) != null) return
 
-        recyclerView.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+        val listener = object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
             private var accumulatedDy = 0
-            private val HAPTIC_THRESHOLD_PX = (80 * recyclerView.context.resources.displayMetrics.density).toInt() // Typical item height
+            private val HAPTIC_THRESHOLD_PX = (40 * recyclerView.context.resources.displayMetrics.density).toInt()
 
             override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 accumulatedDy += dy
 
                 if (Math.abs(accumulatedDy) >= HAPTIC_THRESHOLD_PX) {
-                    // Trigger subtle tick
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                         recyclerView.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
                     } else {
                         recyclerView.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                     }
-                    // Reset accumulator, keeping remainder for precision
                     accumulatedDy %= HAPTIC_THRESHOLD_PX
                 }
             }
+        }
+        
+        recyclerView.addOnScrollListener(listener)
+        recyclerView.setTag(R.id.haptic_scroll_listener_tag, true)
+    }
+    /**
+     * Attaches a subtle scroll haptic engine to a NestedScrollView.
+     */
+    fun attachNestedScrollHaptics(scrollView: androidx.core.widget.NestedScrollView) {
+        if (!isHapticsEnabled(scrollView.context)) return
+        
+        // Prevent duplicate listeners
+        if (scrollView.getTag(R.id.haptic_scroll_listener_tag) != null) return
+
+        var accumulatedDy = 0
+        val thresholdPx = (40 * scrollView.context.resources.displayMetrics.density).toInt()
+        var lastScrollY = scrollView.scrollY
+
+        scrollView.setOnScrollChangeListener(androidx.core.widget.NestedScrollView.OnScrollChangeListener { v, _, scrollY, _, _ ->
+            val dy = scrollY - lastScrollY
+            lastScrollY = scrollY
+            accumulatedDy += dy
+
+            if (Math.abs(accumulatedDy) >= thresholdPx) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                    v.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                } else {
+                    v.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                }
+                accumulatedDy %= thresholdPx
+            }
         })
+        scrollView.setTag(R.id.haptic_scroll_listener_tag, true)
     }
 }

@@ -28,13 +28,26 @@
     <color name="mono_error_container">#505050</color>
     <color name="mono_on_error_container">#E0E0E0</color>
     
-    <!-- Surface = Dark Gray/Black -->
-    <color name="mono_surface">#1C1B1F</color>
+    <!-- Surface Palette (Dark Tonal Layers) -->
+    <color name="mono_dark_surface">#121212</color>
+    <color name="mono_surface">#121212</color>
     <color name="mono_on_surface">#E6E1E5</color>
     <color name="mono_surface_variant">#2D2D2D</color>
     <color name="mono_on_surface_variant">#CAC4D0</color>
     
+    <color name="mono_dark_surface_container_lowest">#0F0F0F</color>
+    <color name="mono_dark_surface_container_low">#1A1A1A</color>
+    <color name="mono_dark_surface_container">#212121</color>
+    <color name="mono_dark_surface_container_high">#2B2B2B</color>
+    <color name="mono_dark_surface_container_highest">#333333</color>
+
     <!-- Outline = Gray lines/borders -->
     <color name="mono_outline">#938F99</color>
     <color name="mono_outline_variant">#49454F</color>
+
+    <!-- M3 Mappings for Drawables -->
+    <color name="surface_container_low">@color/mono_dark_surface_container_low</color>
+    <color name="surface_container_high">@color/mono_dark_surface_container_high</color>
+    <color name="tertiary_container">@color/mono_tertiary_container</color>
+
 </resources>

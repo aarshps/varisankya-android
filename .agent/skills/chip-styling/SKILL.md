@@ -24,28 +24,15 @@ Standardized logic for programmatic chips:
 
 ```kotlin
 fun styleChip(chip: Chip) {
-    val isChecked = chip.isChecked
-    val r = context.resources.displayMetrics.density
-    
-    // Expressive Shape Transition
-    val selectedRadius = 20f * r // M3E Large
-    val unselectedRadius = 100f * r // Standard Pill
-    
-    chip.shapeAppearanceModel = chip.shapeAppearanceModel.toBuilder()
-        .setAllCornerSizes(if (isChecked) selectedRadius else unselectedRadius)
-        .build()
-        
-    // Tonal Color Policy
-    if (isChecked) {
-        // Active/Selected state now matches Home Screen Pills (Primary)
-        chip.chipBackgroundColor = ColorStateList.valueOf(ThemeHelper.getPrimaryColor(context))
-        chip.setTextColor(ThemeHelper.getOnPrimaryColor(context))
-    } else {
-        chip.chipBackgroundColor = ColorStateList.valueOf(ThemeHelper.getSurfaceContainerHighColor(context))
-        chip.setTextColor(ThemeHelper.getOnSurfaceColor(context))
-    }
+    // ... styling logic ...
+
+    // M3E Expressive: Tactile Spring
+    AnimationHelper.applySpringOnTouch(chip)
 }
 ```
+
+## Expressive Motion
+All chips MUST include `AnimationHelper.applySpringOnTouch()`. This provides a "morphed" squish effect when toggling, making the selection feel physical.
 
 ## Rule of Thumb
 
