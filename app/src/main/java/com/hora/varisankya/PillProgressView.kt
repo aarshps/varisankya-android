@@ -32,26 +32,29 @@ class PillProgressView @JvmOverloads constructor(
         }
 
     // Color of the progress fill (foreground)
-    var progressColor: Int = Color.BLACK
+    var progressColor: Int = com.hora.varisankya.util.ThemeHelper.getPrimaryColor(context)
         set(value) {
             field = value
             invalidate()
         }
 
-    // Color of the track (background)
-    var pillBackgroundColor: Int = Color.TRANSPARENT
+    // Color of the track (background) - synched with legacy pillBackgroundColor
+    var trackColor: Int = com.hora.varisankya.util.ThemeHelper.getSurfaceVariantColor(context)
         set(value) {
             field = value
+            pillBackgroundColor = value // Keep synced
             invalidate()
+        }
+
+    // Deprecated: delegated to trackColor
+    var pillBackgroundColor: Int
+        get() = trackColor
+        set(value) {
+            if (trackColor != value) {
+                trackColor = value
+            }
         }
         
-    // Unused in filled mode, kept for compatibility
-    var trackColor: Int = Color.TRANSPARENT
-        set(value) {
-            field = value
-            invalidate()
-        }
-
     var cornerRadiusPx: Float = TypedValue.applyDimension(
         TypedValue.COMPLEX_UNIT_DIP, 
         1000f, 
@@ -79,9 +82,9 @@ class PillProgressView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        // 1. Draw Background (Track)
-        if (pillBackgroundColor != Color.TRANSPARENT) {
-            fillPaint.color = pillBackgroundColor
+        // 1. Draw Background (Track) - ONLY if not fully filled to avoid antialiasing bleed
+        if (trackColor != Color.TRANSPARENT && progress < 100) {
+            fillPaint.color = trackColor
             canvas.drawPath(path, fillPaint)
         }
 
@@ -89,19 +92,21 @@ class PillProgressView @JvmOverloads constructor(
         if (progress > 0) {
             fillPaint.color = progressColor
             
-            // Clip to the pill shape to ensure the left side matches perfectly
-            // and to contain any overflow if calculation is slightly off
+            // Clip to the pill shape to ensure the leading edge matches perfectly
+            // This is the source of truth for the outer boundary
             canvas.save()
             canvas.clipPath(path)
             
             val progressWidth = width * (progress / 100f)
             val radius = height / 2f
             
-            // Draw a Rounded Rect for the progress to give it a soft, rounded leading edge
-            progressRectF.set(0f, 0f, progressWidth, height.toFloat())
+            // Draw a Rounded Rect for the progress
+            // We use a slightly oversized rect on the left to ensure coverage during clipping
+            progressRectF.set(-radius, 0f, progressWidth, height.toFloat())
             canvas.drawRoundRect(progressRectF, radius, radius, fillPaint)
             
             canvas.restore()
         }
     }
+
 }

@@ -9,13 +9,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.chip.Chip
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import com.hora.varisankya.util.AnimationHelper
 
 class UnifiedHistoryActivity : BaseActivity() {
 
@@ -29,6 +29,8 @@ class UnifiedHistoryActivity : BaseActivity() {
     private lateinit var loadingContainer: View
     private lateinit var loadingStatus: TextView
     private lateinit var noHistoryContainer: View
+    private lateinit var totalSpentText: TextView
+    private lateinit var totalSpentLabel: TextView
 
 
     private var allPayments: List<PaymentRecord> = emptyList()
@@ -64,6 +66,10 @@ class UnifiedHistoryActivity : BaseActivity() {
         loadingContainer = findViewById(R.id.loading_container)
         loadingStatus = findViewById(R.id.loading_status)
         noHistoryContainer = findViewById(R.id.no_history_container)
+        
+        // Hero Text Init
+        totalSpentText = findViewById(R.id.text_total_spent_amount)
+        totalSpentLabel = findViewById(R.id.text_total_spent_label)
 
         // Initialize Adapter
         // Initialize Adapter (Read-Only Mode but with Haptics)
@@ -71,26 +77,14 @@ class UnifiedHistoryActivity : BaseActivity() {
             defaultCurrency = "USD",
             onEditClicked = { 
                 // Just for haptic feedback
-                PreferenceHelper.performHaptics(recyclerView, HapticFeedbackConstants.CONTEXT_CLICK) 
+                PreferenceHelper.performHaptics(recyclerView, HapticFeedbackConstants.CONTEXT_CLICK)
             },
             onDeleteClicked = null
         )
-        recyclerView.adapter = adapter
+        // M3E Scroll Haptics
         recyclerView.layoutManager = LinearLayoutManager(this)
-        
-        // Scroll Haptics
-        var lastFirstVisibleItem = -1
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                val layoutManager = recyclerView.layoutManager as? LinearLayoutManager
-                val firstVisibleItem = layoutManager?.findFirstVisibleItemPosition() ?: -1
-                
-                if (firstVisibleItem != lastFirstVisibleItem && firstVisibleItem != -1) {
-                    PreferenceHelper.performHaptics(recyclerView, HapticFeedbackConstants.SEGMENT_FREQUENT_TICK)
-                    lastFirstVisibleItem = firstVisibleItem
-                }
-            }
-        })
+        recyclerView.adapter = adapter
+        PreferenceHelper.attachScrollHaptics(recyclerView)
         
         // Haptics for chart interaction defined in View
         chartView.setOnBarClickListener { data ->
@@ -277,9 +271,6 @@ class UnifiedHistoryActivity : BaseActivity() {
             )
         }
 
-        chartView.setChartData(chartData)
-        updateList(allPayments)
-        
         // Hide Back Button
         if (backButton.isVisible) {
             backButton.animate().alpha(0f)
@@ -289,6 +280,19 @@ class UnifiedHistoryActivity : BaseActivity() {
                     backButton.isVisible = false
                 }.start()
         }
+
+        // --- EXPRESSIVE HERO UPDATE ---
+        // --- EXPRESSIVE HERO UPDATE ---
+        val totalAmount = allPayments.sumOf { it.amount }
+        val currency = if(allPayments.isNotEmpty()) allPayments[0].currency else "USD"
+        val symbol = CurrencyHelper.getSymbol(currency)
+        AnimationHelper.animateTextCountUp(totalSpentText, totalAmount, "$symbol ")
+        totalSpentLabel.text = "Total Spent (All Time)"
+        // -----------------------------
+        // -----------------------------
+        
+        chartView.setChartData(chartData)
+        updateList(allPayments)
 
         scrollToEnd()
         
@@ -341,6 +345,16 @@ class UnifiedHistoryActivity : BaseActivity() {
             )
         }
         
+        // --- EXPRESSIVE HERO UPDATE ---
+        // --- EXPRESSIVE HERO UPDATE ---
+        val totalAmount = level.payments.sumOf { it.amount }
+        val currency = if(level.payments.isNotEmpty()) level.payments[0].currency else "USD"
+        val symbol = CurrencyHelper.getSymbol(currency)
+        AnimationHelper.animateTextCountUp(totalSpentText, totalAmount, "$symbol ")
+        totalSpentLabel.text = "Total in ${level.monthLabel}"
+        // -----------------------------
+        // -----------------------------
+
         chartView.setChartData(chartData)
         updateList(level.payments.sortedByDescending { it.date })
         
@@ -375,6 +389,16 @@ class UnifiedHistoryActivity : BaseActivity() {
                 null
             )
         }
+
+        // --- EXPRESSIVE HERO UPDATE ---
+        // --- EXPRESSIVE HERO UPDATE ---
+        val totalAmount = level.payments.sumOf { it.amount }
+        val currency = if(level.payments.isNotEmpty()) level.payments[0].currency else "USD"
+        val symbol = CurrencyHelper.getSymbol(currency)
+        AnimationHelper.animateTextCountUp(totalSpentText, totalAmount, "$symbol ")
+        totalSpentLabel.text = "Total on ${level.dayLabel}"
+        // -----------------------------
+        // -----------------------------
 
         chartView.setChartData(chartData)
         updateList(level.payments.sortedByDescending { it.date })

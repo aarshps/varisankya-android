@@ -122,4 +122,72 @@ object PreferenceHelper {
             view.performHapticFeedback(feedbackConstant)
         }
     }
+
+    /**
+     * Performs a strong "Success" or "Confirm" haptic.
+     * Uses CONFIRM on Android R+, else CONTEXT_CLICK.
+     */
+    fun performSuccessHaptic(view: View) {
+        if (!isHapticsEnabled(view.context)) return
+        
+        val constant = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            HapticFeedbackConstants.CONFIRM
+        } else {
+            HapticFeedbackConstants.CONTEXT_CLICK
+        }
+        view.performHapticFeedback(constant)
+    }
+
+    /**
+     * Performs a light "Click" or "Tick" haptic.
+     * Uses CLOCK_TICK or KEYBOARD_TAP.
+     */
+    fun performClickHaptic(view: View) {
+        if (!isHapticsEnabled(view.context)) return
+        view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+    }
+
+    /**
+     * Performs an "Error" or "Reject" haptic.
+     */
+    fun performErrorHaptic(view: View) {
+         if (!isHapticsEnabled(view.context)) return
+         
+         val constant = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            HapticFeedbackConstants.REJECT
+        } else {
+            HapticFeedbackConstants.LONG_PRESS // Fallback heavy vibration
+        }
+        view.performHapticFeedback(constant)
+    }
+
+    /**
+     * Attaches a subtle scroll haptic engine to a RecyclerView.
+     * Triggers a light TICK every time the user scrolls past a distance equivalent to ~1 item (80dp).
+     * Creates a premium "mechanical wheel" feel.
+     */
+    fun attachScrollHaptics(recyclerView: androidx.recyclerview.widget.RecyclerView) {
+        if (!isHapticsEnabled(recyclerView.context)) return
+
+        recyclerView.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+            private var accumulatedDy = 0
+            private val HAPTIC_THRESHOLD_PX = (80 * recyclerView.context.resources.displayMetrics.density).toInt() // Typical item height
+
+            override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                accumulatedDy += dy
+
+                if (Math.abs(accumulatedDy) >= HAPTIC_THRESHOLD_PX) {
+                    // Trigger subtle tick
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                        recyclerView.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                    } else {
+                        recyclerView.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                    }
+                    // Reset accumulator, keeping remainder for precision
+                    accumulatedDy %= HAPTIC_THRESHOLD_PX
+                }
+            }
+        })
+    }
 }

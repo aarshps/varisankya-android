@@ -21,13 +21,14 @@ class PaymentAdapter(
 ) : ListAdapter<PaymentRecord, PaymentAdapter.ViewHolder>(PaymentDiffCallback()) {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val dayNumberText: TextView = view.findViewById(R.id.text_day_number)
         val dateText: TextView = view.findViewById(R.id.text_payment_date)
         val subNameText: TextView = view.findViewById(R.id.text_subscription_name)
+        val amountPill: com.google.android.material.card.MaterialCardView = view.findViewById(R.id.amount_pill)
         val amountText: TextView = view.findViewById(R.id.text_payment_amount)
-        val lineTop: View = view.findViewById(R.id.timeline_line_top)
-        val lineBottom: View = view.findViewById(R.id.timeline_line_bottom)
-        val btnDelete: MaterialButton = view.findViewById(R.id.btn_delete_payment)
+        val btnDelete: com.google.android.material.button.MaterialButton = view.findViewById(R.id.btn_delete_payment)
     }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -37,9 +38,14 @@ class PaymentAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val payment = getItem(position)
-        val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-
-        holder.dateText.text = payment.date?.let { dateFormat.format(it) } ?: "Unknown Date"
+        
+        // Date formatting
+        val fullFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
+        val dayFormat = SimpleDateFormat("dd", Locale.getDefault())
+        
+        holder.dayNumberText.text = payment.date?.let { dayFormat.format(it) } ?: "?"
+        holder.dateText.text = payment.date?.let { fullFormat.format(it) } ?: "Unknown Date"
+        
         holder.subNameText.text = payment.subscriptionName ?: "Unknown Subscription"
         
         val recordCurrency = payment.currency ?: defaultCurrency
@@ -50,19 +56,28 @@ class PaymentAdapter(
         }
         holder.amountText.text = String.format("%s %.2f", symbol, payment.amount)
 
-        // Timeline logic
-        holder.lineTop.visibility = if (position == 0) View.INVISIBLE else View.VISIBLE
-        holder.lineBottom.visibility = if (position == itemCount - 1) View.INVISIBLE else View.VISIBLE
+        // M3 High-Contrast Highlights: Dynamic Primary
+        val context = holder.itemView.context
+        val primary = com.hora.varisankya.util.ThemeHelper.getPrimaryColor(context)
+        val onPrimary = com.hora.varisankya.util.ThemeHelper.getOnPrimaryColor(context)
+        
+        holder.amountPill.setCardBackgroundColor(primary)
+        holder.amountText.setTextColor(onPrimary)
+
 
         if (onEditClicked != null) {
             holder.itemView.setOnClickListener {
                 PreferenceHelper.performHaptics(it, HapticFeedbackConstants.VIRTUAL_KEY)
                 onEditClicked.invoke(payment)
             }
+            com.hora.varisankya.util.AnimationHelper.applySpringOnTouch(holder.itemView)
         } else {
             holder.itemView.setOnClickListener(null)
             holder.itemView.isClickable = false
         }
+        
+        // Entrance
+        com.hora.varisankya.util.AnimationHelper.animateEntrance(holder.itemView, position)
 
         if (onDeleteClicked != null) {
             holder.btnDelete.visibility = View.VISIBLE

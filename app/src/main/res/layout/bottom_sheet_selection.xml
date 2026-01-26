@@ -56,6 +56,7 @@
             app:chipSpacingHorizontal="8dp"
             app:chipSpacingVertical="8dp"
             app:selectionRequired="false"
+
             app:singleSelection="true">
 
         </com.google.android.material.chip.ChipGroup>

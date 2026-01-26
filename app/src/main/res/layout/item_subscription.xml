@@ -5,15 +5,21 @@
     style="?attr/materialCardViewFilledStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="16dp">
+    android:layout_marginHorizontal="@dimen/card_margin_horizontal"
+    android:layout_marginVertical="6dp"
+    app:cardBackgroundColor="?attr/colorSurfaceContainer"
+    app:cardCornerRadius="@dimen/card_corner_radius_large"
+    app:strokeWidth="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="24dp"
-        android:paddingTop="20dp"
-        android:paddingEnd="20dp"
-        android:paddingBottom="20dp">
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp">
+
+
 
         <TextView
             android:id="@+id/subscription_name"
@@ -36,14 +42,13 @@
             style="?attr/materialCardViewFilledStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="-16dp"
             app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
             app:cardCornerRadius="100dp"
             app:cardElevation="0dp"
             app:strokeWidth="0dp"
-            app:layout_constraintBottom_toBottomOf="@+id/subscription_name"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/unified_status_pill"
-            app:layout_constraintTop_toTopOf="@+id/subscription_name">
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
                 android:id="@+id/subscription_amount"
@@ -51,13 +56,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingStart="12dp"
-                android:paddingTop="6dp"
-                android:paddingEnd="24dp"
-                android:paddingBottom="6dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="8dp"
                 android:textColor="?attr/colorOnSurfaceVariant"
-                android:textStyle="bold"
                 tools:text="$ 12.99" />
+
         </com.google.android.material.card.MaterialCardView>
+
 
         <TextView
             android:id="@+id/subscription_details"
@@ -81,10 +87,9 @@
             app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
             app:cardCornerRadius="100dp"
             app:cardElevation="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/pill_progress_view"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed"
             app:strokeWidth="0dp">
 
             <TextView
@@ -97,23 +102,10 @@
                 android:paddingVertical="10dp"
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="13sp"
-                android:textStyle="bold"
                 tools:text="5 Days" />
 
         </com.google.android.material.card.MaterialCardView>
 
-
-
-        <!-- Separate Progress Bar Below Pill (Fattier) -->
-        <com.hora.varisankya.PillProgressView
-            android:id="@+id/pill_progress_view"
-            android:layout_width="0dp"
-            android:layout_height="10dp"
-            android:layout_marginTop="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/unified_status_pill"
-            app:layout_constraintStart_toStartOf="@id/unified_status_pill"
-            app:layout_constraintTop_toBottomOf="@id/unified_status_pill" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -31,19 +31,25 @@ Subscription expense tracking application that helps users monitor recurring pay
 | `PaymentHistoryBottomSheet` | Per-subscription payment history |
 
 ### Adapters
-
+ 
 | Adapter | Purpose |
 |---------|---------|
-| `SubscriptionAdapter` | Main subscription list with 4-tier coloring |
+| `SubscriptionAdapter` | Main list with Primary/Active coloring |
 | `PaymentAdapter` | Payment history items |
 | `PaymentHistoryAdapter` | Unified history timeline |
+ 
+### Hero Insights (Cashflow)
+ 
+The `MainActivity` Hero Card implements a **"Remaining Monthly Liability"** logic, calculating the sum of all future bills in the current month to provide a cashflow forecast.
 
 ### Utilities
 
 | Utility | Purpose |
 |---------|---------|
 | `ThemeHelper` | M3 Dynamic Color resolution |
+| `ChipHelper` | Centralized High-Contrast Chip styling |
 | `PreferenceHelper` | SharedPreferences access |
+
 | `Constants` | App-wide constants (categories, recurrences) |
 
 ### Custom Views
@@ -51,6 +57,8 @@ Subscription expense tracking application that helps users monitor recurring pay
 | View | Purpose |
 |------|---------|
 | `RoundedProgressView` | Circular progress in subscription pills |
+| `PaymentHistoryChart` | Custom drawn payment timeline chart |
+
 
 ## Data Layer
 

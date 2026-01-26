@@ -4,12 +4,34 @@ description: How to properly resolve Material 3 Dynamic Colors in this Android/K
 ---
 
 # M3 Dynamic Color Resolution
-
-This skill explains how to correctly resolve Material 3 (M3) Dynamic Color theme attributes in this Android project.
-
-## Problem
-
-Direct references to `com.google.android.material.R.attr.colorPrimary` and similar M3 attributes cause Kotlin compilation errors ("Unresolved reference"). This is a known issue with Kotlin's R-class handling.
+ 
+ > [!NOTE]
+ > **Dynamic Colors (Android 12+) are ENABLED** in this project via `VarisankyaApplication`. The app uses Material You (wallpaper-based) theming.
+ 
+ This skill explains how to correctly resolve Material 3 (M3) Dynamic Color theme attributes in this Android project.
+ 
+ ## Problem: BaseActivity Theme Override
+ 
+ A common issue in this project is that `BaseActivity` calls `setTheme()` to handle custom fonts (System vs Google Sans). This manual `setTheme()` call **wipes out** the Dynamic Color overlay applied by the Application class.
+ 
+ **Solution:**
+ You MUST re-apply dynamic colors *after* calling `setTheme()`:
+ 
+ ```kotlin
+ override fun onCreate(savedInstanceState: Bundle?) {
+     // ... logic to check font pref ...
+     setTheme(themeId) // <--- This wipes Dynamic Colors
+     
+     // VITAL: Re-apply overlay immediately
+     com.google.android.material.color.DynamicColors.applyToActivityIfAvailable(this)
+     
+     super.onCreate(savedInstanceState)
+ }
+ ```
+ 
+ ## Problem: Kotlin R-Class Resolution
+ 
+ Direct references to `com.google.android.material.R.attr.colorPrimary` often cause "Unresolved reference" errors.
 
 ## Solution: ThemeHelper
 
@@ -31,7 +53,9 @@ app/src/main/java/com/hora/varisankya/util/ThemeHelper.kt
 | `getSurfaceVariantColor(context)` | colorSurfaceVariant | Low contrast (Tier 4/Inactive) |
 | `getOnSurfaceVariantColor(context)` | colorOnSurfaceVariant | Text on SurfaceVariant |
 | `getOnSurfaceColor(context)` | colorOnSurface | Standard text |
+| `getSurfaceContainerHighColor(context)` | colorSurfaceContainerHigh | Distinct surface for chips/cards |
 | `getOutlineVariantColor(context)` | colorOutlineVariant | Progress bar tracks |
+
 
 ### How It Works
 
@@ -72,8 +96,10 @@ For XML resources, use `?attr/` syntax which resolves correctly:
 ```
 
 These are defined in:
-- `res/color/selector_chip_background_high_contrast.xml`
-- `res/color/selector_chip_text_high_contrast.xml`
+- `res/color/chip_background_color.xml`
+- `res/color/chip_stroke_color.xml`
+- `res/color/chip_text_color.xml`
+
 
 ## Troubleshooting
 
@@ -112,7 +138,22 @@ getIdentifier(name, "attr", context.packageName)
 
 **Solution:** Apply colors programmatically using ThemeHelper (see chip-styling skill).
 
+### Surface Hierarchy (Tonal Layering)
+
+To achieve the "Breezy" M3E look, use the correct container role for the background:
+
+| Role | Attribute | Usage |
+|------|-----------|-------|
+| **Base** | `colorSurfaceContainerLow` | Main screen window background. |
+| **Card** | `colorSurfaceContainer` | Subscription items, standard blocks. |
+| **Pill** | `colorSurfaceContainerHigh` | Highlight bubbles, amount chips inside cards. |
+| **Active** | `colorPrimary` | Highest urgency/active status highlights. |
+
 ## Related Skills
 
+
 - **chip-styling** - High-contrast chip implementation
+- **chart-visualization** - Standardized chart drawing and colors
+- **header-actions** - Toolbar icon standards and order
 - **subscription-color-hierarchy** - 4-tier pill color system
+

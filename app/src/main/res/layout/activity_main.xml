@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
     tools:context=".MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -12,7 +13,7 @@
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
         app:elevation="0dp"
-        app:liftOnScroll="true">
+        app:liftOnScroll="false">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -20,7 +21,9 @@
             android:layout_height="?attr/actionBarSize"
             app:contentInsetEnd="24dp"
             app:contentInsetStart="24dp"
-            app:titleCentered="false">
+            app:titleCentered="false"
+            android:background="?attr/colorSurfaceContainerLow">
+
 
             <LinearLayout
                 android:id="@+id/search_trigger_layout"
@@ -63,6 +66,9 @@
                 app:shapeAppearanceOverlay="@style/App.ShapeAppearanceOverlay.Rounded"
                 tools:src="@tools:sample/avatars" />
 
+
+
+
         </com.google.android.material.appbar.MaterialToolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -73,60 +79,129 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <FrameLayout
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:animateLayoutChanges="true">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/subscriptions_recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:paddingTop="0dp"
-                android:paddingBottom="100dp"
-                tools:listitem="@layout/item_subscription" />
+            android:fillViewport="true">
 
             <LinearLayout
-                android:id="@+id/empty_state_container"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="32dp"
-                android:visibility="gone"
-                tools:visibility="visible">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-                <ImageView
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:alpha="0.6"
-                    android:src="@drawable/ic_add"
-                    app:tint="?attr/colorOutline" />
-
-                <TextView
-                    android:layout_width="wrap_content"
+                <!-- M3E Expressive Hero Section (Google Weather Style) -->
+                <LinearLayout
+                    android:id="@+id/hero_section"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="No Subscriptions Yet"
-                    android:textAlignment="center"
-                    android:textAppearance="?attr/textAppearanceHeadlineSmall"
-                    android:textColor="?attr/colorOnSurface" />
+                    android:paddingTop="16dp"
+                    android:paddingBottom="24dp"
+                    android:paddingHorizontal="16dp"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground"
+                    android:foreground="?attr/selectableItemBackground">
 
-                <TextView
-                    android:layout_width="wrap_content"
+
+
+
+                    <TextView
+                        android:id="@+id/hero_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Upcoming Payment"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
+
+                    <TextView
+                        android:id="@+id/total_expense_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:textAppearance="?attr/textAppearanceDisplayLarge"
+                        android:textColor="?attr/colorOnSurface"
+                        android:includeFontPadding="false"
+                        tools:text="₹12,450" />
+
+                    <TextView
+                        android:id="@+id/expense_subtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Active Subscriptions (12)"
+                        android:textAppearance="?attr/textAppearanceLabelLarge"
+                        android:textColor="?attr/colorSecondary" />
+
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/subscriptions_recycler_view"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Add your first subscription to start tracking your expenses."
-                    android:textAlignment="center"
-                    android:textAppearance="?attr/textAppearanceBodyLarge"
-                    android:textColor="?attr/colorOnSurfaceVariant" />
+                    android:clipToPadding="false"
+                    android:nestedScrollingEnabled="false"
+                    android:paddingBottom="24dp"
+                    tools:listitem="@layout/item_subscription" />
+
+
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/empty_state_container"
+                    style="?attr/materialCardViewFilledStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="24dp"
+                    android:layout_marginVertical="32dp"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                    app:cardCornerRadius="28dp"
+                    app:strokeWidth="0dp"
+                    tools:visibility="visible">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="48dp">
+
+                        <ImageView
+                            android:layout_width="96dp"
+                            android:layout_height="96dp"
+                            android:alpha="0.6"
+                            android:src="@drawable/ic_add"
+                            app:tint="?attr/colorOnSurfaceVariant" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="24dp"
+                            android:text="No Subscriptions"
+                            android:textAlignment="center"
+                            android:textAppearance="?attr/textAppearanceTitleLarge"
+                            android:textColor="?attr/colorOnSurface" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:text="Add your first subscription to start tracking."
+                            android:textAlignment="center"
+                            android:textAppearance="?attr/textAppearanceBodyMedium"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+
 
             </LinearLayout>
-
-        </FrameLayout>
+        </androidx.core.widget.NestedScrollView>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
 
     <LinearLayout
         android:id="@+id/login_container"
@@ -171,27 +246,17 @@
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_history"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="100dp"
-        android:contentDescription="Payment History"
-        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
-        app:tint="?attr/colorOnPrimaryContainer"
-        app:srcCompat="@drawable/ic_history" />
-
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fab_add_subscription"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="32dp"
-        android:text="Add New"
-        android:fontFamily="sans-serif-medium"
-        app:icon="@drawable/ic_add"
-        app:shapeAppearanceOverlay="@style/App.ShapeAppearanceOverlay.Pill" />
+        android:layout_margin="16dp"
+        android:contentDescription="Add Subscription"
+        app:srcCompat="@drawable/ic_add"
+        app:backgroundTint="?attr/colorPrimary"
+        app:tint="?attr/colorOnPrimary"
+        app:borderWidth="0dp"
+        style="@style/Widget.Material3.FloatingActionButton.Primary" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+

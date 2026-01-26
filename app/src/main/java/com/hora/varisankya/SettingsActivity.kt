@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit
 import androidx.biometric.BiometricManager
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.hora.varisankya.util.BiometricAuthManager
+import com.hora.varisankya.util.AnimationHelper
 
 class SettingsActivity : BaseActivity() {
 
@@ -73,7 +74,7 @@ class SettingsActivity : BaseActivity() {
         biometricSwitch.setOnClickListener {
             val isTurningOn = biometricSwitch.isChecked
             
-            PreferenceHelper.performHaptics(biometricSwitch, HapticFeedbackConstants.CLOCK_TICK)
+            PreferenceHelper.performClickHaptic(biometricSwitch)
             
             if (isTurningOn) {
                 // If turning ON, must verify compatibility and then authenticate to confirm
@@ -134,49 +135,25 @@ class SettingsActivity : BaseActivity() {
                 else -> R.style.ShapeAppearance_App_MiddleItem
             }
             card.shapeAppearanceModel = ShapeAppearanceModel.builder(this, styleRes, 0).build()
+            
+            // Expressive Touch
+            AnimationHelper.applySpringOnTouch(card)
         }
     }
 
     private fun updateGroupShapes(group: ChipGroup) {
-        for (i in 0 until group.childCount) {
-            val chip = group.getChildAt(i) as? com.google.android.material.chip.Chip
-            chip?.let { updateChipShape(it) }
-        }
+        com.hora.varisankya.util.ChipHelper.styleChipGroup(group)
     }
     
     private fun updateChipShape(chip: com.google.android.material.chip.Chip) {
-        val r = resources.displayMetrics.density
-        val selectedRadius = 6f * r  // Less rounded when selected
-        val unselectedRadius = 100f * r  // Fully pill-shaped
-        
-        chip.shapeAppearanceModel = chip.shapeAppearanceModel.toBuilder()
-            .setAllCornerSizes(if (chip.isChecked) selectedRadius else unselectedRadius)
-            .build()
-        
-        // Apply M3 Dynamic Colors using ThemeHelper
-        if (chip.isChecked) {
-            chip.chipBackgroundColor = android.content.res.ColorStateList.valueOf(
-                com.hora.varisankya.util.ThemeHelper.getTertiaryColor(this)
-            )
-            chip.setTextColor(com.hora.varisankya.util.ThemeHelper.getOnTertiaryColor(this))
-            chip.chipIconTint = android.content.res.ColorStateList.valueOf(
-                com.hora.varisankya.util.ThemeHelper.getOnTertiaryColor(this)
-            )
-        } else {
-            chip.chipBackgroundColor = android.content.res.ColorStateList.valueOf(
-                com.hora.varisankya.util.ThemeHelper.getSurfaceVariantColor(this)
-            )
-            chip.setTextColor(com.hora.varisankya.util.ThemeHelper.getOnSurfaceColor(this))
-            chip.chipIconTint = android.content.res.ColorStateList.valueOf(
-                com.hora.varisankya.util.ThemeHelper.getOnSurfaceColor(this)
-            )
-        }
+        com.hora.varisankya.util.ChipHelper.styleChip(chip)
     }
+
 
     private fun setupLogoutButton() {
         val logoutButton = findViewById<View>(R.id.logout_button)
         logoutButton.setOnClickListener {
-            PreferenceHelper.performHaptics(window.decorView, HapticFeedbackConstants.CONFIRM)
+            PreferenceHelper.performSuccessHaptic(window.decorView)
             
             // Fire and forget: Clear system credential state in background
             // We use a detached scope because the activity will die immediately
@@ -209,7 +186,7 @@ class SettingsActivity : BaseActivity() {
 
         themeToggleGroup.setOnCheckedStateChangeListener { group, checkedIds ->
             if (checkedIds.isNotEmpty()) {
-                PreferenceHelper.performHaptics(group, HapticFeedbackConstants.KEYBOARD_TAP)
+                PreferenceHelper.performClickHaptic(group)
                 when (checkedIds[0]) {
                     R.id.theme_light -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                     R.id.theme_dark -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
@@ -232,7 +209,7 @@ class SettingsActivity : BaseActivity() {
 
         fontToggleGroup.setOnCheckedStateChangeListener { group, checkedIds ->
             if (checkedIds.isNotEmpty()) {
-                PreferenceHelper.performHaptics(group, HapticFeedbackConstants.KEYBOARD_TAP)
+                PreferenceHelper.performClickHaptic(group)
                 val enableGoogleFont = checkedIds[0] == R.id.font_google
                 
                 // Only recreate if preference actually changed
@@ -259,14 +236,10 @@ class SettingsActivity : BaseActivity() {
         
         updateTimeText(timeChip, currentHour, currentMinute)
         
-        // Apply 20% contrast-reduced Tertiary color (consistent with chips)
-        val tertiaryColor = com.hora.varisankya.util.ThemeHelper.getTertiaryColor(this)
-        val onTertiaryColor = com.hora.varisankya.util.ThemeHelper.getOnTertiaryColor(this)
-        timeChip.chipBackgroundColor = ColorStateList.valueOf(tertiaryColor)
-        timeChip.setTextColor(onTertiaryColor)
+        // Color application removed
 
         timeSettingLayout.setOnClickListener {
-            PreferenceHelper.performHaptics(it, HapticFeedbackConstants.CLOCK_TICK)
+            PreferenceHelper.performClickHaptic(it)
             
             val picker = MaterialTimePicker.Builder()
                 .setTimeFormat(TimeFormat.CLOCK_12H)
@@ -294,14 +267,11 @@ class SettingsActivity : BaseActivity() {
         slider.value = currentDays.toFloat().coerceIn(0f, 10f)
         label.text = "$currentDays days before"
         
-        // Apply 20% contrast-reduced Tertiary color (consistent with app hierarchy)
-        val tertiaryColor = com.hora.varisankya.util.ThemeHelper.getTertiaryColor(this)
-        slider.thumbTintList = ColorStateList.valueOf(tertiaryColor)
-        slider.trackActiveTintList = ColorStateList.valueOf(tertiaryColor)
+        // Color application removed
 
         slider.addOnChangeListener { _, value, fromUser ->
             if (fromUser) {
-                PreferenceHelper.performHaptics(slider, HapticFeedbackConstants.CLOCK_TICK)
+                PreferenceHelper.performClickHaptic(slider)
                 val days = value.toInt()
                 label.text = "$days days before"
             }
@@ -373,7 +343,7 @@ class SettingsActivity : BaseActivity() {
         
         hapticsToggleGroup.setOnCheckedStateChangeListener { group, checkedIds ->
             if (checkedIds.isNotEmpty()) {
-                PreferenceHelper.performHaptics(group, HapticFeedbackConstants.KEYBOARD_TAP)
+                PreferenceHelper.performClickHaptic(group)
                 val enableHaptics = checkedIds[0] == R.id.haptics_on
                 PreferenceHelper.setHapticsEnabled(this, enableHaptics)
                 updateGroupShapes(group)
@@ -384,7 +354,7 @@ class SettingsActivity : BaseActivity() {
     private fun setupPrivacyPolicy() {
         val privacyPolicyLayout = findViewById<View>(R.id.privacy_policy_layout)
         privacyPolicyLayout.setOnClickListener {
-            PreferenceHelper.performHaptics(it, HapticFeedbackConstants.CLOCK_TICK)
+            PreferenceHelper.performClickHaptic(it)
             val policyUrl = "https://github.com/aarshps/varisankya-android/blob/master/PRIVACY.md"
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(policyUrl))
             startActivity(browserIntent)

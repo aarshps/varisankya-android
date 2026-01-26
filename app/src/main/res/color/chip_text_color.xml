@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chip Text: SWAPPED - Selected is light, unselected is dark -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Selected: Dynamic OnTertiary text -->
+    <item android:color="?attr/colorOnTertiary" android:state_selected="true" />
+    <item android:color="?attr/colorOnTertiary" android:state_checked="true" />
+    <!-- Unselected: Dynamic Neutral (Tinted) text -->
+    <item android:color="?attr/colorOnSurface" />
+</selector>

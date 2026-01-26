@@ -44,17 +44,20 @@ class PaymentHistoryChart @JvmOverloads constructor(
     }
 
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        textSize = 30f
+        textSize = 32f // M3E Large
         textAlign = Paint.Align.CENTER
-        // Set font to sans-serif-medium
-        typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+        typeface = Typeface.DEFAULT
     }
 
+
     private val datePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        textSize = 28f
+        textSize = 32f // M3E Large
         textAlign = Paint.Align.CENTER
+        typeface = Typeface.DEFAULT
         color = Color.GRAY
     }
+
+
 
     // Dimensions
     private val barWidth = 120f
@@ -99,8 +102,8 @@ class PaymentHistoryChart @JvmOverloads constructor(
         requestLayout()
         
         val animator = android.animation.ValueAnimator.ofFloat(0f, 1f)
-        animator.duration = 600
-        animator.interpolator = androidx.interpolator.view.animation.FastOutSlowInInterpolator()
+        animator.duration = 800 // Slower, more expressive
+        animator.interpolator = com.hora.varisankya.util.AnimationHelper.EMPHASIZED
         animator.addUpdateListener { 
             animationProgress = it.animatedValue as Float
             invalidate()
@@ -122,15 +125,19 @@ class PaymentHistoryChart @JvmOverloads constructor(
         // Resolve Colors via ThemeHelper
         val colorPrimary = ThemeHelper.getPrimaryColor(context)
         val colorTertiary = ThemeHelper.getTertiaryColor(context)
-        val resolvedErrorColor = ThemeHelper.getErrorColor(context)
+        val colorOnTertiary = ThemeHelper.getOnTertiaryColor(context)
+        val colorSurfaceVariant = ThemeHelper.getSurfaceVariantColor(context)
+        val colorOnSurface = ThemeHelper.getOnSurfaceColor(context)
 
-        // M3 colors
-        val colorSecondaryContainer = ThemeHelper.getSecondaryContainerColor(context)
-        val colorOnSecondaryContainer = ThemeHelper.getOnSecondaryContainerColor(context)
-        
-        datePaint.color = colorOnSecondaryContainer
-        labelBgPaint.color = colorSecondaryContainer
-        textPaint.color = colorOnSecondaryContainer
+        // Labels use Tonal background (Integrated M3E look)
+        val colorContainerHigh = ThemeHelper.getSurfaceContainerHighColor(context)
+        labelBgPaint.color = colorContainerHigh
+        datePaint.color = colorOnSurface
+        textPaint.color = colorOnSurface
+
+
+
+
 
         // Scaling (safety check for 0)
         val maxAmount = dataPoints.maxOfOrNull { it.value.toFloat() } ?: 100f
@@ -151,8 +158,9 @@ class PaymentHistoryChart @JvmOverloads constructor(
             val rawAmount = item.value.toFloat()
             val symbol = item.symbol
             
-            // Use Tertiary color (20% contrast-reduced) for all bars
-            barPaint.color = colorTertiary
+            // Use Primary color for all bars
+            barPaint.color = colorPrimary
+
             val amount = if (isAnimating) rawAmount * animationProgress else rawAmount
 
             // Calculate Position

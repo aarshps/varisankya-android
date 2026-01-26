@@ -8,41 +8,34 @@ description: The 4-tier M3 color system for subscription status pills
 This skill documents the color hierarchy used for subscription status pills in the app.
 
 ## Color Tiers
-
-| Tier | State | Background | Text | Usage |
-|------|-------|-----------|------|-------|
-| **1** | Overdue | `colorPrimary` | `colorOnPrimary` | Maximum urgency - past due date |
-| **2** | Near Due | `colorTertiary` | `colorOnTertiary` | High urgency - within notification window |
-| **3** | Future | `colorSecondaryContainer` | `colorOnSecondaryContainer` | Normal - due but outside window |
-| **4** | Inactive | `colorSurfaceVariant` | `colorOnSurfaceVariant` | Disabled subscriptions |
-
-## Implementation Location
-
-```
-app/src/main/java/com/hora/varisankya/SubscriptionAdapter.kt
-```
-
-## Tier Logic
-
-```kotlin
-when {
-    daysLeft <= 0 -> {
-        // TIER 1: OVERDUE - Primary (Boldest M3 color)
-        holder.pillContainer.setCardBackgroundColor(primary)
-        holder.daysLeftTextView.setTextColor(onPrimary)
-    }
-    daysLeft <= notificationWindow -> {
-        // TIER 2: NEAR DUE - Tertiary (Distinct M3 accent)
-        holder.pillContainer.setCardBackgroundColor(tertiary)
-        holder.daysLeftTextView.setTextColor(onTertiary)
-    }
-    else -> {
-        // TIER 3: FUTURE - SecondaryContainer (Soft M3 tonal)
-        holder.pillContainer.setCardBackgroundColor(secondaryContainer)
-        holder.daysLeftTextView.setTextColor(onSecondaryContainer)
-    }
-}
-```
+ 
+ | State | Background | Text | Usage |
+ |-------|-----------|------|-------|
+ | **Active** | `colorPrimary` | `colorOnPrimary` | Any active subscription (Due Today/Tomorrow/Future) |
+ | **Inactive** | `colorSurfaceVariant` | `colorOnSurfaceVariant` | Paused/Discontinued subscriptions |
+ | **Amount Pill** | `colorSurfaceContainerHighest` | `colorOnSurface` | Secondary formatting for cost |
+ 
+ ## Implementation Location
+ 
+ ```
+ app/src/main/java/com/hora/varisankya/SubscriptionAdapter.kt
+ ```
+ 
+ ## Logic
+ 
+ We moved away from complex urgency gradients to a clean binary state:
+ 
+ ```kotlin
+ if (!subscription.active) {
+     // INACTIVE
+     holder.pillContainer.setCardBackgroundColor(surfaceVariant)
+     holder.daysLeftTextView.setTextColor(onSurfaceVariant)
+ } else {
+     // ACTIVE (Uniform Priority)
+     holder.pillContainer.setCardBackgroundColor(primary)
+     holder.daysLeftTextView.setTextColor(onPrimary)
+ }
+ ```
 
 ## Progress Bar Colors
 

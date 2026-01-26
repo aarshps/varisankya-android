@@ -2,90 +2,64 @@ package com.hora.varisankya.util
 
 import android.content.Context
 import android.graphics.Color
-import androidx.core.graphics.ColorUtils
+import android.util.TypedValue
 import com.google.android.material.color.MaterialColors
 
 object ThemeHelper {
-    
-    // Contrast reduction factor (20% = 0.20f blend towards surface)
-    private const val CONTRAST_REDUCTION = 0.20f
 
-    fun getPrimaryColor(context: Context): Int {
-        val raw = resolveColor(context, "colorPrimary", Color.BLUE)
-        return blendTowardsSurface(context, raw, CONTRAST_REDUCTION)
-    }
+    private val idCache = mutableMapOf<String, Int>()
 
-    fun getTertiaryColor(context: Context): Int {
-        val raw = resolveColor(context, "colorTertiary", Color.MAGENTA)
-        return blendTowardsSurface(context, raw, CONTRAST_REDUCTION)
-    }
-
-    fun getErrorColor(context: Context): Int {
-        return resolveColor(context, "colorError", Color.RED)
-    }
-
-    fun getSecondaryContainerColor(context: Context): Int {
-        return resolveColor(context, "colorSecondaryContainer", Color.LTGRAY)
-    }
-
-    fun getOnSecondaryContainerColor(context: Context): Int {
-        return resolveColor(context, "colorOnSecondaryContainer", Color.BLACK)
-    }
-    
-    fun getSurfaceColor(context: Context): Int {
-        return resolveColor(context, "colorSurface", Color.WHITE)
-    }
-    
-    fun getOnPrimaryColor(context: Context): Int {
-        val raw = resolveColor(context, "colorOnPrimary", Color.WHITE)
-        return blendTowardsSurface(context, raw, CONTRAST_REDUCTION)
-    }
-    
-    fun getOnTertiaryColor(context: Context): Int {
-        val raw = resolveColor(context, "colorOnTertiary", Color.WHITE)
-        return blendTowardsSurface(context, raw, CONTRAST_REDUCTION)
-    }
-    
-    fun getSurfaceVariantColor(context: Context): Int {
-        return resolveColor(context, "colorSurfaceVariant", Color.LTGRAY)
-    }
-    
-    fun getOnSurfaceVariantColor(context: Context): Int {
-        return resolveColor(context, "colorOnSurfaceVariant", Color.DKGRAY)
-    }
-    
-    fun getOnSurfaceColor(context: Context): Int {
-        return resolveColor(context, "colorOnSurface", Color.BLACK)
-    }
-    
-    fun getOutlineVariantColor(context: Context): Int {
-        return resolveColor(context, "colorOutlineVariant", Color.LTGRAY)
-    }
-    
-    /**
-     * Blends a color towards the surface color by the given ratio.
-     * ratio = 0.0 means no change, ratio = 1.0 means fully surface color.
-     */
-    private fun blendTowardsSurface(context: Context, color: Int, ratio: Float): Int {
-        val surface = getSurfaceColor(context)
-        return ColorUtils.blendARGB(color, surface, ratio)
-    }
-
-    private fun resolveColor(context: Context, attrName: String, defaultColor: Int): Int {
-        // Try finding the attribute ID in the app's package (merged attributes)
-        var attrId = context.resources.getIdentifier(attrName, "attr", context.packageName)
-        if (attrId == 0) {
-            // Fallback to android package
-            attrId = context.resources.getIdentifier(attrName, "attr", "android")
+    private fun resolveAttrId(context: Context, attrName: String): Int {
+        return idCache.getOrPut(attrName) {
+            // First try the app's attributes (where Material attributes are merged)
+            var id = context.resources.getIdentifier(attrName, "attr", context.packageName)
+            if (id == 0) {
+                // Then try android system attributes
+                id = context.resources.getIdentifier(attrName, "attr", "android")
+            }
+            id
         }
-        if (attrId == 0) {
-             // Basic fallback for material strict names if needed, but usually in app package
-        }
-        
+    }
+
+    private fun getColor(context: Context, attrName: String, fallback: Int): Int {
+        val attrId = resolveAttrId(context, attrName)
         return if (attrId != 0) {
-            MaterialColors.getColor(context, attrId, defaultColor)
+            MaterialColors.getColor(context, attrId, fallback)
         } else {
-            defaultColor
+            fallback
         }
     }
+
+    fun getPrimaryColor(context: Context): Int = getColor(context, "colorPrimary", Color.BLACK)
+    fun getOnPrimaryColor(context: Context): Int = getColor(context, "colorOnPrimary", Color.WHITE)
+    fun getPrimaryContainerColor(context: Context): Int = getColor(context, "colorPrimaryContainer", Color.DKGRAY)
+    fun getOnPrimaryContainerColor(context: Context): Int = getColor(context, "colorOnPrimaryContainer", Color.WHITE)
+    
+    fun getSecondaryColor(context: Context): Int = getColor(context, "colorSecondary", Color.DKGRAY)
+    fun getOnSecondaryColor(context: Context): Int = getColor(context, "colorOnSecondary", Color.WHITE)
+    fun getSecondaryContainerColor(context: Context): Int = getColor(context, "colorSecondaryContainer", Color.LTGRAY)
+    fun getOnSecondaryContainerColor(context: Context): Int = getColor(context, "colorOnSecondaryContainer", Color.BLACK)
+    
+    fun getTertiaryColor(context: Context): Int = getColor(context, "colorTertiary", Color.DKGRAY)
+    fun getOnTertiaryColor(context: Context): Int = getColor(context, "colorOnTertiary", Color.WHITE)
+    
+    fun getSurfaceColor(context: Context): Int = getColor(context, "colorSurface", Color.WHITE)
+    fun getOnSurfaceColor(context: Context): Int = getColor(context, "colorOnSurface", Color.BLACK)
+    fun getSurfaceVariantColor(context: Context): Int = getColor(context, "colorSurfaceVariant", Color.LTGRAY)
+    fun getOnSurfaceVariantColor(context: Context): Int = getColor(context, "colorOnSurfaceVariant", Color.GRAY)
+    
+    fun getErrorColor(context: Context): Int = getColor(context, "colorError", Color.RED)
+    fun getOnErrorColor(context: Context): Int = getColor(context, "colorOnError", Color.WHITE)
+    fun getErrorContainerColor(context: Context): Int = getColor(context, "colorErrorContainer", Color.RED)
+    fun getOnErrorContainerColor(context: Context): Int = getColor(context, "colorOnErrorContainer", Color.WHITE)
+    
+    fun getOutlineVariantColor(context: Context): Int = getColor(context, "colorOutlineVariant", Color.LTGRAY)
+    fun getSurfaceContainerHighColor(context: Context): Int = getColor(context, "colorSurfaceContainerHigh", Color.LTGRAY)
+    fun getSurfaceContainerColor(context: Context): Int = getColor(context, "colorSurfaceContainer", Color.WHITE)
+    fun getSurfaceContainerLowColor(context: Context): Int = getColor(context, "colorSurfaceContainerLow", Color.WHITE)
+    fun getSurfaceContainerHighestColor(context: Context): Int = getColor(context, "colorSurfaceContainerHighest", Color.LTGRAY)
 }
+
+
+
+

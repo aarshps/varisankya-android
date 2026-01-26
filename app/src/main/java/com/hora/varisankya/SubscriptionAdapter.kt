@@ -1,6 +1,5 @@
 package com.hora.varisankya
 
-import android.animation.ObjectAnimator
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Build
@@ -21,9 +20,8 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 // Explicitly using the app's R class is not needed when in the same package
 // import com.hora.varisankya.R
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator
-import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import com.hora.varisankya.util.ThemeHelper
+import com.hora.varisankya.util.AnimationHelper
 
 // Pre-calculate shapes to avoid building them on every scroll
 private var singleShape: ShapeAppearanceModel? = null
@@ -41,7 +39,6 @@ class SubscriptionAdapter(
         val daysLeftTextView: TextView = view.findViewById(R.id.subscription_days_left)
         val detailsTextView: TextView = view.findViewById(R.id.subscription_details)
         val pillContainer: MaterialCardView = view.findViewById(R.id.unified_status_pill)
-        val progressView: PillProgressView = view.findViewById(R.id.pill_progress_view)
         val amountPill: MaterialCardView = view.findViewById(R.id.amount_pill)
         val amountTextView: TextView = view.findViewById(R.id.subscription_amount)
     }
@@ -55,6 +52,9 @@ class SubscriptionAdapter(
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         val subscription = subscriptions[position]
         val context = holder.itemView.context
+        
+        // Staggered Entrance
+        AnimationHelper.animateEntrance(holder.itemView, position)
         
         holder.nameTextView.text = subscription.name
         
@@ -79,6 +79,7 @@ class SubscriptionAdapter(
             lastShape = ShapeAppearanceModel.builder(context, R.style.ShapeAppearance_App_LastItem, 0).build()
         }
 
+
         val shapeModel = when {
             isSingle -> singleShape
             isFirst -> firstShape
@@ -99,7 +100,6 @@ class SubscriptionAdapter(
             holder.detailsTextView.text = "Discontinued • ${subscription.recurrence}"
             holder.pillContainer.visibility = View.VISIBLE
             holder.daysLeftTextView.text = "Inactive"
-            holder.progressView.visibility = View.GONE
             
             // Inactive style: SurfaceVariant (Direct M3 Dynamic via ThemeHelper)
             val surfaceVariant = ThemeHelper.getSurfaceVariantColor(context)
@@ -150,35 +150,7 @@ class SubscriptionAdapter(
 
                 holder.daysLeftTextView.text = text
                 holder.pillContainer.visibility = View.VISIBLE
-                
-                // Fetch user preference for notification window
-                val notificationWindow = PreferenceHelper.getNotificationDays(context)
 
-                // M3E Dynamic Styling & Progress Logic
-                val progress = when {
-                     daysLeft < 0 -> 100 // Overdue is fully urgent
-                     daysLeft > notificationWindow -> 0 // Outside window = 0% progress
-                     else -> {
-                         // Scale from 0% at N days to 100% at 0 days
-                         // daysLeft is between 0 and N here
-                         ((notificationWindow - daysLeft).toFloat() / notificationWindow * 100).toInt()
-                     }
-                }
-                
-                // Animate progress change
-                // Always animate for M3 Motion compliance per user request
-                val progressAnimator = ObjectAnimator.ofInt(holder.progressView, "progress", 0, progress)
-                progressAnimator.duration = 1000 // Smooth standard duration
-                progressAnimator.interpolator = FastOutSlowInInterpolator()
-                progressAnimator.start()
-
-                // Animate Amount Pill Slide-out (from behind status pill)
-                // Initial state: shifted right by ~50dp (approx 150px) to hide behind status pill
-                holder.amountPill.translationX = 150f
-                val amountAnimator = ObjectAnimator.ofFloat(holder.amountPill, "translationX", 0f)
-                amountAnimator.duration = 1000
-                amountAnimator.interpolator = FastOutSlowInInterpolator()
-                amountAnimator.start()
 
                 // Subtle Haptic Feedback on appearance
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -188,56 +160,25 @@ class SubscriptionAdapter(
                 }
 
                 // Resolve Colors DIRECTLY from M3 Dynamic Theme using ThemeHelper
+                // Semantic Roles:
+                // MONOCHROME: All pills use uniform gray styling regardless of status
+                // No different colors for overdue, near due, or future dates
+                
+                // M3 High-Contrast Highlights: Dynamic Primary
                 val primary = ThemeHelper.getPrimaryColor(context)
                 val onPrimary = ThemeHelper.getOnPrimaryColor(context)
-
-                val tertiary = ThemeHelper.getTertiaryColor(context)
-                val onTertiary = ThemeHelper.getOnTertiaryColor(context)
-
-                val secondaryContainer = ThemeHelper.getSecondaryContainerColor(context)
-                val onSecondaryContainer = ThemeHelper.getOnSecondaryContainerColor(context)
-
-                val surfaceVariant = ThemeHelper.getSurfaceVariantColor(context)
-                val onSurfaceVariant = ThemeHelper.getOnSurfaceVariantColor(context)
-
-                val outlineVariant = ThemeHelper.getOutlineVariantColor(context)
+                val containerHighest = ThemeHelper.getSurfaceContainerHighestColor(context)
+                val onSurface = ThemeHelper.getOnSurfaceColor(context)
                 
-                // Track Color: Always OutlineVariant
-                holder.progressView.pillBackgroundColor = outlineVariant
+                // Urgency/Status pill uses dynamic primary (Tier 1)
+                holder.pillContainer.setCardBackgroundColor(primary)
+                holder.daysLeftTextView.setTextColor(onPrimary)
+                
+                // Amount pill uses subtle tonal surface (Tier 2/3) for "Weather" look
+                holder.amountPill.setCardBackgroundColor(containerHighest)
+                holder.amountTextView.setTextColor(onSurface)
 
-                // 4-Tier M3 Dynamic Styling
-                holder.pillContainer.strokeWidth = 0
-                holder.amountPill.strokeWidth = 0
 
-                when {
-                    daysLeft <= 0 -> {
-                        // TIER 1: OVERDUE - Primary (Boldest M3 color)
-                        holder.pillContainer.setCardBackgroundColor(primary)
-                        holder.daysLeftTextView.setTextColor(onPrimary)
-                        holder.progressView.progressColor = primary
-                        holder.progressView.visibility = View.VISIBLE
-                        holder.amountPill.setCardBackgroundColor(primary)
-                        holder.amountTextView.setTextColor(onPrimary)
-                    }
-                    daysLeft <= notificationWindow -> {
-                        // TIER 2: NEAR DUE - Tertiary (Distinct M3 accent)
-                        holder.pillContainer.setCardBackgroundColor(tertiary)
-                        holder.daysLeftTextView.setTextColor(onTertiary)
-                        holder.progressView.progressColor = tertiary
-                        holder.progressView.visibility = View.VISIBLE
-                        holder.amountPill.setCardBackgroundColor(tertiary)
-                        holder.amountTextView.setTextColor(onTertiary)
-                    }
-                    else -> {
-                        // TIER 3: FUTURE - SecondaryContainer (Soft M3 tonal)
-                        holder.pillContainer.setCardBackgroundColor(secondaryContainer)
-                        holder.daysLeftTextView.setTextColor(onSecondaryContainer)
-                        holder.progressView.progressColor = secondaryContainer
-                        holder.progressView.visibility = View.VISIBLE
-                        holder.amountPill.setCardBackgroundColor(secondaryContainer)
-                        holder.amountTextView.setTextColor(onSecondaryContainer)
-                    }
-                }
 
             } ?: run {
                 holder.pillContainer.visibility = View.GONE
@@ -250,14 +191,44 @@ class SubscriptionAdapter(
             PreferenceHelper.performHaptics(it, haptic)
             onSubscriptionClicked(subscription)
         }
+        // Apply Spring Feel
+        AnimationHelper.applySpringOnTouch(holder.itemView)
     }
 
     override fun getItemCount() = subscriptions.size
 
     fun updateData(newSubscriptions: List<Subscription>) {
+        val diffCallback = SubscriptionDiffCallback(this.subscriptions, newSubscriptions)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+        
         this.subscriptions = newSubscriptions
-        // We do NOT clear animatedItems here to preserve "animates once" behavior across updates
-        notifyDataSetChanged()
+        diffResult.dispatchUpdatesTo(this)
+    }
+
+    class SubscriptionDiffCallback(
+        private val oldList: List<Subscription>,
+        private val newList: List<Subscription>
+    ) : DiffUtil.Callback() {
+
+        override fun getOldListSize(): Int = oldList.size
+
+        override fun getNewListSize(): Int = newList.size
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            // Assuming Subscription has a unique ID, otherwise fallback to name+cost+dueDate
+            // Using logic based on available fields since ID might not be exposed or reliable in this context if not stable
+            val oldItem = oldList[oldItemPosition]
+            val newItem = newList[newItemPosition]
+            // Ideally compare by ID if available. Let's assume user defined ID or unique fields.
+            // If explicit ID exists, use it. Based on Subscription class usage elsewhere (Firestore), it likely has an ID.
+            // But I don't see the Subscription class definition here. I'll rely on object reference or content for now if ID is missing.
+            // SAFEST: Compare critical business keys
+            return oldItem === newItem || (oldItem.name == newItem.name && oldItem.cost == newItem.cost) 
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition] == newList[newItemPosition]
+        }
     }
 
     private fun formatCost(amount: Double): String {

@@ -14,6 +14,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.hora.varisankya.util.AnimationHelper
 
 class SearchActivity : BaseActivity() {
 
@@ -101,62 +102,45 @@ class SearchActivity : BaseActivity() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        categoryChipGroup.setOnCheckedStateChangeListener { group, _ ->
-            // Update shapes dynamically on selection change
-            for (i in 0 until group.childCount) {
-                val chip = group.getChildAt(i) as? Chip
-                chip?.let { updateChipShape(it) }
-            }
+        categoryChipGroup.setOnCheckedStateChangeListener { group, checkedIds ->
             performSearch()
         }
         
         searchEditText.requestFocus()
     }
 
-    private fun updateChipShape(chip: Chip) {
-        val r = resources.displayMetrics.density
-        val selectedRadius = 6f * r  // Less rounded when selected
-        val unselectedRadius = 100f * r
-        
-        chip.shapeAppearanceModel = chip.shapeAppearanceModel.toBuilder()
-            .setAllCornerSizes(if (chip.isChecked) selectedRadius else unselectedRadius)
-            .build()
-        
-        // Apply M3 Dynamic Colors using ThemeHelper
-        if (chip.isChecked) {
-            chip.chipBackgroundColor = android.content.res.ColorStateList.valueOf(
-                com.hora.varisankya.util.ThemeHelper.getTertiaryColor(this)
-            )
-            chip.setTextColor(com.hora.varisankya.util.ThemeHelper.getOnTertiaryColor(this))
-            chip.chipIconTint = android.content.res.ColorStateList.valueOf(
-                com.hora.varisankya.util.ThemeHelper.getOnTertiaryColor(this)
-            )
-        } else {
-            chip.chipBackgroundColor = android.content.res.ColorStateList.valueOf(
-                com.hora.varisankya.util.ThemeHelper.getSurfaceVariantColor(this)
-            )
-            chip.setTextColor(com.hora.varisankya.util.ThemeHelper.getOnSurfaceColor(this))
-            chip.chipIconTint = android.content.res.ColorStateList.valueOf(
-                com.hora.varisankya.util.ThemeHelper.getOnSurfaceColor(this)
-            )
-        }
-    }
+
 
     private fun setupCategories() {
         categoryChipGroup.removeAllViews()
         Constants.CATEGORIES.forEach { category ->
-            val chip = Chip(ContextThemeWrapper(this, R.style.Widget_App_Chip)).apply {
+            val chip = Chip(this).apply {
                 text = category
                 isCheckable = true
                 isChecked = false
-                updateChipShape(this)
+                
+                updateChipStyle(this)
+                
                 setOnClickListener {
                     PreferenceHelper.performHaptics(it, HapticFeedbackConstants.CLOCK_TICK)
+                    updateChipStyle(this)
                 }
+                
+                // Expressive Touch
+                AnimationHelper.applySpringOnTouch(this)
             }
             categoryChipGroup.addView(chip)
         }
     }
+
+    private fun updateChipStyle(chip: Chip) {
+        com.hora.varisankya.util.ChipHelper.styleChip(chip)
+    }
+
+
+
+
+
 
     private fun loadAllSubscriptions(contentContainer: View, loadingContainer: View, loadingStatus: TextView) {
         auth.currentUser?.uid?.let { userId ->

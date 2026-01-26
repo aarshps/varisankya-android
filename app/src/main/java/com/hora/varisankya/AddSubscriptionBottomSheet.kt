@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import com.hora.varisankya.util.AnimationHelper
 
 class AddSubscriptionBottomSheet(
     private val subscription: Subscription? = null,
@@ -62,7 +63,12 @@ class AddSubscriptionBottomSheet(
         val deleteButton = view.findViewById<Button>(R.id.button_delete)
         val markPaidButton = view.findViewById<Button>(R.id.button_mark_paid)
         val dragHandle = view.findViewById<View>(R.id.drag_handle)
-
+        
+        // Expressive Buttons
+        AnimationHelper.applySpringOnTouch(saveButton)
+        AnimationHelper.applySpringOnTouch(deleteButton)
+        AnimationHelper.applySpringOnTouch(markPaidButton)
+        
         dragHandle.setOnClickListener {
             PreferenceHelper.performHaptics(it, HapticFeedbackConstants.CLOCK_TICK)
             it.animate().scaleX(0.9f).scaleY(0.9f).setDuration(Constants.ANIM_DURATION_CLICK).setInterpolator(androidx.interpolator.view.animation.FastOutSlowInInterpolator()).withEndAction {
@@ -73,11 +79,10 @@ class AddSubscriptionBottomSheet(
         titleTextView.text = if (subscription == null) "Add Subscription" else "Edit Subscription"
 
         val addHaptic = { v: View -> 
-            PreferenceHelper.performHaptics(v, HapticFeedbackConstants.CLOCK_TICK)
+            PreferenceHelper.performClickHaptic(v)
         }
         val addStrongHaptic = { v: View -> 
-            val haptic = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) HapticFeedbackConstants.CONFIRM else HapticFeedbackConstants.LONG_PRESS
-            PreferenceHelper.performHaptics(v, haptic)
+            PreferenceHelper.performSuccessHaptic(v)
         }
 
         nameEditText.setOnFocusChangeListener { v, hasFocus -> if(hasFocus) addHaptic(v) }
@@ -271,11 +276,11 @@ class AddSubscriptionBottomSheet(
                             dragHandle.animate().scaleX(1.2f).scaleY(1.2f).setDuration(Constants.ANIM_DURATION_SHORT).setInterpolator(androidx.interpolator.view.animation.FastOutSlowInInterpolator())
                                 .withEndAction { dragHandle.animate().scaleX(1f).scaleY(1f).setInterpolator(androidx.interpolator.view.animation.FastOutSlowInInterpolator()).start() }
                                 .start()
-                            PreferenceHelper.performHaptics(dragHandle, HapticFeedbackConstants.CONFIRM)
+                            PreferenceHelper.performSuccessHaptic(dragHandle)
                         }
                         BottomSheetBehavior.STATE_DRAGGING -> {
                             dragHandle.animate().scaleX(0.9f).scaleY(0.9f).setDuration(Constants.ANIM_DURATION_SHORT).setInterpolator(androidx.interpolator.view.animation.FastOutSlowInInterpolator()).start()
-                            PreferenceHelper.performHaptics(dragHandle, HapticFeedbackConstants.CLOCK_TICK)
+                            PreferenceHelper.performClickHaptic(dragHandle)
                         }
                         BottomSheetBehavior.STATE_SETTLING, BottomSheetBehavior.STATE_COLLAPSED -> {
                             dragHandle.animate().scaleX(1f).scaleY(1f).setDuration(Constants.ANIM_DURATION_SHORT).setInterpolator(androidx.interpolator.view.animation.FastOutSlowInInterpolator()).start()

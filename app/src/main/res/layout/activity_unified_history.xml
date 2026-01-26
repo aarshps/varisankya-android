@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="?attr/colorSurface"
+    android:background="?attr/colorSurfaceContainerLow"
     tools:context=".UnifiedHistoryActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -13,15 +13,18 @@
         android:layout_height="wrap_content"
         app:elevation="0dp"
         android:fitsSystemWindows="true"
-        android:background="?attr/colorSurface">
+        android:background="?attr/colorSurfaceContainerLow">
+
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorSurfaceContainerLow"
             app:contentInsetStart="24dp"
             app:contentInsetEnd="24dp"
             app:navigationIcon="@drawable/ic_back">
+
 
             <TextView
                 android:layout_width="wrap_content"
@@ -53,17 +56,40 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="16dp"
                 android:clipChildren="false"
                 android:clipToPadding="false">
+
+                <TextView
+                    android:id="@+id/text_total_spent_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Total Spent"
+                    android:gravity="center"
+                    android:textAppearance="?attr/textAppearanceLabelMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:alpha="0.8" />
+
+                <TextView
+                    android:id="@+id/text_total_spent_amount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:gravity="center"
+                    android:textAppearance="?attr/textAppearanceDisplayMedium"
+                    android:textColor="?attr/colorOnSurface"
+                    android:layout_marginBottom="24dp" />
         
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     style="?attr/materialCardViewFilledStyle"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="0dp">
+                    app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                    app:cardCornerRadius="28dp"
+                    app:strokeWidth="0dp">
+
 
                     <FrameLayout
                         android:layout_width="match_parent"
@@ -99,7 +125,6 @@
                             android:layout_marginStart="16dp"
                             app:srcCompat="@drawable/ic_back"
                             app:tint="?attr/colorOnSecondaryContainer"
-                            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
                             android:contentDescription="Go Back"
                             android:visibility="gone"
                             tools:visibility="visible" />

@@ -41,6 +41,7 @@
                 android:text="Add Subscription"
                 android:textAppearance="?attr/textAppearanceHeadlineSmall" />
 
+
             <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/switch_active_status"
                 style="@style/Widget.App.Switch"
@@ -188,12 +189,11 @@
 
                 <Button
                     android:id="@+id/button_save"
-                    style="@style/Widget.App.Button.Tertiary"
+                    style="@style/Widget.Material3.Button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
                     android:padding="16dp"
-                    android:textStyle="bold"
                     android:text="Save Subscription" />
 
                 <LinearLayout
@@ -204,14 +204,16 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/button_delete"
-                        style="@style/Widget.Material3.Button.IconButton"
+                        style="@style/App.Button.Destructive.Icon"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:layout_marginEnd="8dp"
                         android:contentDescription="Delete"
                         android:visibility="gone"
                         app:icon="@drawable/ic_delete"
-                        app:iconTint="?attr/colorError"
+                        app:iconGravity="textStart"
+                        app:iconPadding="0dp"
+                        app:iconSize="24dp"
                         tools:visibility="visible" />
 
                     <Button
@@ -221,7 +223,6 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:padding="12dp"
-                        android:textStyle="bold"
                         android:text="Payments"
                         android:visibility="gone"
                         tools:visibility="visible" />

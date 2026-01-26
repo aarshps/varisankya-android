@@ -53,44 +53,17 @@ class SelectionBottomSheet(
         titleTextView.text = title
 
         options.forEach { option ->
-            val chip = Chip(android.view.ContextThemeWrapper(requireContext(), R.style.Widget_App_Chip))
+            val chip = Chip(requireContext())
             chip.text = option
             chip.isCheckable = true
             chip.isCheckedIconVisible = false
             chip.isChecked = option == selectedOption
-            
+
             // Ensure spacing is visually balanced by disabling automatic vertical expansion
             chip.setEnsureMinTouchTargetSize(false)
+            
+            updateChipStyle(chip)
 
-            // M3E Styling: Selected = Less Rounded (6dp), Unselected = Fully Rounded (Pill/50dp)
-            val r = requireContext().resources.displayMetrics.density
-            val selectedRadius = 6f * r  // Less rounded when selected
-            val unselectedRadius = 100f * r
-            
-            chip.shapeAppearanceModel = chip.shapeAppearanceModel.toBuilder()
-                .setAllCornerSizes(if (chip.isChecked) selectedRadius else unselectedRadius)
-                .build()
-            
-            // Apply M3 Dynamic Colors using ThemeHelper
-            val ctx = requireContext()
-            if (chip.isChecked) {
-                chip.chipBackgroundColor = android.content.res.ColorStateList.valueOf(
-                    com.hora.varisankya.util.ThemeHelper.getTertiaryColor(ctx)
-                )
-                chip.setTextColor(com.hora.varisankya.util.ThemeHelper.getOnTertiaryColor(ctx))
-                chip.chipIconTint = android.content.res.ColorStateList.valueOf(
-                    com.hora.varisankya.util.ThemeHelper.getOnTertiaryColor(ctx)
-                )
-            } else {
-                chip.chipBackgroundColor = android.content.res.ColorStateList.valueOf(
-                    com.hora.varisankya.util.ThemeHelper.getSurfaceVariantColor(ctx)
-                )
-                chip.setTextColor(com.hora.varisankya.util.ThemeHelper.getOnSurfaceColor(ctx))
-                chip.chipIconTint = android.content.res.ColorStateList.valueOf(
-                    com.hora.varisankya.util.ThemeHelper.getOnSurfaceColor(ctx)
-                )
-            }
-            
             chip.setOnClickListener { v ->
                 PreferenceHelper.performHaptics(v, HapticFeedbackConstants.VIRTUAL_KEY)
                 onOptionSelected(option)
@@ -101,6 +74,7 @@ class SelectionBottomSheet(
         }
 
         searchEditText.addTextChangedListener(object : TextWatcher {
+
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val query = s.toString().trim().lowercase()
@@ -123,7 +97,16 @@ class SelectionBottomSheet(
         return view
     }
 
+    private fun updateChipStyle(chip: Chip) {
+        com.hora.varisankya.util.ChipHelper.styleChip(chip)
+    }
+
+
+
+
+
     override fun onStart() {
+
         super.onStart()
         val bottomSheet = (dialog as? BottomSheetDialog)?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
         val behavior = (dialog as? BottomSheetDialog)?.behavior

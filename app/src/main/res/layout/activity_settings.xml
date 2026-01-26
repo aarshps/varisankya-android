@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/colorSurfaceContainerLow"
     tools:context=".SettingsActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -11,14 +12,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
+        android:background="?attr/colorSurfaceContainerLow"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorSurfaceContainerLow"
             app:contentInsetStart="24dp"
             app:contentInsetEnd="24dp">
+
 
             <TextView
                 android:layout_width="wrap_content"
@@ -68,7 +72,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/card_margin_horizontal"
-                android:layout_marginBottom="@dimen/group_item_spacing">
+                android:layout_marginBottom="@dimen/group_item_spacing"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                app:cardCornerRadius="28dp"
+                app:strokeWidth="0dp">
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -131,7 +139,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/card_margin_horizontal"
-                android:layout_marginBottom="@dimen/group_item_spacing">
+                android:layout_marginBottom="@dimen/group_item_spacing"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                app:cardCornerRadius="28dp"
+                app:strokeWidth="0dp">
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -203,7 +215,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/card_margin_horizontal"
-                android:layout_marginBottom="@dimen/group_item_spacing">
+                android:layout_marginBottom="@dimen/group_item_spacing"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                app:cardCornerRadius="28dp"
+                app:strokeWidth="0dp">
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -255,7 +271,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/card_margin_horizontal"
-                android:layout_marginBottom="@dimen/group_item_spacing">
+                android:layout_marginBottom="@dimen/group_item_spacing"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                app:cardCornerRadius="28dp"
+                app:strokeWidth="0dp">
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -374,7 +394,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/card_margin_horizontal"
-                android:layout_marginBottom="@dimen/group_item_spacing">
+                android:layout_marginBottom="@dimen/group_item_spacing"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                app:cardCornerRadius="28dp"
+                app:strokeWidth="0dp">
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -426,7 +450,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/card_margin_horizontal"
-                android:layout_marginBottom="@dimen/group_section_spacing">
+                android:layout_marginBottom="@dimen/group_section_spacing"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                app:cardCornerRadius="28dp"
+                app:strokeWidth="0dp">
+
 
                 <LinearLayout
                     android:layout_width="match_parent"

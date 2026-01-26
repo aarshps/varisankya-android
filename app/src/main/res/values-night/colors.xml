@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ============================================== -->
+    <!-- MONOCHROME COLOR PALETTE: Dark Mode           -->
+    <!-- ============================================== -->
+    
+    <!-- Primary = White/Light Gray (for buttons, FABs, etc.) -->
+    <color name="mono_primary">#E0E0E0</color>
+    <color name="mono_on_primary">#1C1B1F</color>
+    <color name="mono_primary_container">#3C3C3C</color>
+    <color name="mono_on_primary_container">#E0E0E0</color>
+    
+    <!-- Secondary = Medium Gray -->
+    <color name="mono_secondary">#A0A0A0</color>
+    <color name="mono_on_secondary">#1C1B1F</color>
+    <color name="mono_secondary_container">#4A4A4A</color>
+    <color name="mono_on_secondary_container">#E0E0E0</color>
+    
+    <!-- Tertiary = Light Gray -->
+    <color name="mono_tertiary">#888888</color>
+    <color name="mono_on_tertiary">#1C1B1F</color>
+    <color name="mono_tertiary_container">#404040</color>
+    <color name="mono_on_tertiary_container">#E0E0E0</color>
+    
+    <!-- Error = Light Gray (no red!) -->
+    <color name="mono_error">#BFBFBF</color>
+    <color name="mono_on_error">#1C1B1F</color>
+    <color name="mono_error_container">#505050</color>
+    <color name="mono_on_error_container">#E0E0E0</color>
+    
+    <!-- Surface = Dark Gray/Black -->
+    <color name="mono_surface">#1C1B1F</color>
+    <color name="mono_on_surface">#E6E1E5</color>
+    <color name="mono_surface_variant">#2D2D2D</color>
+    <color name="mono_on_surface_variant">#CAC4D0</color>
+    
+    <!-- Outline = Gray lines/borders -->
+    <color name="mono_outline">#938F99</color>
+    <color name="mono_outline_variant">#49454F</color>
+</resources>

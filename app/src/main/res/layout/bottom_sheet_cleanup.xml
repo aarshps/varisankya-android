@@ -55,7 +55,6 @@
             android:padding="16dp"
             android:text="Delete Records"
             android:textColor="?attr/colorOnError"
-            android:textStyle="bold"
             app:cornerRadius="32dp" />
 
         <Button
@@ -66,7 +65,6 @@
             android:padding="16dp"
             android:text="Ignore for Now"
             android:textColor="?attr/colorOnSurface"
-            android:textStyle="bold"
             app:cornerRadius="32dp" />
 
     </LinearLayout>

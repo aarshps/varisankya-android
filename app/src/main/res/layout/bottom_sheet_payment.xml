@@ -134,10 +134,9 @@
             style="@style/Widget.Material3.Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
             android:padding="16dp"
-            app:cornerRadius="32dp"
-            android:textStyle="bold"
-            android:text="Mark Paid" />
+            android:text="Mark as Paid" />
 
         <Button
             android:id="@+id/btn_pay_custom"
@@ -147,7 +146,6 @@
             android:layout_marginTop="12dp"
             android:padding="12dp"
             app:cornerRadius="32dp"
-            android:textStyle="bold"
             android:text="Change Schedule" />
 
 

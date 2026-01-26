@@ -2,14 +2,16 @@ package com.hora.varisankya
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.enableEdgeToEdge
 import com.google.android.material.color.DynamicColors
-import com.google.android.material.color.DynamicColorsOptions
 
 open class BaseActivity : AppCompatActivity() {
     
     private var currentFontEnabled: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
+        
         // Cache the current preference value used to create this activity
         currentFontEnabled = PreferenceHelper.isGoogleFontEnabled(this)
         
@@ -20,19 +22,13 @@ open class BaseActivity : AppCompatActivity() {
             setTheme(R.style.Theme_Varisankya)
         }
         
-        // 2. Apply Dynamic Colors Overlay ON TOP of the base theme
-        val optionsBuilder = DynamicColorsOptions.Builder()
-        
-        // Try to find the Expressive overlay at runtime to avoid compile-time issues
-        // It might be named differently or not exposed in R class in alpha version
-        val overlayId = resources.getIdentifier("ThemeOverlay_Material3_DynamicColors_Expressive", "style", packageName)
-        if (overlayId != 0) {
-            optionsBuilder.setThemeOverlay(overlayId)
-        }
-        
-        DynamicColors.applyToActivityIfAvailable(this, optionsBuilder.build())
+        // VITAL: Re-apply Dynamic Colors because the manual setTheme() above overrides 
+        // the global Application callback (which happens in onActivityPreCreated).
+        DynamicColors.applyToActivityIfAvailable(this)
         
         super.onCreate(savedInstanceState)
+
+
     }
 
     override fun onResume() {

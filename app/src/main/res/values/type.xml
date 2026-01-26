@@ -10,7 +10,9 @@
     <style name="TextAppearance.App.DisplayMedium" parent="TextAppearance.Material3.DisplayMedium">
         <item name="android:fontFamily">@font/google_sans_flex</item>
         <item name="fontFamily">@font/google_sans_flex</item>
+        <item name="android:textStyle">bold</item>
     </style>
+
     <style name="TextAppearance.App.DisplaySmall" parent="TextAppearance.Material3.DisplaySmall">
         <item name="android:fontFamily">@font/google_sans_flex</item>
         <item name="fontFamily">@font/google_sans_flex</item>
@@ -34,11 +36,15 @@
     <style name="TextAppearance.App.TitleLarge" parent="TextAppearance.Material3.TitleLarge">
         <item name="android:fontFamily">@font/google_sans_flex</item>
         <item name="fontFamily">@font/google_sans_flex</item>
+        <item name="android:textStyle">bold</item>
     </style>
+
     <style name="TextAppearance.App.TitleMedium" parent="TextAppearance.Material3.TitleMedium">
         <item name="android:fontFamily">@font/google_sans_flex</item>
         <item name="fontFamily">@font/google_sans_flex</item>
+        <item name="android:textStyle">bold</item>
     </style>
+
     <style name="TextAppearance.App.TitleSmall" parent="TextAppearance.Material3.TitleSmall">
         <item name="android:fontFamily">@font/google_sans_flex</item>
         <item name="fontFamily">@font/google_sans_flex</item>

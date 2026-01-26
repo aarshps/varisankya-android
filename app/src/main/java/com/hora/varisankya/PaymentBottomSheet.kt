@@ -124,6 +124,7 @@ class PaymentBottomSheet(
 
     private fun setupUI() {
         historyRecycler.layoutManager = LinearLayoutManager(context)
+        PreferenceHelper.attachScrollHaptics(historyRecycler)
 
         btnPayCurrent.setOnClickListener {
             val haptic = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) HapticFeedbackConstants.CONFIRM else HapticFeedbackConstants.LONG_PRESS

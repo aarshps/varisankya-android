@@ -6,6 +6,25 @@
         <!-- Ensure status bar icons are light in dark mode -->
         <item name="android:windowLightStatusBar">false</item>
         
+        <!-- ============================================== -->
+        <!-- DYNAMIC COLORS ENABLED (Dark Mode)            -->
+        <!-- ============================================== -->
+        
+        <!-- No hardcoded color overrides needed. 
+             DynamicColors.applyToActivitiesIfAvailable() will automatically 
+             inject the system palette at runtime. -->
+        
+        <!-- M3E Mapping: Base surface is ContainerLow -->
+        <item name="android:windowBackground">?attr/colorSurfaceContainerLow</item>
+        <item name="android:statusBarColor">?attr/colorSurfaceContainerLow</item>
+
+        <!-- Global Chip Style -->
+        <item name="chipStyle">@style/Widget.App.Chip</item>
+        
+        <!-- Global Bottom Sheet Style -->
+        <item name="bottomSheetStyle">@style/Widget.App.BottomSheet.Modal</item>
+
+        
         <!-- Default Font Family (Both namespaces) -->
         <item name="android:fontFamily">@font/google_sans_flex</item>
         <item name="fontFamily">@font/google_sans_flex</item>
@@ -61,7 +80,7 @@
 
     <!-- Splash Screen Theme -->
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">#1C1B1F</item>
+        <!-- Removed hardcoded background - system uses Dynamic Colors automatically -->
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_icon_centered</item>
         <item name="postSplashScreenTheme">@style/Theme.Varisankya</item>
     </style>

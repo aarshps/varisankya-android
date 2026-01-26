@@ -9,6 +9,22 @@
         <!-- Ensure status bar icons are dark in light mode -->
         <item name="android:windowLightStatusBar">true</item>
 
+        <!-- ============================================== -->
+        <!-- DYNAMIC COLORS ENABLED                        -->
+        <!-- ============================================== -->
+        
+        <!-- No hardcoded color overrides needed. 
+             DynamicColors.applyToActivitiesIfAvailable() will automatically 
+             inject the system palette at runtime. -->
+        
+        <!-- M3E Mapping: Base surface is ContainerLow -->
+        <item name="android:windowBackground">?attr/colorSurfaceContainerLow</item>
+        <item name="android:statusBarColor">?attr/colorSurfaceContainerLow</item>
+
+
+
+
+
         <!-- Default Font Family (Both namespaces for compatibility) -->
         <item name="android:fontFamily">@font/google_sans_flex</item>
         <item name="fontFamily">@font/google_sans_flex</item>
@@ -37,23 +53,13 @@
         <item name="appBarLayoutStyle">@style/Widget.App.AppBarLayout</item>
         <item name="toolbarStyle">@style/Widget.App.Toolbar</item>
         
-        <!-- Semantic M3 Contrast Tokens (Authentic Tiered Mapping) -->
-        <item name="vibrant">?attr/colorPrimary</item>
-        <item name="vibrantOn">?attr/colorOnPrimary</item>
-        
-        <item name="alert">?attr/colorTertiary</item>
-        <item name="alertOn">?attr/colorOnTertiary</item>
-        
-        <item name="medium">?attr/colorSecondaryContainer</item>
-        <item name="mediumOn">?attr/colorOnSecondaryContainer</item>
-        
-        <item name="low">?attr/colorSurfaceVariant</item>
-        <item name="lowOn">?attr/colorOnSurfaceVariant</item>
-
-        <item name="neutral">?attr/colorOutlineVariant</item>
+        <!-- Semantic M3 Contrast Tokens Removed (Pure M3E Compliance) -->
 
         <!-- Global Chip Style -->
         <item name="chipStyle">@style/Widget.App.Chip</item>
+        
+        <!-- Global Bottom Sheet Style -->
+        <item name="bottomSheetStyle">@style/Widget.App.BottomSheet.Modal</item>
     </style>
 
     <!-- System Font Theme -->
@@ -91,6 +97,11 @@
     <style name="Widget.App.SearchView" parent="Widget.Material3.SearchView">
         <item name="dividerColor">@android:color/transparent</item>
     </style>
+    
+    <style name="Widget.App.BottomSheet.Modal" parent="Widget.Material3.BottomSheet.Modal">
+        <item name="shapeAppearance">@style/ShapeAppearance.App.BottomSheet</item>
+        <item name="backgroundTint">?attr/colorSurface</item>
+    </style>
 
     <!-- Splash Screen Theme -->
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
@@ -100,11 +111,27 @@
         <item name="postSplashScreenTheme">@style/Theme.Varisankya</item>
     </style>
 
-    <!-- Custom Shape Appearance for fully rounded corners -->
+    <!-- Custom Shape Appearance for fully rounded corners (Profile, Buttons) -->
     <style name="App.ShapeAppearanceOverlay.Rounded" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">16dp</item>
     </style>
+    
+    <!-- M3 Standard Input Field Shape (4dp) -->
+    <style name="App.ShapeAppearanceOverlay.TextField" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">4dp</item>
+    </style>
+    
+    <!-- M3E Bottom Sheet Shape (28dp Top Corners) -->
+    <style name="ShapeAppearance.App.BottomSheet" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">32dp</item>
+        <item name="cornerSizeTopRight">32dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+
 
     <style name="App.ShapeAppearanceOverlay.Pill" parent="">
         <item name="cornerFamily">rounded</item>
@@ -113,14 +140,12 @@
 
     <!-- Style for rounded text input fields -->
     <style name="App.TextInputLayout.Rounded" parent="Widget.Material3.TextInputLayout.OutlinedBox">
-        <item name="shapeAppearanceOverlay">@style/App.ShapeAppearanceOverlay.Rounded</item>
-        <item name="boxStrokeColor">@color/outline_stroke_app</item>
+        <item name="shapeAppearanceOverlay">@style/App.ShapeAppearanceOverlay.TextField</item>
     </style>
 
     <!-- Style for rounded dropdown menus -->
     <style name="App.TextInputLayout.Rounded.ExposedDropdownMenu" parent="Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
-        <item name="shapeAppearanceOverlay">@style/App.ShapeAppearanceOverlay.Rounded</item>
-        <item name="boxStrokeColor">@color/outline_stroke_app</item>
+        <item name="shapeAppearanceOverlay">@style/App.ShapeAppearanceOverlay.TextField</item>
     </style>
 
     <!-- Base style for the button toggle group -->
@@ -137,8 +162,17 @@
     <!-- Style for Destructive/Delete Buttons (Outlined Error) -->
     <style name="App.Button.Destructive" parent="Widget.Material3.Button.OutlinedButton">
         <item name="android:textColor">?attr/colorError</item>
-        <item name="strokeColor">@color/outline_stroke_app</item>
-        <item name="rippleColor">?attr/colorError</item>
+        <item name="strokeColor">?attr/colorOutline</item>
+    </style>
+
+    <!-- Destructive Icon Button (Outlined circle with error tint) -->
+    <style name="App.Button.Destructive.Icon" parent="Widget.Material3.Button.OutlinedButton.Icon">
+        <item name="iconTint">?attr/colorError</item>
+        <item name="strokeColor">?attr/colorOutline</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Material3.Corner.Full</item>
     </style>
 
     <!-- Style for Mark Paid Buttons (Standard Tonal - uses Secondary colors) -->
@@ -148,21 +182,18 @@
     
     <!-- MaterialSwitch Style with Tertiary Color (matches chips) -->
     <style name="Widget.App.Switch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
-        <item name="thumbTint">@color/selector_switch_thumb</item>
-        <item name="trackTint">@color/selector_switch_track</item>
+        <!-- Reverting to standard M3 colors -->
     </style>
     
     <!-- Filled Button with Tertiary Color -->
     <style name="Widget.App.Button.Tertiary" parent="Widget.Material3.Button">
-        <item name="backgroundTint">?attr/colorTertiary</item>
-        <item name="android:textColor">?attr/colorOnTertiary</item>
+        <item name="backgroundTint">?attr/colorPrimary</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
     </style>
 
     <!-- Slider Style with Dynamic Colors (Tier 2 - Tertiary) -->
     <style name="Widget.App.Slider" parent="Widget.Material3.Slider">
         <item name="labelStyle">@style/Widget.App.Slider.Tooltip</item>
-        <item name="thumbColor">?attr/colorTertiary</item>
-        <item name="trackColorActive">?attr/colorTertiary</item>
     </style>
 
     <style name="Widget.App.Slider.Tooltip" parent="Widget.Material3.Tooltip">
@@ -170,15 +201,35 @@
         <item name="android:textColor">?attr/colorSurface</item>
     </style>
 
-    <!-- Unified Chip Style with Standard Borders and Higher Contrast Background -->
+    <!-- Unified Chip Style - SWAPPED: Selected = Dark bg, Light text -->
     <style name="Widget.App.Chip" parent="Widget.Material3.Chip.Filter">
-        <item name="chipStrokeColor">@color/chip_stroke_app</item>
-        <item name="chipStrokeWidth">1dp</item>
-        <!-- High Contrast: 'low' (Grey) for unselected, 'alert' for selected -->
-        <item name="chipBackgroundColor">@color/selector_chip_background_high_contrast</item>
-        <item name="android:textColor">@color/selector_chip_text_high_contrast</item>
-        <item name="chipIconTint">@color/selector_chip_text_high_contrast</item>
+        <!-- Background: Unselected = Light, Selected = Dark -->
+        <item name="chipBackgroundColor">@color/chip_background_color</item>
+        <!-- Text: Unselected = Dark, Selected = Light -->
+        <item name="android:textColor">@color/chip_text_color</item>
+        <!-- Check Icon: Same as text color -->
+        <item name="checkedIconTint">@color/chip_text_color</item>
+        <item name="chipIconTint">@color/chip_text_color</item>
+        <!-- Subtle Border for unselected chips -->
+        <item name="chipStrokeColor">@color/chip_stroke_color</item>
+        <item name="chipStrokeWidth">0.8dp</item>
+
+
+        <!-- Default Shape (Unselected) -->
+        <item name="shapeAppearance">@style/ShapeAppearance.App.Chip.Unselected</item>
     </style>
+
+    <style name="ShapeAppearance.App.Chip.Selected" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+
+
+    <style name="ShapeAppearance.App.Chip.Unselected" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">100dp</item>
+    </style>
+
 
     <!-- Grouped List Item Shapes -->
     <style name="ShapeAppearance.App.FirstItem" parent="">

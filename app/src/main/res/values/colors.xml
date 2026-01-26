@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ============================================== -->
+    <!-- MONOCHROME COLOR PALETTE: White, Gray, Black  -->
+    <!-- ============================================== -->
+    
+    <!-- Primary = Black/Dark Gray (for buttons, FABs, etc.) -->
+    <color name="mono_primary">#1C1B1F</color>
+    <color name="mono_on_primary">#FFFFFF</color>
+    <color name="mono_primary_container">#E0E0E0</color>
+    <color name="mono_on_primary_container">#1C1B1F</color>
+    
+    <!-- Secondary = Medium Gray -->
+    <color name="mono_secondary">#5E5E5E</color>
+    <color name="mono_on_secondary">#FFFFFF</color>
+    <color name="mono_secondary_container">#E8E8E8</color>
+    <color name="mono_on_secondary_container">#1C1B1F</color>
+    
+    <!-- Tertiary = Dark Gray (High Contrast for selected states) -->
+    <color name="mono_tertiary">#1C1B1F</color>
+    <color name="mono_on_tertiary">#FFFFFF</color>
+    <color name="mono_tertiary_container">#E0E0E0</color>
+    <color name="mono_on_tertiary_container">#1C1B1F</color>
+
+    
+    <!-- Error = Dark Gray (no red!) -->
+    <color name="mono_error">#3C3C3C</color>
+    <color name="mono_on_error">#FFFFFF</color>
+    <color name="mono_error_container">#D0D0D0</color>
+    <color name="mono_on_error_container">#1C1B1F</color>
+    
+    <!-- Surface Palette (Light) -->
+    <color name="mono_surface">#FAFAFA</color>
+    <color name="mono_on_surface">#1C1B1F</color>
+    <color name="mono_surface_variant">#E0E0E0</color>
+    <color name="mono_on_surface_variant">#404040</color> <!-- Darkened from #7A7A7A for WCAG AA -->
+
+    
+    <!-- Surface Containers (Light Tonal Layers) -->
+    <color name="mono_surface_container_lowest">#FFFFFF</color>
+    <color name="mono_surface_container_low">#F5F5F5</color>
+    <color name="mono_surface_container">#EDEDED</color>
+    <color name="mono_surface_container_high">#E0E0E0</color>
+    <color name="mono_surface_container_highest">#D6D6D6</color>
+
+    <!-- Surface Palette (Dark Tones - for night theme) -->
+    <color name="mono_dark_surface">#121212</color>
+    <color name="mono_dark_surface_container_lowest">#0F0F0F</color>
+    <color name="mono_dark_surface_container_low">#1A1A1A</color>
+    <color name="mono_dark_surface_container">#212121</color>
+    <color name="mono_dark_surface_container_high">#2B2B2B</color>
+    <color name="mono_dark_surface_container_highest">#333333</color>
+    
+    <!-- Outline = Gray lines/borders -->
+    <color name="mono_outline">#79747E</color>
+    <color name="mono_outline_variant">#C4C4C4</color>
+</resources>
+
+
