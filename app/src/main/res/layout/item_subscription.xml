@@ -74,7 +74,7 @@
             android:textColor="?attr/colorOnSurfaceVariant"
             android:alpha="0.8"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/unified_status_pill"
+            app:layout_constraintEnd_toStartOf="@+id/amount_pill"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/subscription_name"
             tools:text="Due Dec 25 • Monthly" />

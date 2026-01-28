@@ -84,6 +84,7 @@ class UnifiedHistoryActivity : BaseActivity() {
         // M3E Scroll Haptics
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
+        recyclerView.itemAnimator = null
         PreferenceHelper.attachScrollHaptics(recyclerView)
         
         // Haptics for chart interaction defined in View

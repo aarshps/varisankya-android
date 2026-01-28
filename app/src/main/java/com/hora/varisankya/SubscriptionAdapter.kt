@@ -55,10 +55,10 @@ class SubscriptionAdapter(
         val subscription = subscriptions[position]
         val context = holder.itemView.context
         
-        // Entrance Animation - Only for the first few items to keep it buttery smooth
-        if (position < 12) {
-            AnimationHelper.animateEntrance(holder.itemView, position)
-        }
+        // Entrance Animation - Removed to prevent layout glitches on item update
+        // if (position < 12) {
+        //    AnimationHelper.animateEntrance(holder.itemView, position)
+        // }
         
         holder.nameTextView.text = subscription.name
         

@@ -77,7 +77,7 @@ class PaymentAdapter(
         }
         
         // Entrance
-        com.hora.varisankya.util.AnimationHelper.animateEntrance(holder.itemView, position)
+        // Entrance animation removed to fix chart sync issues and match main page scroll feel
 
         if (onDeleteClicked != null) {
             holder.btnDelete.visibility = View.VISIBLE
