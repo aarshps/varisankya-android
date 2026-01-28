@@ -194,6 +194,8 @@ class PaymentBottomSheet(
 
     private fun loadHistory() {
         val userId = auth.currentUser?.uid ?: return
+
+
         val subId = subscription.id ?: run {
             progressHistory.visibility = View.GONE
             noHistoryContainer.visibility = View.VISIBLE
@@ -339,6 +341,9 @@ class PaymentBottomSheet(
 
     private fun recordPayment(paymentDate: Date, nextDueDate: Date?) {
         val userId = auth.currentUser?.uid ?: return
+        
+
+
         val subId = subscription.id ?: run {
             return
         }

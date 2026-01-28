@@ -120,6 +120,20 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+                <!-- Loading Skeleton -->
+                <include
+                    android:id="@+id/loading_skeleton"
+                    layout="@layout/layout_home_skeleton"
+                    android:visibility="visible" />
+
+                <!-- Main Content Container -->
+                <LinearLayout
+                    android:id="@+id/main_content_wrapper"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
                 <!-- M3E Expressive Hero Section (Data Island Style) -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/hero_section"
@@ -154,10 +168,10 @@
                                 android:layout_height="wrap_content"
                                 android:alpha="0.7"
                                 android:letterSpacing="0.1"
-                                android:text="REMAINING BUDGET"
                                 android:textAppearance="?attr/textAppearanceLabelLarge"
                                 android:textColor="?attr/colorPrimary"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                tools:text="REMAINING BUDGET" />
 
                             <TextView
                                 android:id="@+id/total_expense_text"
@@ -260,10 +274,14 @@
 
 
 
+                </LinearLayout>
+
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+
 
 
     <LinearLayout
@@ -379,6 +397,8 @@
         app:tint="?attr/colorOnPrimary"
         app:borderWidth="0dp"
         style="@style/Widget.Material3.FloatingActionButton.Primary" />
+
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

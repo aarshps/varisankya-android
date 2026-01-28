@@ -128,6 +128,9 @@ class AddSubscriptionBottomSheet(
         }
         setupSelection(categoryAutoComplete, "Select Category", categories, addHaptic)
 
+
+
+
         if (subscription != null) {
             statusSwitch.visibility = View.VISIBLE
             statusSwitch.isChecked = subscription.active
@@ -193,6 +196,7 @@ class AddSubscriptionBottomSheet(
             deleteButton.visibility = View.VISIBLE
             deleteButton.setOnClickListener {
                 addStrongHaptic(it)
+
                 val userId = auth.currentUser?.uid ?: return@setOnClickListener
                 firestore.collection("users").document(userId).collection("subscriptions").document(subscription.id!!).delete()
                 dismiss()
@@ -223,6 +227,9 @@ class AddSubscriptionBottomSheet(
              frequencyEditText.setText("")
              recurrenceAutoComplete.setText("")
              tilFrequency.visibility = View.VISIBLE
+             
+             deleteButton.visibility = View.GONE
+             markPaidButton.visibility = View.GONE
         }
         
         currencyAutoComplete.setOnDismissListener { currencyAutoComplete.clearFocus() }
@@ -231,17 +238,18 @@ class AddSubscriptionBottomSheet(
 
         saveButton.setOnClickListener {
             addStrongHaptic(it)
-            val userId = auth.currentUser?.uid ?: return@setOnClickListener
-
             val currency = currencyAutoComplete.text.toString()
             val category = categoryAutoComplete.text.toString()
             val finalRecurrence = getRecurrenceString(recurrenceAutoComplete.text.toString(), frequencyEditText.text.toString())
+            val isActiveStatus = if (subscription != null) statusSwitch.isChecked else true
+
+
+
+            val userId = auth.currentUser?.uid ?: return@setOnClickListener
 
             PreferenceHelper.recordUsage(requireContext(), "currency", currency)
             PreferenceHelper.recordUsage(requireContext(), "category", category)
             PreferenceHelper.recordUsage(requireContext(), "recurrence", recurrenceAutoComplete.text.toString())
-
-            val isActiveStatus = if (subscription != null) statusSwitch.isChecked else true
 
             val dataMap = hashMapOf(
                 "name" to nameEditText.text.toString(),

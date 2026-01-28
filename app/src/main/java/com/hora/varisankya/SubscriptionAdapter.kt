@@ -91,9 +91,9 @@ class SubscriptionAdapter(
             else -> middleShape
         }
 
-        cardView.shapeAppearanceModel = shapeModel!!
 
-        cardView.shapeAppearanceModel = shapeModel!!
+
+        cardView.shapeAppearanceModel = shapeModel ?: throw IllegalStateException("Shapes not initialized")
 
         // Margin manipulation removed to prevent layout jitter during scroll
         // Standard spacing is handled by cardVerticalMargin in XML
@@ -136,6 +136,7 @@ class SubscriptionAdapter(
                 today.set(Calendar.MILLISECOND, 0)
 
                 val dueCal = Calendar.getInstance()
+                // ...
                 dueCal.time = dueDate
                 dueCal.set(Calendar.HOUR_OF_DAY, 0)
                 dueCal.set(Calendar.MINUTE, 0)
@@ -272,5 +273,12 @@ class SubscriptionAdapter(
         } else {
             formatted + suffix
         }
+    }
+
+    fun getItem(position: Int): Subscription? {
+        if (position in subscriptions.indices) {
+            return subscriptions[position]
+        }
+        return null
     }
 }

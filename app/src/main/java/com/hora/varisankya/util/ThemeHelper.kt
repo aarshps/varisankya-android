@@ -58,6 +58,11 @@ object ThemeHelper {
     fun getSurfaceContainerColor(context: Context): Int = getColor(context, "colorSurfaceContainer", Color.WHITE)
     fun getSurfaceContainerLowColor(context: Context): Int = getColor(context, "colorSurfaceContainerLow", Color.WHITE)
     fun getSurfaceContainerHighestColor(context: Context): Int = getColor(context, "colorSurfaceContainerHighest", Color.LTGRAY)
+    fun getReferenceColor(context: Context, attrId: Int): Int {
+        val typedValue = TypedValue()
+        context.theme.resolveAttribute(attrId, typedValue, true)
+        return typedValue.data
+    }
 }
 
 

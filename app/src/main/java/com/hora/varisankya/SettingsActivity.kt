@@ -61,7 +61,10 @@ class SettingsActivity : BaseActivity() {
         setupScrollHaptics()
         setupBiometricToggle()
         setupCardGrouping()
+
     }
+    
+
     
     private fun setupBiometricToggle() {
         val biometricSwitch = findViewById<MaterialSwitch>(R.id.switch_biometric)

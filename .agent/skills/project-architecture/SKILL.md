@@ -77,12 +77,6 @@ The `MainActivity` Hero Card implements a **"Remaining Monthly Liability"** logi
 - **Theme file:** `res/values/themes.xml`
 - **Color resolution:** via `ThemeHelper.kt`, with manual resource mapping for widgets.
  
-## Widget
- 
-- **UpcomingWidgetProvider** - Redesigned for M3E (detached cards, Hero area).
-- **Hero Priority**: The most upcoming bill is featured in a prominent card (`bg_widget_item_hero`) with unique styling.
-- **WidgetUpdateHelper** - Widget data refresh
-- Update frequency: 1 hour
  
 ## Key Preferences
  

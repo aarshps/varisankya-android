@@ -476,6 +476,9 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Help Card -->
+
+
             <!-- Legal Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_legal"

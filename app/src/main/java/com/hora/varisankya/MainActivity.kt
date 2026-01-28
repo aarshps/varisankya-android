@@ -36,8 +36,6 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -45,6 +43,8 @@ import java.util.concurrent.TimeUnit
 import com.hora.varisankya.util.BiometricAuthManager
 import com.hora.varisankya.util.ThemeHelper
 import com.hora.varisankya.util.AnimationHelper
+import com.hora.varisankya.util.SubscriptionActionHelper
+import com.hora.varisankya.viewmodel.MainViewModel
 import android.widget.Toast
 import android.widget.FrameLayout
 
@@ -53,7 +53,10 @@ class MainActivity : BaseActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var credentialManager: CredentialManager
-    private lateinit var firestore: FirebaseFirestore
+    
+    // ViewModel & Helper
+    private lateinit var viewModel: MainViewModel
+    private lateinit var actionHelper: SubscriptionActionHelper
 
     // UI Views
     private lateinit var btnSignIn: Button
@@ -65,6 +68,8 @@ class MainActivity : BaseActivity() {
     private lateinit var fabAddSubscription: FloatingActionButton
     private lateinit var emptyStateContainer: View
     private lateinit var mainNestedScrollView: androidx.core.widget.NestedScrollView
+    private lateinit var loadingSkeleton: View
+    private lateinit var mainContentWrapper: View
 
 
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
@@ -137,6 +142,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun initializeApp() {
+
         // Initialize views
 
         btnSignIn = findViewById(R.id.btnSignIn)
@@ -158,12 +164,27 @@ class MainActivity : BaseActivity() {
         totalExpenseText = findViewById(R.id.total_expense_text)
         expenseSubtitle = findViewById(R.id.expense_subtitle)
         heroSubtitlePill = findViewById(R.id.subtitle_pill)
+        
+        loadingSkeleton = findViewById(R.id.loading_skeleton)
+        mainContentWrapper = findViewById(R.id.main_content_wrapper)
+        
+        // Root layout for content hiding is already assigned as android.R.id.content
+        mainContentRoot = findViewById(android.R.id.content)
+        appBar = findViewById(R.id.app_bar)
+        
+
+        
+
+
 
 
         // Initialize Firebase and Credential Manager
         auth = FirebaseAuth.getInstance()
         credentialManager = CredentialManager.create(this)
-        firestore = FirebaseFirestore.getInstance()
+        
+        // Initialize ViewModel and ActionHelper
+        viewModel = androidx.lifecycle.ViewModelProvider(this)[MainViewModel::class.java]
+        actionHelper = SubscriptionActionHelper(this, viewModel)
         
         // Initialize RecyclerView Adapter once
         adapter = SubscriptionAdapter(emptyList()) { subscription ->
@@ -177,19 +198,25 @@ class MainActivity : BaseActivity() {
 
         // Check current user and update UI
         updateUI(auth.currentUser != null)
+        
+        // Load data if user is signed in
         if (auth.currentUser != null) {
             setupNotifications()
-            loadSubscriptions() // Start loading data
+            viewModel.loadSubscriptions()
+            observeViewModel()
         } else {
             isDataLoaded = true
-            isDataLoaded = true
         }
+
 
         // Handle App Shortcuts
         handleIntent(intent)
 
         // Setup Swipe Refresh
         setupSwipeRefresh()
+        
+        // Setup Swipe Actions
+        setupSwipeActions()
 
         // Set click listeners
         profileImage.setOnClickListener { view ->
@@ -255,11 +282,184 @@ class MainActivity : BaseActivity() {
             }
         })
 
-
+        // Safety fallback: if data fails to load or takes too long, dismiss splash anyway after 5s
+        mainNestedScrollView.postDelayed({
+            if (!isDataLoaded) {
+                isDataLoaded = true
+            }
+        }, 5000)
     }
 
-    private fun setupSwipeRefresh() {
+    private fun observeViewModel() {
+        viewModel.subscriptions.observe(this) { subscriptions ->
+            if (subscriptions.isEmpty()) {
+                val isLoading = viewModel.isLoading.value ?: false
+                if (!isLoading) {
+                    checkReadyState()
+                    emptyStateContainer.visibility = View.VISIBLE
+                    subscriptionsRecyclerView.visibility = View.GONE
+                }
+            } else {
+                emptyStateContainer.visibility = View.GONE
+                subscriptionsRecyclerView.visibility = View.VISIBLE
+                adapter.updateData(subscriptions)
+                checkReadyState()
+            }
+        }
+        
+        viewModel.heroState.observe(this) { state ->
+            updateHeroSection(state)
+            checkReadyState()
+        }
+        
+        viewModel.isLoading.observe(this) { loading ->
+             if (loading) {
+                 swipeRefreshLayout.isRefreshing = true
+                 loadingSkeleton.visibility = View.VISIBLE
+                 mainContentWrapper.visibility = View.GONE
+                 emptyStateContainer.visibility = View.GONE 
+             } else {
+                 swipeRefreshLayout.isRefreshing = false
+                 if (loadingSkeleton.visibility == View.VISIBLE) {
+                     loadingSkeleton.visibility = View.GONE
+                     mainContentWrapper.visibility = View.VISIBLE
+                     AnimationHelper.animateReveal(mainContentWrapper)
+                     PreferenceHelper.performClickHaptic(mainContentWrapper)
+                 }
+                 
+                 val currentList = viewModel.subscriptions.value
+                 if (currentList.isNullOrEmpty()) {
+                     emptyStateContainer.visibility = View.VISIBLE
+                     subscriptionsRecyclerView.visibility = View.GONE
+                 } else {
+                     emptyStateContainer.visibility = View.GONE
+                     subscriptionsRecyclerView.visibility = View.VISIBLE
+                 }
+                 checkReadyState()
+             }
+        }
 
+        viewModel.error.observe(this) { errorMsg ->
+            if (errorMsg != null) {
+                android.widget.Toast.makeText(this, errorMsg, android.widget.Toast.LENGTH_SHORT).show()
+                checkReadyState()
+            }
+        }
+
+        checkReadyState()
+    }
+
+    private fun checkReadyState() {
+        val isLoading = viewModel.isLoading.value ?: true
+        if (!isLoading) {
+             isDataLoaded = true
+        }
+    }
+
+    
+    private fun setupSwipeActions() {
+        // Delegated to Helper
+        actionHelper.setupSwipeActions(subscriptionsRecyclerView, adapter, mainContentRoot)
+    }
+
+
+
+    private fun updateHeroSection(state: MainViewModel.HeroState) {
+        val today = Calendar.getInstance()
+        val currentMonthName = java.text.SimpleDateFormat("MMM", java.util.Locale.getDefault()).format(today.time)
+        
+
+        
+        // Reset defaults
+        heroLabel.text = "Remaining in $currentMonthName"
+        heroLabel.setTextColor(ThemeHelper.getOnSurfaceVariantColor(this))
+        totalExpenseText.setTextColor(ThemeHelper.getOnSurfaceColor(this))
+        heroSubtitlePill.setCardBackgroundColor(ThemeHelper.getSurfaceContainerHighestColor(this))
+        heroSubtitlePill.strokeColor = ThemeHelper.getOutlineVariantColor(this)
+
+        val activeSubs = state.activeSubscriptions
+        
+        // --- Multi-Currency Logic ---
+        val totals = state.currencyTotals
+        val primaryCurrency = if (totals.isNotEmpty()) {
+            totals.keys.maxByOrNull { totals[it] ?: 0.0 } ?: "INR"
+        } else "INR"
+        val primaryTotal = totals[primaryCurrency] ?: 0.0
+        val symbol = try { java.util.Currency.getInstance(primaryCurrency).symbol } catch (e: Exception) { "₹" }
+        
+        val displayTotal = "$symbol ${if(primaryTotal % 1.0 == 0.0) String.format("%.0f", primaryTotal) else primaryTotal}"
+        
+        val totalCount = totals.size
+        // Animation base logic (will refine in cases)
+        
+        val nextPayment = state.nextPayment
+        
+        if (nextPayment != null) {
+            val format = java.text.SimpleDateFormat("MMM dd", java.util.Locale.getDefault())
+            expenseSubtitle.text = "Next: ${nextPayment.name} on ${format.format(nextPayment.dueDate!!)}"
+            expenseSubtitle.setTextColor(ThemeHelper.getSecondaryColor(this))
+            
+            AnimationHelper.animateTextCountUp(totalExpenseText, primaryTotal, "$symbol ")
+            if (totalCount > 1) {
+                 expenseSubtitle.text = "${expenseSubtitle.text} (+ ${totalCount - 1} other currencies)"
+            }
+            
+        } else {
+             // Check Overdue
+             val overdueSubs = state.overdueSubscriptions
+             
+             if (overdueSubs.isNotEmpty()) {
+                 // Priority Alert State
+                 heroLabel.text = "Overdue Actions"
+                 heroLabel.setTextColor(ThemeHelper.getErrorColor(this))
+                 
+                 val overdueAmount = overdueSubs.sumOf { it.cost } // Simplification: Summing regardless of currency for alert magnitude is tricky. 
+                 // Better: "X Items Overdue"
+                 
+                 totalExpenseText.text = "${overdueSubs.size} Items"
+                 expenseSubtitle.text = "Payments are past due"
+                 
+                 // Urgent Styling
+                 totalExpenseText.setTextColor(ThemeHelper.getErrorColor(this))
+                 expenseSubtitle.setTextColor(ThemeHelper.getErrorColor(this))
+                 heroSubtitlePill.setCardBackgroundColor(android.graphics.Color.TRANSPARENT)
+                 heroSubtitlePill.strokeColor = ThemeHelper.getErrorColor(this)
+             } else if (activeSubs.isNotEmpty()) {
+                 // All Clear - FREEDOM STATE (Zero Liability for month but has subs)
+                 if (primaryTotal == 0.0) {
+                     heroLabel.text = "Financial Zen"
+                     totalExpenseText.text = "All Clear"
+                     expenseSubtitle.text = "No payments left for $currentMonthName. Enjoy!"
+                     
+                     // Friendly Green/Teal
+                     val zenColor = ThemeHelper.getPrimaryColor(this) 
+                     totalExpenseText.setTextColor(zenColor)
+                     expenseSubtitle.setTextColor(zenColor)
+                     heroSubtitlePill.setCardBackgroundColor(ThemeHelper.getReferenceColor(this, com.google.android.material.R.attr.colorSecondaryContainer))
+                 } else {
+                      // Has liability but no 'next payment' (maybe end of month?)
+                      AnimationHelper.animateTextCountUp(totalExpenseText, primaryTotal, "$symbol ")
+                      expenseSubtitle.text = "Total remaining for $currentMonthName"
+                 }
+
+             } else {
+                 // True Empty State (No Subs at all)
+                 val defaultSym = try { java.util.Currency.getInstance("INR").symbol } catch (e: Exception) { "₹" }
+                 heroLabel.text = "Monthly Expenses"
+                 totalExpenseText.text = "${defaultSym}0"
+                 expenseSubtitle.text = "No active subscriptions"
+                 expenseSubtitle.setTextColor(ThemeHelper.getSecondaryColor(this))
+                 
+                 // Friendly "Start"
+                 heroLabel.text = "Get Started"
+                 totalExpenseText.text = "Welcome"
+                 totalExpenseText.textSize = 32f // Slightly smaller than numbers logic usually
+             }
+        }
+    }
+
+
+    private fun setupSwipeRefresh() {
         val colorPrimary = MaterialColors.getColor(this, android.R.attr.colorPrimary, android.graphics.Color.BLACK)
         val colorSurfaceContainer = MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurfaceContainerHigh, android.graphics.Color.WHITE)
         
@@ -268,7 +468,7 @@ class MainActivity : BaseActivity() {
 
         swipeRefreshLayout.setOnRefreshListener {
             PreferenceHelper.performHaptics(swipeRefreshLayout, HapticFeedbackConstants.CONTEXT_CLICK)
-            loadSubscriptions()
+            viewModel.loadSubscriptions() // Use ViewModel
         }
     }
 
@@ -319,171 +519,9 @@ class MainActivity : BaseActivity() {
 
     // Removed setupRecyclerView as we do it in onCreate now
 
-    private fun loadSubscriptions() {
-        auth.currentUser?.uid?.let { userId ->
-            firestore.collection("users").document(userId).collection("subscriptions")
-                .orderBy("dueDate", Query.Direction.ASCENDING)
-                .addSnapshotListener { snapshots, e ->
-                    isDataLoaded = true
-                    swipeRefreshLayout.isRefreshing = false
-                    if (e != null) {
-                        Log.w("Firestore", "Listen failed.", e)
-                        return@addSnapshotListener
-                    }
 
-                    val subscriptions = snapshots?.toObjects(Subscription::class.java) ?: emptyList()
-                    
-                    // Mechanical Scroll Haptics are attached once in initializeApp() for efficiency
-                    
-                    // Sort: Active first, then by due date
-                    val sortedSubscriptions = subscriptions.sortedWith(compareByDescending<Subscription> { it.active }.thenBy { it.dueDate })
 
-                    if (sortedSubscriptions.isEmpty()) {
-                        emptyStateContainer.visibility = View.VISIBLE
-                        subscriptionsRecyclerView.visibility = View.GONE
-                    } else {
-                        emptyStateContainer.visibility = View.GONE
-                        subscriptionsRecyclerView.visibility = View.VISIBLE
-                        // Update existing adapter
-                        adapter.updateData(sortedSubscriptions)
-                    }
-                    
-                    updateHeroSection(subscriptions)
-                }
-        } ?: run {
-            isDataLoaded = true
-            swipeRefreshLayout.isRefreshing = false
-        }
-    }
 
-    private fun updateHeroSection(subscriptions: List<Subscription>) {
-        val activeSubs = subscriptions.filter { it.active && it.dueDate != null }
-        
-        val today = Calendar.getInstance()
-        // Reset to end of today for strict "future" comparison (items due today are arguably "remaining" if not paid, 
-        // but typically "remaining" implies future liability. Let's include Today for safety).
-        today.set(Calendar.HOUR_OF_DAY, 0)
-        today.set(Calendar.MINUTE, 0)
-        today.set(Calendar.SECOND, 0)
-        today.set(Calendar.MILLISECOND, 0)
-
-        val currentMonth = today.get(Calendar.MONTH)
-        val currentYear = today.get(Calendar.YEAR)
-        
-        var remainingLiability = 0.0
-        
-        // Logic to calculate remaining liability for CURRENT MONTH
-        for (sub in activeSubs) {
-            val subDate = Calendar.getInstance()
-            subDate.time = sub.dueDate!!
-            subDate.set(Calendar.HOUR_OF_DAY, 0)
-            subDate.set(Calendar.MINUTE, 0)
-            subDate.set(Calendar.SECOND, 0)
-            subDate.set(Calendar.MILLISECOND, 0)
-
-            // We need to determine if this subscription has a due date strictly appearing 
-            // between TODAY (inclusive) and END OF MONTH.
-            
-            // Normalize subDate to current month/year for recurrence checks
-            // (Simplified assumption: Simple monthly recurrence on the same day)
-            // If it's weekly/daily, it's harder.
-            // Let's stick to the "Next Occurrence" logic already present in the data or infer it? 
-            // The Subscription model has `dueDate`. 
-            // IMPORTANT: The app logic updates `dueDate` to the next future date automatically (via Worker/App logic).
-            // So `sub.dueDate` IS the next due date.
-            
-            // So simply: Is `sub.dueDate` in the current month and >= today?
-            
-            // Calculate Liability:
-            // 1. Overdue Items (Before Today)
-            // 2. Upcoming Items (After/On Today AND In Current Month)
-            
-            val isOverdue = subDate.before(today)
-            val isCurrentMonth = subDate.get(Calendar.MONTH) == currentMonth && subDate.get(Calendar.YEAR) == currentYear
-            
-            if (isOverdue || isCurrentMonth) {
-                remainingLiability += sub.cost
-            }
-        }
-        
-        // Find the absolute next payment (could be next month if nothing left this month)
-        val nextPayment = activeSubs
-            .filter { 
-                val d = Calendar.getInstance()
-                d.time = it.dueDate!!
-                d.set(Calendar.HOUR_OF_DAY, 0)
-                d.set(Calendar.MINUTE, 0)
-                d.set(Calendar.SECOND, 0)
-                d.set(Calendar.MILLISECOND, 0)
-                !d.before(today)
-             }
-            .minByOrNull { it.dueDate!! }
-
-        // Update UI
-        val currentMonthName = java.text.SimpleDateFormat("MMM", java.util.Locale.getDefault()).format(today.time)
-        heroLabel.text = "Remaining in $currentMonthName"
-        heroLabel.setTextColor(ThemeHelper.getOnSurfaceVariantColor(this)) // Reset
-        
-        val symbol = try {
-            if (activeSubs.isNotEmpty()) java.util.Currency.getInstance(activeSubs[0].currency).symbol else "₹"
-        } catch (e: Exception) { "₹" }
-        
-        // Use a stable color by default
-        totalExpenseText.setTextColor(ThemeHelper.getOnSurfaceColor(this))
-        heroSubtitlePill.setCardBackgroundColor(ThemeHelper.getSurfaceContainerHighestColor(this))
-        heroSubtitlePill.strokeColor = ThemeHelper.getOutlineVariantColor(this)
-
-        // Animate Count Up
-        AnimationHelper.animateTextCountUp(totalExpenseText, remainingLiability, "$symbol ")
-
-        if (nextPayment != null) {
-            val format = java.text.SimpleDateFormat("MMM dd", java.util.Locale.getDefault())
-            expenseSubtitle.text = "Next: ${nextPayment.name} on ${format.format(nextPayment.dueDate!!)}"
-            expenseSubtitle.setTextColor(ThemeHelper.getSecondaryColor(this))
-        } else {
-             // If no FUTURE payment found, check for OVERDUE items
-             val overdueSubs = activeSubs.filter { 
-                val d = Calendar.getInstance()
-                d.time = it.dueDate!!
-                d.set(Calendar.HOUR_OF_DAY, 0)
-                d.set(Calendar.MINUTE, 0)
-                d.set(Calendar.SECOND, 0)
-                d.set(Calendar.MILLISECOND, 0)
-                d.before(today)
-             }
-             
-             if (overdueSubs.isNotEmpty()) {
-                 // Priority Alert State
-                 heroLabel.text = "Overdue Actions"
-                 heroLabel.setTextColor(ThemeHelper.getErrorColor(this))
-                 
-                 // Show total overdue amount
-                 val overdueAmount = overdueSubs.sumOf { it.cost }
-                 val sym = try { java.util.Currency.getInstance(overdueSubs[0].currency).symbol } catch(e:Exception){"₹"}
-                 
-                 totalExpenseText.text = "$sym ${if(overdueAmount % 1.0 == 0.0) String.format("%.0f", overdueAmount) else overdueAmount}"
-                 expenseSubtitle.text = "${overdueSubs.size} payments are past due"
-                 
-                 // Urgent Styling
-                 totalExpenseText.setTextColor(ThemeHelper.getErrorColor(this))
-                 expenseSubtitle.setTextColor(ThemeHelper.getErrorColor(this))
-                 heroSubtitlePill.setCardBackgroundColor(android.graphics.Color.TRANSPARENT)
-                 heroSubtitlePill.strokeColor = ThemeHelper.getErrorColor(this)
-             } else if (activeSubs.isNotEmpty()) {
-                 // All Clear
-                 totalExpenseText.text = "All Clear"
-                 expenseSubtitle.text = "Relax! No payments left via $currentMonthName"
-                 totalExpenseText.setTextColor(ThemeHelper.getPrimaryColor(this))
-                 expenseSubtitle.setTextColor(ThemeHelper.getPrimaryColor(this))
-             } else {
-                 val symbol = try { java.util.Currency.getInstance("INR").symbol } catch (e: Exception) { "₹" }
-                 heroLabel.text = "Monthly Expenses"
-                 totalExpenseText.text = "${symbol}0"
-                 expenseSubtitle.text = "No active subscriptions"
-                 expenseSubtitle.setTextColor(ThemeHelper.getSecondaryColor(this))
-             }
-        }
-    }
 
     private fun getDaysDiff(date: java.util.Date): Long {
         val today = Calendar.getInstance()
@@ -551,7 +589,8 @@ class MainActivity : BaseActivity() {
                 if (task.isSuccessful) {
                     updateUI(true)
                     setupNotifications()
-                    loadSubscriptions() // Reload data for new user
+                    viewModel.loadSubscriptions() // Reload data for new user
+                    observeViewModel()
                 } else {
                     updateUI(false)
                 }
@@ -610,4 +649,6 @@ class MainActivity : BaseActivity() {
         const val ACTION_ADD_SUBSCRIPTION = "com.hora.varisankya.ACTION_ADD_SUBSCRIPTION"
         const val ACTION_VIEW_HISTORY = "com.hora.varisankya.ACTION_VIEW_HISTORY"
     }
+
+
 }

@@ -12,6 +12,9 @@ object PreferenceHelper {
     private const val KEY_NOTIF_HOUR = "notification_hour"
     private const val KEY_NOTIF_MINUTE = "notification_minute"
     private const val KEY_USE_GOOGLE_FONT = "use_google_font"
+
+    
+
     private const val KEY_NOTIF_DAYS = "notification_days"
     private const val KEY_PAYMENT_VIEW_MODE = "payment_view_mode" // "list" or "chart" (current session)
     private const val KEY_DEFAULT_PAYMENT_VIEW = "default_payment_view" // "list" or "chart" (user setting)
