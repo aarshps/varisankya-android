@@ -14,6 +14,7 @@ Varisankya is a modern, high-performance Android application designed to help us
 *   **Standardized M3 Motion**: Animations are tuned to industry-standard values (Short: 100ms, Medium: 300ms, Long: 500ms) with `FastOutSlowIn` interpolators for natural, physical movement.
 *   **Immersive Haptics & Silent UX**: A completely toast-free experience. All actions are verified via distinct haptic feedback patterns (Tick, Click, Heavy Click) and subtle UI transitions, ensuring a distraction-free environment.
 *   **Themed Branding**: Intelligent logo adaptation that responds to system light/dark mode changes.
+*   **Ultra Smooth Home Launch**: Optimized app start sequence using shimmer skeletons and M3E reveal animations for a zero-flash, premium landing.
 
 ### 📊 Smart Analytics & History
 *   **Premium Charting**: Totally redesigned Payment History featuring a horizontally scrollable **Column Chart**.
@@ -41,6 +42,7 @@ Varisankya is a modern, high-performance Android application designed to help us
 *   **Platform**: Android 15+ (Min API 35, Target API 36)
 *   **Language**: 100% Kotlin
 *   **UI Framework**: Material Components 1.14.0-alpha08 (Material 3)
+*   **Architecture**: MVVM with Clean Loading Policy
 *   **Backend**: Firebase (Auth & Firestore)
 
 ## 📦 Build & Release
