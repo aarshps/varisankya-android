@@ -17,9 +17,9 @@
              DynamicColors.applyToActivitiesIfAvailable() will automatically 
              inject the system palette at runtime. -->
         
-        <!-- M3E Mapping: Base surface is ContainerLow -->
-        <item name="android:windowBackground">?attr/colorSurfaceContainerLow</item>
-        <item name="android:statusBarColor">?attr/colorSurfaceContainerLow</item>
+        <!-- M3E Mapping: Base surface is Surface -->
+        <item name="android:windowBackground">?attr/colorSurface</item>
+        <item name="android:statusBarColor">?attr/colorSurface</item>
 
 
 

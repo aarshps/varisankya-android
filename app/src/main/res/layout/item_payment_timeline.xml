@@ -84,6 +84,7 @@
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="8dp"
+                android:fontFamily="sans-serif-medium"
                 tools:text="$12.99" />
         </com.google.android.material.card.MaterialCardView>
 

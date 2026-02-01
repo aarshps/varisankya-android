@@ -24,8 +24,8 @@
             android:layout_marginEnd="12dp"
             android:ellipsize="end"
             android:singleLine="true"
-            android:textAppearance="?attr/textAppearanceTitleLarge"
-            android:textStyle="bold"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textSize="18sp"
             android:textColor="?attr/colorOnSurface"
             app:layout_constraintBottom_toTopOf="@+id/subscription_details"
             app:layout_constraintEnd_toStartOf="@+id/amount_pill"
@@ -50,14 +50,14 @@
 
             <TextView
                 android:id="@+id/subscription_amount"
-                style="@style/TextAppearance.Material3.LabelMedium"
+                style="@style/TextAppearance.Material3.LabelLarge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingStart="14dp"
                 android:paddingTop="10dp"
                 android:paddingEnd="14dp"
                 android:paddingBottom="10dp"
-                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
                 android:textColor="?attr/colorOnSurfaceVariant"
                 tools:text="$ 12.99" />
 
@@ -70,7 +70,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_marginEnd="16dp"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
+            style="@style/TextAppearance.Material3.BodySmall"
             android:textColor="?attr/colorOnSurfaceVariant"
             android:alpha="0.8"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -103,7 +103,6 @@
                 android:textAppearance="?attr/textAppearanceLabelLarge"
                 android:textStyle="bold"
                 android:textColor="?attr/colorOnSurface"
-                android:textSize="13sp"
                 tools:text="5 Days" />
 
         </com.google.android.material.card.MaterialCardView>
