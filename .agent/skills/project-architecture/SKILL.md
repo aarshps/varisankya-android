@@ -27,8 +27,11 @@ Subscription expense tracking application that helps users monitor recurring pay
 | Component | Purpose |
 |-----------|---------|
 | `AddSubscriptionBottomSheet` | Add/Edit subscription form |
-| `SelectionBottomSheet` | Generic chip-based picker (Category, Recurrence) |
+| `SelectionBottomSheet` | Generic chip-based picker (Category, Recurrence, **Currency**) |
 | `PaymentHistoryBottomSheet` | Per-subscription payment history |
+
+> [!NOTE]
+> **Settings Pattern:** This project uses the `SelectionBottomSheet` for high-impact settings like Currency selection. Traditional M3E consolidated cards were considered but reverted to maintain the "focused slide-up" experience that reduces visual clutter.
 
 ### Adapters
  
@@ -51,13 +54,13 @@ The `MainActivity` Hero Card implements a **"Remaining Monthly Liability"** logi
   - `ChipHelper.kt`: High-contrast chip orchestration.
   - `Constants.kt`: App-wide constants (categories, recurrences).
 
-### Custom Views
+## Core Standards
 
-| View | Purpose |
-|------|---------|
-| `RoundedProgressView` | Circular progress in subscription pills |
-| `PaymentHistoryChart` | Custom drawn payment timeline chart |
-
+- [Agent Skill Standards](file:///.agent/skills/agent-skill-standards/SKILL.md): Guidelines for skill focus and granularity.
+- [Currency Display Standards](file:///.agent/skills/currency-display-standards/SKILL.md): Formatting, spacing, and 50% sizing rules.
+- [Chart Visualization Standards](file:///.agent/skills/chart-visualization/SKILL.md): Custom drawing and chronological sorting.
+- [Hero Section UI Stability](file:///.agent/skills/hero-section-stability/SKILL.md): Performance and layout jitter prevention.
+- [M3E Haptic Standards](file:///.agent/skills/m3e-haptic-standards/SKILL.md): Tactile feedback orchestration.
 
 ## Data Layer
 

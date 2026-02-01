@@ -39,6 +39,8 @@ private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
 ## Interaction Standards
  
 - **Labels**: Horizontal Axis (Activity) and Legend (Bottom).
+- **Chronological Grouping**: Months MUST be grouped and sorted using **zero-padded strings** (e.g., `String.format(Locale.US, "%d-%02d", year, month)`) to avoid lexical sorting errors where October (`9`) follows December (`11`).
+- **Currency Parity**: All amount labels drawn in charts MUST follow the app-wide **50% smaller symbol** and **standard spacing** rules. This requires manual `Paint` size adjustments in `onDraw`.
 - **Interactive Haptics**: Every bar tap MUST trigger `PreferenceHelper.performClickHaptic()`. A confirmed navigation (Drill Down) MUST trigger `performSuccessHaptic()`.
  
 ## Implementation ExamplentHistoryChart.kt
