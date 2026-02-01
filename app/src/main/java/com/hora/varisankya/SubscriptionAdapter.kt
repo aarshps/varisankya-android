@@ -62,13 +62,9 @@ class SubscriptionAdapter(
         
         holder.nameTextView.text = subscription.name
         
-        // Format Amount
-        val symbol = try {
-            java.util.Currency.getInstance(subscription.currency).symbol
-        } catch (e: Exception) {
-            subscription.currency
-        }
-        holder.amountTextView.text = "$symbol ${formatCost(subscription.cost)}"
+        // Format Amount using global currency symbol
+        val globalCurrency = PreferenceHelper.getCurrency(context)
+        holder.amountTextView.text = CurrencyHelper.formatCurrency(context, subscription.cost, globalCurrency)
         
         // Dynamic Grouping Logic
         val cardView = holder.itemView as MaterialCardView

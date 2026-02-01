@@ -1,44 +1,89 @@
 package com.hora.varisankya
 
-import java.util.Locale
-
+/**
+ * Currency helper with minimal list + custom option
+ */
 object CurrencyHelper {
 
-    // Base Currency: USD
-    // approximate rates as of early 2026 (projected/stable averages)
-    private val rates = mapOf(
-        "USD" to 1.0,
-        "EUR" to 0.92,
-        "GBP" to 0.78,
-        "INR" to 85.0,
-        "JPY" to 150.0,
-        "CAD" to 1.35,
-        "AUD" to 1.50,
-        "CNY" to 7.20,
-        "CHF" to 0.88,
-        "SGD" to 1.34
+    data class CurrencyItem(
+        val code: String,
+        val name: String,
+        val symbol: String
     )
 
-    fun getSymbol(currencyCode: String): String {
-        return try {
-            java.util.Currency.getInstance(currencyCode).symbol
-        } catch (e: Exception) {
-            "$"
-        }
+    /**
+     * Top 15 world currencies + Issue requests
+     * Symbols verified for Google Sans Flex compatibility
+     */
+    val ALL_CURRENCIES: List<CurrencyItem> = listOf(
+        CurrencyItem("INR", "Indian Rupee", "₹"),
+        CurrencyItem("USD", "US Dollar", "$"),
+        CurrencyItem("EUR", "Euro", "€"),
+        CurrencyItem("GBP", "British Pound", "£"),
+        CurrencyItem("JPY", "Japanese Yen", "¥"),
+        CurrencyItem("AUD", "Australian Dollar", "$"),
+        CurrencyItem("CAD", "Canadian Dollar", "$"),
+        CurrencyItem("CHF", "Swiss Franc", "₣"),
+        CurrencyItem("CNY", "Chinese Yuan", "¥"),
+        CurrencyItem("HKD", "Hong Kong Dollar", "$"),
+        CurrencyItem("NZD", "New Zealand Dollar", "$"),
+        CurrencyItem("SEK", "Swedish Krona", "kr"),
+        CurrencyItem("KRW", "South Korean Won", "₩"),
+        CurrencyItem("SGD", "Singapore Dollar", "$"),
+        CurrencyItem("MXN", "Mexican Peso", "$"),
+        CurrencyItem("KES", "Kenyan Shilling", "KSh"),
+        CurrencyItem("UNT", "Generic Unit", "#")
+    )
+
+    /**
+     * Standardized currency formatting:
+     * - Adds a space between symbol and amount
+     * - Reduces symbol size by 50%
+     */
+    fun formatCurrency(context: android.content.Context, amount: Double, currencyCode: String): CharSequence {
+        val symbol = getSymbol(currencyCode)
+        val formattedAmount = if (amount % 1.0 == 0.0) String.format("%.0f", amount) else String.format("%.2f", amount)
+        val fullText = "$symbol $formattedAmount"
+        
+        val spannable = android.text.SpannableStringBuilder(fullText)
+        val symbolEnd = symbol.length
+        
+        spannable.setSpan(
+            android.text.style.RelativeSizeSpan(0.5f),
+            0,
+            symbolEnd,
+            android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        
+        return spannable
     }
 
     /**
-     * Converts an amount from one currency to another using the static rates.
-     * If a currency is unknown, it falls back to 1:1 conversion (worst case safety).
+     * Get display strings for SelectionBottomSheet in "CODE Symbol" format
      */
-    fun convert(amount: Double, fromCurrency: String, toCurrency: String): Double {
-        if (fromCurrency.equals(toCurrency, ignoreCase = true)) return amount
+    fun getCurrencyDisplayList(): Array<String> {
+        return ALL_CURRENCIES.map { "${it.code} ${it.symbol}" }.toTypedArray()
+    }
 
-        val fromRate = rates[fromCurrency.uppercase(Locale.ROOT)] ?: 1.0
-        val toRate = rates[toCurrency.uppercase(Locale.ROOT)] ?: 1.0
+    /**
+     * Extract currency code from display string
+     */
+    fun getCodeFromDisplay(display: String): String {
+        return display.split(" ").firstOrNull() ?: "INR"
+    }
 
-        // Convert to USD first (Amount / Rate), then to Target (USD * TargetRate)
-        val amountInUSD = amount / fromRate
-        return amountInUSD * toRate
+    /**
+     * Get currency symbol by code
+     */
+    fun getSymbol(currencyCode: String): String {
+        val symbol = ALL_CURRENCIES.find { it.code == currencyCode }?.symbol ?: "$"
+        return symbol
+    }
+
+    /**
+     * Get CurrencyItem by code
+     */
+    fun getByCode(code: String): CurrencyItem? {
+        return ALL_CURRENCIES.find { it.code == code }
     }
 }

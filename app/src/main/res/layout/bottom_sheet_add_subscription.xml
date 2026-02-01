@@ -182,7 +182,6 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
                         android:baselineAligned="false"
                         android:orientation="horizontal">
 
@@ -190,7 +189,7 @@
                             style="@style/App.TextInputLayout.Rounded"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1.2"
+                            android:layout_weight="1"
                             android:hint="Amount">
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -205,31 +204,17 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:hint="Cur"
+                            android:layout_weight="1.5"
+                            android:hint="Category"
                             app:endIconMode="none">
 
                             <AutoCompleteTextView
-                                android:id="@+id/auto_complete_currency"
+                                android:id="@+id/auto_complete_category"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:inputType="none" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        style="@style/App.TextInputLayout.Rounded.ExposedDropdownMenu"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Category"
-                        app:endIconMode="none">
-
-                        <AutoCompleteTextView
-                            android:id="@+id/auto_complete_category"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="none" />
-                    </com.google.android.material.textfield.TextInputLayout>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

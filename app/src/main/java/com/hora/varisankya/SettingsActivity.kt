@@ -52,6 +52,7 @@ class SettingsActivity : BaseActivity() {
         auth = FirebaseAuth.getInstance()
 
         setupLogoutButton()
+        setupCurrencySetting()
         setupThemeToggle()
         setupFontToggle()
         setupNotificationTimeSetting()
@@ -112,6 +113,7 @@ class SettingsActivity : BaseActivity() {
 
     private fun setupCardGrouping() {
         val cards = listOfNotNull(
+            findViewById<MaterialCardView>(R.id.card_currency),
             findViewById<MaterialCardView>(R.id.card_security),
             findViewById<MaterialCardView>(R.id.card_appearance),
             findViewById<MaterialCardView>(R.id.card_typography),
@@ -180,6 +182,38 @@ class SettingsActivity : BaseActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
+    }
+
+    private fun setupCurrencySetting() {
+        val currencyLayout = findViewById<View>(R.id.currency_setting)
+        val currencyChip = findViewById<Chip>(R.id.currency_chip)
+        
+        fun updateDisplay() {
+            val code = PreferenceHelper.getCurrency(this)
+            val symbol = CurrencyHelper.getSymbol(code)
+            currencyChip.text = "$code $symbol"
+        }
+        updateDisplay()
+
+        currencyLayout.setOnClickListener {
+            PreferenceHelper.performClickHaptic(it)
+            val options = CurrencyHelper.getCurrencyDisplayList()
+            val currentCode = PreferenceHelper.getCurrency(this)
+            val currentSymbol = CurrencyHelper.getSymbol(currentCode)
+            val currentSelection = "$currentCode $currentSymbol"
+
+            SelectionBottomSheet(
+                title = "Select Currency",
+                options = options,
+                selectedOption = currentSelection
+            ) { selected ->
+                val code = CurrencyHelper.getCodeFromDisplay(selected)
+                PreferenceHelper.setCurrency(this, code)
+                updateDisplay()
+            }.show(supportFragmentManager, "CurrencySelection")
+        }
+
+        AnimationHelper.applySpringOnTouch(currencyLayout)
     }
 
     private fun setupThemeToggle() {

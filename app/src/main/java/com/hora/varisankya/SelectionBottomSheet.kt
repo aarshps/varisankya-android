@@ -55,10 +55,7 @@ class SelectionBottomSheet(
             chip.isCheckable = true
             chip.isCheckedIconVisible = false
             chip.isChecked = option == selectedOption
-
-            // Ensure spacing is visually balanced by disabling automatic vertical expansion
             chip.setEnsureMinTouchTargetSize(false)
-            
             updateChipStyle(chip)
 
             chip.setOnClickListener { v ->

@@ -48,16 +48,13 @@ class PaymentAdapter(
         
         holder.subNameText.text = payment.subscriptionName
         
-        val recordCurrency = payment.currency
-        val symbol = try {
-            Currency.getInstance(recordCurrency).symbol
-        } catch (e: Exception) {
-            recordCurrency
-        }
-        holder.amountText.text = String.format("%s %.2f", symbol, payment.amount)
-
         // M3 High-Contrast Highlights: Dynamic Primary
         val context = holder.itemView.context
+        
+        // Use global currency
+        val globalCurrency = PreferenceHelper.getCurrency(context)
+        holder.amountText.text = CurrencyHelper.formatCurrency(context, payment.amount, globalCurrency)
+
         val primary = com.hora.varisankya.util.ThemeHelper.getPrimaryColor(context)
         val onPrimary = com.hora.varisankya.util.ThemeHelper.getOnPrimaryColor(context)
         

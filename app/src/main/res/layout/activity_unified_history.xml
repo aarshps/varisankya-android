@@ -92,7 +92,7 @@
 
                         <TextView
                             android:id="@+id/text_total_spent_amount"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:includeFontPadding="false"
@@ -100,7 +100,12 @@
                             android:textColor="?attr/colorOnSurface"
                             android:textStyle="bold"
                             android:letterSpacing="-0.01"
-                            tools:text="₹45,280" />
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            app:autoSizeTextType="uniform"
+                            app:autoSizeMinTextSize="24sp"
+                            app:autoSizeMaxTextSize="45sp"
+                            tools:text="₹ 45,280" />
 
                         <TextView
                             android:id="@+id/history_subtitle"

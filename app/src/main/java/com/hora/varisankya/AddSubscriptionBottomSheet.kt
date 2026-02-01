@@ -53,7 +53,6 @@ class AddSubscriptionBottomSheet(
         val nameEditText = view.findViewById<TextInputEditText>(R.id.edit_text_name)
         val dueDateEditText = view.findViewById<TextInputEditText>(R.id.edit_text_due_date)
         val costEditText = view.findViewById<TextInputEditText>(R.id.edit_text_cost)
-        val currencyAutoComplete = view.findViewById<AutoCompleteTextView>(R.id.auto_complete_currency)
         val recurrenceAutoComplete = view.findViewById<AutoCompleteTextView>(R.id.auto_complete_recurrence)
         val frequencyEditText = view.findViewById<TextInputEditText>(R.id.edit_text_frequency)
         val tilFrequency = view.findViewById<TextInputLayout>(R.id.til_frequency)
@@ -111,11 +110,12 @@ class AddSubscriptionBottomSheet(
             datePicker.show(childFragmentManager, "DATE_PICKER")
         }
 
-        val currencies = PreferenceHelper.getPersonalizedList(requireContext(), "currency", arrayOf("USD", "EUR", "GBP", "INR"))
         val recurrenceOptions = PreferenceHelper.getPersonalizedList(requireContext(), "recurrence", arrayOf("Monthly", "Yearly", "Weekly", "Daily", "Custom"))
         val categories = PreferenceHelper.getPersonalizedList(requireContext(), "category", Constants.CATEGORIES)
+        
+        // Use global currency setting
+        val globalCurrency = PreferenceHelper.getCurrency(requireContext())
 
-        setupSelection(currencyAutoComplete, "Select Currency", currencies, addHaptic)
         setupSelection(recurrenceAutoComplete, "Select Recurrence", recurrenceOptions, addHaptic) { selected ->
              PreferenceHelper.performHaptics(view, HapticFeedbackConstants.SEGMENT_TICK)
              if (selected == "Custom") {
@@ -143,27 +143,6 @@ class AddSubscriptionBottomSheet(
                 dueDateEditText.setText(format.format(date))
             }
             costEditText.setText(subscription.cost.toString())
-            currencyAutoComplete.setText(subscription.currency, false)
-            // Default to disabled/dimmed while we check for payment history
-            currencyAutoComplete.isEnabled = false
-            currencyAutoComplete.alpha = 0.5f
-
-            val userId = auth.currentUser?.uid
-            val subId = subscription.id
-            if (userId != null && subId != null) {
-                firestore.collection("users").document(userId)
-                    .collection("subscriptions").document(subId)
-                    .collection("payments")
-                    .limit(1)
-                    .get()
-                    .addOnSuccessListener { snapshots ->
-                        if (snapshots.isEmpty && isAdded) {
-                            // No payments exist, safe to unlock currency editing
-                            currencyAutoComplete.isEnabled = true
-                            currencyAutoComplete.alpha = 1.0f
-                        }
-                    }
-            }
             
             categoryAutoComplete.setText(subscription.category, false)
 
@@ -210,7 +189,7 @@ class AddSubscriptionBottomSheet(
                     name = nameEditText.text.toString(),
                     dueDate = selectedDueDate,
                     cost = costEditText.text.toString().toDoubleOrNull() ?: 0.0,
-                    currency = currencyAutoComplete.text.toString(),
+                    currency = globalCurrency,
                     recurrence = getRecurrenceString(recurrenceAutoComplete.text.toString(), frequencyEditText.text.toString()),
                     category = categoryAutoComplete.text.toString(),
                     active = statusSwitch.isChecked
@@ -232,13 +211,11 @@ class AddSubscriptionBottomSheet(
              markPaidButton.visibility = View.GONE
         }
         
-        currencyAutoComplete.setOnDismissListener { currencyAutoComplete.clearFocus() }
         recurrenceAutoComplete.setOnDismissListener { recurrenceAutoComplete.clearFocus() }
         categoryAutoComplete.setOnDismissListener { categoryAutoComplete.clearFocus() }
 
         saveButton.setOnClickListener {
             addStrongHaptic(it)
-            val currency = currencyAutoComplete.text.toString()
             val category = categoryAutoComplete.text.toString()
             val finalRecurrence = getRecurrenceString(recurrenceAutoComplete.text.toString(), frequencyEditText.text.toString())
             val isActiveStatus = if (subscription != null) statusSwitch.isChecked else true
@@ -247,7 +224,6 @@ class AddSubscriptionBottomSheet(
 
             val userId = auth.currentUser?.uid ?: return@setOnClickListener
 
-            PreferenceHelper.recordUsage(requireContext(), "currency", currency)
             PreferenceHelper.recordUsage(requireContext(), "category", category)
             PreferenceHelper.recordUsage(requireContext(), "recurrence", recurrenceAutoComplete.text.toString())
 
@@ -255,7 +231,7 @@ class AddSubscriptionBottomSheet(
                 "name" to nameEditText.text.toString(),
                 "dueDate" to selectedDueDate,
                 "cost" to (costEditText.text.toString().toDoubleOrNull() ?: 0.0),
-                "currency" to currency,
+                "currency" to globalCurrency,
                 "recurrence" to finalRecurrence,
                 "category" to category,
                 "active" to isActiveStatus

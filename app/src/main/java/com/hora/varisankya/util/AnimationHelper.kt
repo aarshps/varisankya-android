@@ -98,6 +98,7 @@ object AnimationHelper {
     /**
      * Animates a TextView's number from 0 to target value.
      * Preserves prefix/suffix if passed.
+     * Uses LTR embedding to handle RTL currency symbols properly.
      */
     fun animateTextCountUp(
         textView: android.widget.TextView, 
@@ -109,11 +110,41 @@ object AnimationHelper {
         animator.duration = 1200 // Slower, more deliberate
         animator.interpolator = EMPHASIZED
         
+        // LTR embedding marks to handle RTL currency symbols
+        val ltrMark = "\u200E"
+        
+        // Check if target has decimals to keep formatting stable during animation
+        val hasDecimals = targetValue % 1.0 >= 0.01
+        
         animator.addUpdateListener { animation ->
             val value = animation.animatedValue as Float
-            // Smart formatting: Remove decimal if .00
-            val formatted = if(value % 1.0 < 0.01) String.format("%.0f", value) else String.format("%.2f", value)
-            textView.text = "$prefix$formatted$suffix"
+            
+            // Stabilize formatting to prevent width jumps during animation
+            val formattedNoSymbol = if (hasDecimals) {
+                String.format(java.util.Locale.US, "%.2f", value)
+            } else {
+                String.format(java.util.Locale.US, "%.0f", value)
+            }
+            
+            if (prefix.isNotEmpty() && prefix.endsWith(" ")) {
+                val symbol = prefix.trim()
+                val fullText = "$ltrMark$symbol $formattedNoSymbol$suffix"
+                val spannable = android.text.SpannableStringBuilder(fullText)
+                
+                // Find symbol start and end in the full text
+                val symbolStart = fullText.indexOf(symbol)
+                if (symbolStart != -1) {
+                    spannable.setSpan(
+                        android.text.style.RelativeSizeSpan(0.5f),
+                        symbolStart,
+                        symbolStart + symbol.length,
+                        android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                }
+                textView.text = spannable
+            } else {
+                textView.text = "$ltrMark$prefix$formattedNoSymbol$suffix"
+            }
         }
         
         animator.start()

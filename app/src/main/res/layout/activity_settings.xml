@@ -98,6 +98,68 @@
 
             </com.google.android.material.card.MaterialCardView>
             
+            <!-- Currency Card - Global Setting -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_currency"
+                style="?attr/materialCardViewFilledStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/card_margin_horizontal"
+                android:layout_marginBottom="@dimen/group_item_spacing"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                app:cardCornerRadius="28dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:id="@+id/currency_setting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground"
+                    android:paddingStart="@dimen/card_padding_horizontal"
+                    android:paddingTop="@dimen/card_padding_vertical"
+                    android:paddingEnd="@dimen/card_padding_horizontal"
+                    android:paddingBottom="@dimen/card_padding_vertical">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/TextAppearance.Material3.TitleMedium"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Currency"
+                            android:textColor="?attr/colorOnSurface" />
+
+                        <TextView
+                            style="@style/TextAppearance.Material3.BodySmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Set a global currency for all subscriptions"
+                            android:textColor="?attr/colorOnSurfaceVariant" />
+                    </LinearLayout>
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/currency_chip"
+                        style="@style/Widget.App.Chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checkable="true"
+                        android:checked="true"
+                        app:checkedIconVisible="false"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:text="INR ₹" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            
             <!-- Security Card (Biometrics) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_security"

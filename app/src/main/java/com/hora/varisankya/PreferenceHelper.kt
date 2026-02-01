@@ -18,6 +18,17 @@ object PreferenceHelper {
     private const val KEY_NOTIF_DAYS = "notification_days"
     private const val KEY_PAYMENT_VIEW_MODE = "payment_view_mode" // "list" or "chart" (current session)
     private const val KEY_DEFAULT_PAYMENT_VIEW = "default_payment_view" // "list" or "chart" (user setting)
+    private const val KEY_CURRENCY = "app_currency"
+
+    fun getCurrency(context: Context): String {
+        val prefs = context.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
+        return prefs.getString(KEY_CURRENCY, "INR") ?: "INR"
+    }
+
+    fun setCurrency(context: Context, currencyCode: String) {
+        val prefs = context.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_CURRENCY, currencyCode).apply()
+    }
 
     fun customPreference(context: Context, name: String): android.content.SharedPreferences {
         return context.getSharedPreferences(name, Context.MODE_PRIVATE)

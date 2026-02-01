@@ -210,18 +210,41 @@ class PaymentHistoryChart @JvmOverloads constructor(
                 textPaint.alpha = (255 * (animationProgress - 0.5f) * 2).toInt()
                 labelBgPaint.alpha = (255 * (animationProgress - 0.5f) * 2).toInt()
                 
-                val labelTextY = String.format("%s%.0f", symbol, rawAmount)
-                val textWidth = textPaint.measureText(labelTextY)
+                val originalSize = textPaint.textSize
+                val symbolSize = originalSize * 0.5f
+                val amountText = String.format(Locale.US, "%.0f", rawAmount)
+                val spaceAndAmount = " $amountText"
+                
+                // Calculate total width
+                textPaint.textSize = symbolSize
+                val sWidth = textPaint.measureText(symbol)
+                textPaint.textSize = originalSize
+                val aWidth = textPaint.measureText(spaceAndAmount)
+                val totalWidth = sWidth + aWidth
+
                 val bgRect = RectF(
-                    xCenter - textWidth / 2 - labelPadding,
+                    xCenter - totalWidth / 2 - labelPadding,
                     barTop - 50f - labelPadding, 
-                    xCenter + textWidth / 2 + labelPadding,
+                    xCenter + totalWidth / 2 + labelPadding,
                     barTop - 50f + 30f + labelPadding 
                 )
                 canvas.drawRoundRect(bgRect, 20f, 20f, labelBgPaint)
+                
                 val fontMetrics = textPaint.fontMetrics
                 val baseline = bgRect.centerY() - (fontMetrics.bottom + fontMetrics.top) / 2
-                canvas.drawText(labelTextY, xCenter, baseline, textPaint)
+                
+                // Draw Symbol
+                val startX = xCenter - totalWidth / 2
+                textPaint.textAlign = Paint.Align.LEFT
+                textPaint.textSize = symbolSize
+                canvas.drawText(symbol, startX, baseline, textPaint)
+                
+                // Draw Amount
+                textPaint.textSize = originalSize
+                canvas.drawText(spaceAndAmount, startX + sWidth, baseline, textPaint)
+                
+                // Restore for next bars
+                textPaint.textAlign = Paint.Align.CENTER
                 
                 textPaint.alpha = 255
                 labelBgPaint.alpha = 255

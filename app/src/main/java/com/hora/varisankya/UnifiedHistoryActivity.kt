@@ -239,28 +239,23 @@ class UnifiedHistoryActivity : BaseActivity() {
     private fun showOverview() {
         currentLevel = ViewLevel.Overview
         
-        // Aggregate by (Month + Currency)
-        // Key: "2025-10|USD", "2025-10|INR"
+        // Global currency symbol for all displays
+        val globalCurrency = PreferenceHelper.getCurrency(this)
+        val symbol = CurrencyHelper.getSymbol(globalCurrency)
+        
+        // Aggregate by Month only (no multi-currency)
         val grouped = allPayments.groupBy { 
             val cal = Calendar.getInstance()
             cal.time = it.date ?: Date()
-            "${cal.get(Calendar.YEAR)}-${cal.get(Calendar.MONTH)}|${it.currency}"
+            String.format(Locale.US, "%d-%02d", cal.get(Calendar.YEAR), cal.get(Calendar.MONTH))
         }
 
-        // Sort by Time only, then Currency
-        val sortedKeys = grouped.keys.sortedWith(compareBy<String> { 
-             val parts = it.split("|")[0].split("-")
-             parts[0].toInt() * 12 + parts[1].toInt()
-        }.thenBy { it.split("|")[1] })
+        // Sort by Time
+        val sortedKeys = grouped.keys.sorted()
 
-        val chartData = sortedKeys.map { key ->
-            val parts = key.split("|")
-            val monthKey = parts[0]
-            val currency = parts[1]
-            val payments = grouped[key] ?: emptyList()
-            
+        val chartData = sortedKeys.map { monthKey ->
+            val payments = grouped[monthKey] ?: emptyList()
             val total = payments.sumOf { it.amount }
-            val symbol = CurrencyHelper.getSymbol(currency)
             val date = payments.firstOrNull()?.date ?: Date()
             val monthLabel = dateFormatMonth.format(date)
             
@@ -283,10 +278,7 @@ class UnifiedHistoryActivity : BaseActivity() {
         }
 
         // --- EXPRESSIVE HERO UPDATE ---
-        // --- EXPRESSIVE HERO UPDATE ---
         val totalAmount = allPayments.sumOf { it.amount }
-        val currency = if(allPayments.isNotEmpty()) allPayments[0].currency else "USD"
-        val symbol = CurrencyHelper.getSymbol(currency)
         AnimationHelper.animateTextCountUp(totalSpentText, totalAmount, "$symbol ")
         totalSpentLabel.text = "Total Spent (All Time)"
         // -----------------------------
@@ -347,9 +339,8 @@ class UnifiedHistoryActivity : BaseActivity() {
         }
         
         // --- EXPRESSIVE HERO UPDATE ---
-        // --- EXPRESSIVE HERO UPDATE ---
         val totalAmount = level.payments.sumOf { it.amount }
-        val currency = if(level.payments.isNotEmpty()) level.payments[0].currency else "USD"
+        val currency = PreferenceHelper.getCurrency(this)
         val symbol = CurrencyHelper.getSymbol(currency)
         AnimationHelper.animateTextCountUp(totalSpentText, totalAmount, "$symbol ")
         totalSpentLabel.text = "Total in ${level.monthLabel}"
@@ -392,9 +383,8 @@ class UnifiedHistoryActivity : BaseActivity() {
         }
 
         // --- EXPRESSIVE HERO UPDATE ---
-        // --- EXPRESSIVE HERO UPDATE ---
         val totalAmount = level.payments.sumOf { it.amount }
-        val currency = if(level.payments.isNotEmpty()) level.payments[0].currency else "USD"
+        val currency = PreferenceHelper.getCurrency(this)
         val symbol = CurrencyHelper.getSymbol(currency)
         AnimationHelper.animateTextCountUp(totalSpentText, totalAmount, "$symbol ")
         totalSpentLabel.text = "Total on ${level.dayLabel}"
@@ -445,7 +435,7 @@ class UnifiedHistoryActivity : BaseActivity() {
                     val monthPayments = allPayments.filter { 
                          val cal = Calendar.getInstance()
                          cal.time = it.date ?: Date()
-                         "${cal.get(Calendar.YEAR)}-${cal.get(Calendar.MONTH)}" == monthKey
+                         String.format(Locale.US, "%d-%02d", cal.get(Calendar.YEAR), cal.get(Calendar.MONTH)) == monthKey
                     }
                     val date = monthPayments.firstOrNull()?.date ?: Date()
                     showMonthDetail(ViewLevel.MonthDetail(monthKey, dateFormatMonth.format(date), monthPayments))

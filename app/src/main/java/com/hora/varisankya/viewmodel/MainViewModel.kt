@@ -37,7 +37,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     
     // Hero Section State
     data class HeroState(
-        val currencyTotals: Map<String, Double> = emptyMap(),
+        val totalAmount: Double = 0.0,
         val nextPayment: Subscription? = null,
         val overdueSubscriptions: List<Subscription> = emptyList(),
         val activeSubscriptions: List<Subscription> = emptyList()
@@ -80,7 +80,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun calculateHeroData(allSubs: List<Subscription>) {
         val activeSubs = allSubs.filter { it.active && it.dueDate != null }
         
-        // USE REAL CALENDAR
         val today = Calendar.getInstance()
         today.set(Calendar.HOUR_OF_DAY, 0)
         today.set(Calendar.MINUTE, 0)
@@ -90,7 +89,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val currentMonth = today.get(Calendar.MONTH)
         val currentYear = today.get(Calendar.YEAR)
         
-        val mapTotals = mutableMapOf<String, Double>()
+        var totalAmount = 0.0
         val overdue = mutableListOf<Subscription>() // RESTORED
         
         for (sub in activeSubs) {
@@ -106,11 +105,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             
             if (isOverdue) {
                 overdue.add(sub)
-                val cur = sub.currency
-                mapTotals[cur] = (mapTotals[cur] ?: 0.0) + sub.cost
+                totalAmount += sub.cost
             } else if (isCurrentMonth) {
-                val cur = sub.currency
-                mapTotals[cur] = (mapTotals[cur] ?: 0.0) + sub.cost
+                totalAmount += sub.cost
             }
         }
         
@@ -128,7 +125,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             .minByOrNull { it.dueDate!! }
             
         heroState.value = HeroState(
-            currencyTotals = mapTotals,
+            totalAmount = totalAmount,
             nextPayment = nextPayment,
             overdueSubscriptions = overdue,
             activeSubscriptions = activeSubs

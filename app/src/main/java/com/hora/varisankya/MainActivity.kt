@@ -141,6 +141,14 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Refresh adapter to pick up any settings changes (like currency)
+        subscriptionsRecyclerView?.adapter?.notifyDataSetChanged()
+        // Re-observe hero state to update currency display
+        viewModel.heroState.value?.let { updateHeroSection(it) }
+    }
+
     private fun initializeApp() {
 
         // Initialize views
@@ -379,18 +387,10 @@ class MainActivity : BaseActivity() {
 
         val activeSubs = state.activeSubscriptions
         
-        // --- Multi-Currency Logic ---
-        val totals = state.currencyTotals
-        val primaryCurrency = if (totals.isNotEmpty()) {
-            totals.keys.maxByOrNull { totals[it] ?: 0.0 } ?: "INR"
-        } else "INR"
-        val primaryTotal = totals[primaryCurrency] ?: 0.0
-        val symbol = try { java.util.Currency.getInstance(primaryCurrency).symbol } catch (e: Exception) { "₹" }
-        
-        val displayTotal = "$symbol ${if(primaryTotal % 1.0 == 0.0) String.format("%.0f", primaryTotal) else primaryTotal}"
-        
-        val totalCount = totals.size
-        // Animation base logic (will refine in cases)
+        // --- Global Currency ---
+        val primaryCurrency = PreferenceHelper.getCurrency(this)
+        val primaryTotal = state.totalAmount
+        val symbol = CurrencyHelper.getSymbol(primaryCurrency)
         
         val nextPayment = state.nextPayment
         
@@ -399,11 +399,8 @@ class MainActivity : BaseActivity() {
             expenseSubtitle.text = "Next: ${nextPayment.name} on ${format.format(nextPayment.dueDate!!)}"
             expenseSubtitle.setTextColor(ThemeHelper.getSecondaryColor(this))
             
+            // Pass symbol with space for AnimationHelper logic
             AnimationHelper.animateTextCountUp(totalExpenseText, primaryTotal, "$symbol ")
-            if (totalCount > 1) {
-                 expenseSubtitle.text = "${expenseSubtitle.text} (+ ${totalCount - 1} other currencies)"
-            }
-            
         } else {
              // Check Overdue
              val overdueSubs = state.overdueSubscriptions
@@ -413,8 +410,7 @@ class MainActivity : BaseActivity() {
                  heroLabel.text = "Overdue Actions"
                  heroLabel.setTextColor(ThemeHelper.getErrorColor(this))
                  
-                 val overdueAmount = overdueSubs.sumOf { it.cost } // Simplification: Summing regardless of currency for alert magnitude is tricky. 
-                 // Better: "X Items Overdue"
+                 val overdueAmount = overdueSubs.sumOf { it.cost } // Simplification
                  
                  totalExpenseText.text = "${overdueSubs.size} Items"
                  expenseSubtitle.text = "Payments are past due"
@@ -425,7 +421,7 @@ class MainActivity : BaseActivity() {
                  heroSubtitlePill.setCardBackgroundColor(android.graphics.Color.TRANSPARENT)
                  heroSubtitlePill.strokeColor = ThemeHelper.getErrorColor(this)
              } else if (activeSubs.isNotEmpty()) {
-                 // All Clear - FREEDOM STATE (Zero Liability for month but has subs)
+                 // All Clear - FREEDOM STATE
                  if (primaryTotal == 0.0) {
                      heroLabel.text = "Financial Zen"
                      totalExpenseText.text = "All Clear"
@@ -437,16 +433,16 @@ class MainActivity : BaseActivity() {
                      expenseSubtitle.setTextColor(zenColor)
                      heroSubtitlePill.setCardBackgroundColor(ThemeHelper.getReferenceColor(this, com.google.android.material.R.attr.colorSecondaryContainer))
                  } else {
-                      // Has liability but no 'next payment' (maybe end of month?)
-                      AnimationHelper.animateTextCountUp(totalExpenseText, primaryTotal, "$symbol ")
-                      expenseSubtitle.text = "Total remaining for $currentMonthName"
+                       // Has liability but no 'next payment'
+                       AnimationHelper.animateTextCountUp(totalExpenseText, primaryTotal, "$symbol ")
+                       expenseSubtitle.text = "Total remaining for $currentMonthName"
                  }
 
              } else {
-                 // True Empty State (No Subs at all)
-                 val defaultSym = try { java.util.Currency.getInstance("INR").symbol } catch (e: Exception) { "₹" }
+                 // True Empty State
+                 val defaultSym = CurrencyHelper.getSymbol(primaryCurrency)
                  heroLabel.text = "Monthly Expenses"
-                 totalExpenseText.text = "${defaultSym}0"
+                 totalExpenseText.text = CurrencyHelper.formatCurrency(this, 0.0, primaryCurrency)
                  expenseSubtitle.text = "No active subscriptions"
                  expenseSubtitle.setTextColor(ThemeHelper.getSecondaryColor(this))
                  
