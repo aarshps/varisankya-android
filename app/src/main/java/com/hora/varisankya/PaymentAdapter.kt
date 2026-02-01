@@ -46,9 +46,9 @@ class PaymentAdapter(
         holder.dayNumberText.text = payment.date?.let { dayFormat.format(it) } ?: "?"
         holder.dateText.text = payment.date?.let { fullFormat.format(it) } ?: "Unknown Date"
         
-        holder.subNameText.text = payment.subscriptionName ?: "Unknown Subscription"
+        holder.subNameText.text = payment.subscriptionName
         
-        val recordCurrency = payment.currency ?: defaultCurrency
+        val recordCurrency = payment.currency
         val symbol = try {
             Currency.getInstance(recordCurrency).symbol
         } catch (e: Exception) {

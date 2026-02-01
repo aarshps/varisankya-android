@@ -106,10 +106,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             
             if (isOverdue) {
                 overdue.add(sub)
-                val cur = sub.currency ?: "INR"
+                val cur = sub.currency
                 mapTotals[cur] = (mapTotals[cur] ?: 0.0) + sub.cost
             } else if (isCurrentMonth) {
-                val cur = sub.currency ?: "INR"
+                val cur = sub.currency
                 mapTotals[cur] = (mapTotals[cur] ?: 0.0) + sub.cost
             }
         }
