@@ -14,8 +14,10 @@ import android.widget.TextView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.color.MaterialColors
+import android.content.res.ColorStateList
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
@@ -25,6 +27,8 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import com.hora.varisankya.util.AnimationHelper
+import com.hora.varisankya.util.ChipHelper
+import com.hora.varisankya.R
 
 class AddSubscriptionBottomSheet(
     private val subscription: Subscription? = null,
@@ -57,7 +61,8 @@ class AddSubscriptionBottomSheet(
         val frequencyEditText = view.findViewById<TextInputEditText>(R.id.edit_text_frequency)
         val tilFrequency = view.findViewById<TextInputLayout>(R.id.til_frequency)
         val categoryAutoComplete = view.findViewById<AutoCompleteTextView>(R.id.auto_complete_category)
-        val statusSwitch = view.findViewById<MaterialSwitch>(R.id.switch_active_status)
+        val activeButton = view.findViewById<MaterialButton>(R.id.btn_active)
+        val autopayButton = view.findViewById<MaterialButton>(R.id.btn_autopay)
         val saveButton = view.findViewById<Button>(R.id.button_save)
         val deleteButton = view.findViewById<Button>(R.id.button_delete)
         val markPaidButton = view.findViewById<Button>(R.id.button_mark_paid)
@@ -119,11 +124,11 @@ class AddSubscriptionBottomSheet(
         setupSelection(recurrenceAutoComplete, "Select Recurrence", recurrenceOptions, addHaptic) { selected ->
              PreferenceHelper.performHaptics(view, HapticFeedbackConstants.SEGMENT_TICK)
              if (selected == "Custom") {
-                 tilFrequency.visibility = View.GONE
-                 frequencyEditText.setText("")
-             } else {
                  tilFrequency.visibility = View.VISIBLE
                  frequencyEditText.isEnabled = true
+             } else {
+                 tilFrequency.visibility = View.GONE
+                 frequencyEditText.setText("")
              }
         }
         setupSelection(categoryAutoComplete, "Select Category", categories, addHaptic)
@@ -131,10 +136,28 @@ class AddSubscriptionBottomSheet(
 
 
 
+        // Autopay toggle — always visible, M3E haptic on change
+
+        // Initialize Autopay Icon Toggle
+        autopayButton.isChecked = subscription?.autopay == true
+        updateButtonStyle(autopayButton)
+        AnimationHelper.applySpringOnTouch(autopayButton)
+        autopayButton.addOnCheckedChangeListener { _, _ ->
+            addHaptic(autopayButton)
+            updateButtonStyle(autopayButton)
+        }
+
+        // Initialize Active Icon Toggle (Edit Mode Only)
         if (subscription != null) {
-            statusSwitch.visibility = View.VISIBLE
-            statusSwitch.isChecked = subscription.active
-            statusSwitch.setOnCheckedChangeListener { _, _ -> addHaptic(statusSwitch) }
+            activeButton.visibility = View.VISIBLE
+            activeButton.isChecked = subscription.active
+            updateButtonStyle(activeButton)
+            AnimationHelper.applySpringOnTouch(activeButton)
+            
+            activeButton.addOnCheckedChangeListener { _, _ -> 
+                addHaptic(activeButton)
+                updateButtonStyle(activeButton)
+            }
 
             nameEditText.setText(subscription.name)
             selectedDueDate = subscription.dueDate
@@ -149,8 +172,8 @@ class AddSubscriptionBottomSheet(
             val rec = subscription.recurrence
             if (rec == "Custom") {
                 recurrenceAutoComplete.setText("Custom", false)
-                tilFrequency.visibility = View.GONE
-                frequencyEditText.setText("")
+                tilFrequency.visibility = View.VISIBLE
+                frequencyEditText.isEnabled = true
             } else if (rec.startsWith("Every ")) {
                 val parts = rec.split(" ")
                 if (parts.size >= 3) {
@@ -169,7 +192,7 @@ class AddSubscriptionBottomSheet(
             } else {
                  frequencyEditText.setText("1")
                  recurrenceAutoComplete.setText(rec, false)
-                 tilFrequency.visibility = View.VISIBLE
+                 tilFrequency.visibility = View.GONE
             }
 
             deleteButton.visibility = View.VISIBLE
@@ -192,7 +215,8 @@ class AddSubscriptionBottomSheet(
                     currency = globalCurrency,
                     recurrence = getRecurrenceString(recurrenceAutoComplete.text.toString(), frequencyEditText.text.toString()),
                     category = categoryAutoComplete.text.toString(),
-                    active = statusSwitch.isChecked
+
+                    active = activeButton.isChecked
                 )
                 val paymentSheet = PaymentBottomSheet(currentSubscription) {
                     onSave() 
@@ -202,7 +226,7 @@ class AddSubscriptionBottomSheet(
             }
 
         } else {
-             statusSwitch.visibility = View.GONE
+             activeButton.visibility = View.GONE
              frequencyEditText.setText("")
              recurrenceAutoComplete.setText("")
              tilFrequency.visibility = View.VISIBLE
@@ -218,7 +242,7 @@ class AddSubscriptionBottomSheet(
             addStrongHaptic(it)
             val category = categoryAutoComplete.text.toString()
             val finalRecurrence = getRecurrenceString(recurrenceAutoComplete.text.toString(), frequencyEditText.text.toString())
-            val isActiveStatus = if (subscription != null) statusSwitch.isChecked else true
+            val isActiveStatus = if (subscription != null) activeButton.isChecked else true
 
 
 
@@ -234,7 +258,8 @@ class AddSubscriptionBottomSheet(
                 "currency" to globalCurrency,
                 "recurrence" to finalRecurrence,
                 "category" to category,
-                "active" to isActiveStatus
+                "active" to isActiveStatus,
+                "autopay" to autopayButton.isChecked
             )
 
             val collection = firestore.collection("users").document(userId).collection("subscriptions")
@@ -335,5 +360,10 @@ class AddSubscriptionBottomSheet(
             }
             bottomSheet.show(childFragmentManager, title)
         }
+    }
+    private fun updateButtonStyle(button: MaterialButton) {
+        val colorAttr = if (button.isChecked) androidx.appcompat.R.attr.colorPrimary else com.google.android.material.R.attr.colorOnSurfaceVariant
+        val color = MaterialColors.getColor(button, colorAttr)
+        button.iconTint = ColorStateList.valueOf(color)
     }
 }

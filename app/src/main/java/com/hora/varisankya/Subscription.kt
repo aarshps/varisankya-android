@@ -22,8 +22,12 @@ data class Subscription(
     
     @get:PropertyName("active")
     @set:PropertyName("active")
-    var active: Boolean = true
+    var active: Boolean = true,
+
+    @get:PropertyName("autopay")
+    @set:PropertyName("autopay")
+    var autopay: Boolean = false
 ) {
     // Zero-argument constructor required for Firestore
-    constructor() : this(null, "", null, 0.0, "USD", "Monthly", "Entertainment", true)
+    constructor() : this(null, "", null, 0.0, "USD", "Monthly", "Entertainment", true, false)
 }

@@ -23,6 +23,10 @@ class SearchActivity : BaseActivity() {
     
     private lateinit var searchEditText: EditText
     private lateinit var categoryChipGroup: ChipGroup
+    private lateinit var autopayChip: Chip
+    private lateinit var notAutopayChip: Chip
+    private lateinit var activeChip: Chip
+    private lateinit var inactiveChip: Chip
     private lateinit var searchRecyclerView: RecyclerView
     private lateinit var emptyStateContainer: View
     private lateinit var adapter: SubscriptionAdapter
@@ -45,6 +49,10 @@ class SearchActivity : BaseActivity() {
 
         searchEditText = findViewById(R.id.search_edit_text)
         categoryChipGroup = findViewById(R.id.search_category_chip_group)
+        autopayChip = findViewById(R.id.chip_autopay_filter)
+        notAutopayChip = findViewById(R.id.chip_not_autopay_filter)
+        activeChip = findViewById(R.id.chip_active_filter)
+        inactiveChip = findViewById(R.id.chip_inactive_filter)
         searchRecyclerView = findViewById(R.id.search_recycler_view)
         emptyStateContainer = findViewById(R.id.empty_state_container)
 
@@ -73,6 +81,7 @@ class SearchActivity : BaseActivity() {
         PreferenceHelper.attachScrollHaptics(searchRecyclerView)
         
         setupCategories()
+        setupFilters()
         
         // Initial Loading State
         val contentContainer = findViewById<View>(R.id.content_container)
@@ -178,14 +187,20 @@ class SearchActivity : BaseActivity() {
     private fun performSearch() {
         val query = searchEditText.text.toString().lowercase().trim()
         val selectedCategories = getSelectedCategories()
-        
+
         val filtered = allSubscriptions.filter { sub ->
             val matchText = sub.name.lowercase().contains(query) || 
                             sub.category.lowercase().contains(query)
             
             val matchCategory = if (selectedCategories.isEmpty()) true else sub.category in selectedCategories
             
-            matchText && matchCategory
+            val matchAutopay = if (autopayChip.isChecked) sub.autopay else true
+            val matchNotAutopay = if (notAutopayChip.isChecked) !sub.autopay else true
+            
+            val matchActive = if (activeChip.isChecked) sub.active else true
+            val matchInactive = if (inactiveChip.isChecked) !sub.active else true
+            
+            matchText && matchCategory && matchAutopay && matchNotAutopay && matchActive && matchInactive
         }
         
         // Sort: Active first, then query match, then due date
@@ -209,6 +224,22 @@ class SearchActivity : BaseActivity() {
             }
         }
         return categories
+    }
+
+    private fun setupFilters() {
+        val chips = listOf(autopayChip, notAutopayChip, activeChip, inactiveChip)
+        
+        chips.forEach { chip ->
+            // M3E Expressive styling
+            com.hora.varisankya.util.ChipHelper.styleChip(chip)
+            AnimationHelper.applySpringOnTouch(chip)
+            
+            chip.setOnClickListener {
+                PreferenceHelper.performHaptics(it, HapticFeedbackConstants.CLOCK_TICK)
+                com.hora.varisankya.util.ChipHelper.styleChip(chip)
+                performSearch()
+            }
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {

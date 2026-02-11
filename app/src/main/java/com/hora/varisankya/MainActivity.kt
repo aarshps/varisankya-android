@@ -323,16 +323,37 @@ class MainActivity : BaseActivity() {
         viewModel.isLoading.observe(this) { loading ->
              if (loading) {
                  swipeRefreshLayout.isRefreshing = true
+                 loadingSkeleton.alpha = 1f
                  loadingSkeleton.visibility = View.VISIBLE
                  mainContentWrapper.visibility = View.GONE
                  emptyStateContainer.visibility = View.GONE 
              } else {
                  swipeRefreshLayout.isRefreshing = false
                  if (loadingSkeleton.visibility == View.VISIBLE) {
-                     loadingSkeleton.visibility = View.GONE
-                     mainContentWrapper.visibility = View.VISIBLE
-                     AnimationHelper.animateReveal(mainContentWrapper)
-                     PreferenceHelper.performClickHaptic(mainContentWrapper)
+                     // M3E Crossfade: Skeleton fades out, content slides up
+                     loadingSkeleton.animate()
+                         .alpha(0f)
+                         .setDuration(300)
+                         .setInterpolator(AnimationHelper.EMPHASIZED_ACCELERATE)
+                         .withEndAction {
+                             loadingSkeleton.visibility = View.GONE
+
+                             // Prepare content wrapper for entrance
+                             mainContentWrapper.alpha = 0f
+                             mainContentWrapper.translationY = 40f
+                             mainContentWrapper.visibility = View.VISIBLE
+
+                             // M3E Reveal: Content slides up + fades in
+                             mainContentWrapper.animate()
+                                 .alpha(1f)
+                                 .translationY(0f)
+                                 .setDuration(450)
+                                 .setInterpolator(AnimationHelper.EMPHASIZED_DECELERATE)
+                                 .start()
+
+                             PreferenceHelper.performClickHaptic(mainContentWrapper)
+                         }
+                         .start()
                  }
                  
                  val currentList = viewModel.subscriptions.value
@@ -508,7 +529,7 @@ class MainActivity : BaseActivity() {
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             "subscription_notifications",
-            ExistingPeriodicWorkPolicy.KEEP,
+            ExistingPeriodicWorkPolicy.UPDATE,
             workRequest
         )
     }

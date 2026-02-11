@@ -25,34 +25,52 @@
             android:orientation="vertical"
             android:paddingBottom="32dp">
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
                 android:paddingHorizontal="24dp">
 
                 <TextView
                     android:id="@+id/bottom_sheet_title"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
+                    android:layout_weight="1"
                     android:text="New Subscription"
                     android:textAppearance="?attr/textAppearanceHeadlineSmall"
                     android:textStyle="bold" />
 
-                <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/switch_active_status"
-                    style="@style/Widget.App.Switch"
+                <!-- Autopay Icon Toggle -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_autopay"
+                    style="@style/Widget.Material3.Button.IconButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
+                    android:checkable="true"
+                    android:contentDescription="Autopay"
+                    android:tooltipText="Autopay"
+                    app:icon="@drawable/ic_autopay"
+                    app:iconTint="?attr/colorOnSurfaceVariant" />
+
+                <!-- Active Icon Toggle -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_active"
+                    style="@style/Widget.Material3.Button.IconButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:checkable="true"
                     android:checked="true"
+                    android:contentDescription="Active Status"
+                    android:tooltipText="Active Status"
                     android:visibility="gone"
+                    app:icon="@drawable/ic_power"
+                    app:iconTint="?attr/colorOnSurfaceVariant"
                     tools:visibility="visible" />
 
-            </RelativeLayout>
+            </LinearLayout>
 
 
 
@@ -133,7 +151,9 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:hint="Every">
+                            android:hint="Every"
+                            android:visibility="gone"
+                            tools:visibility="visible">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/edit_text_frequency"
@@ -159,6 +179,7 @@
                                 android:inputType="none" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

@@ -8,6 +8,7 @@ object Constants {
         "Loan",
         "Software",
         "Family",
+        "Health",
         "Investment",
         "Insurance",
         "Productivity",

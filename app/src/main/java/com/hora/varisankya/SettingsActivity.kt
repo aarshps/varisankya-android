@@ -1,5 +1,6 @@
 package com.hora.varisankya
 
+import android.app.NotificationManager
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -35,6 +36,7 @@ import androidx.biometric.BiometricManager
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.hora.varisankya.util.BiometricAuthManager
 import com.hora.varisankya.util.AnimationHelper
+import com.google.android.material.snackbar.Snackbar
 
 class SettingsActivity : BaseActivity() {
 
@@ -272,8 +274,8 @@ class SettingsActivity : BaseActivity() {
         val timeSettingLayout = findViewById<View>(R.id.notification_time_setting)
         val timeChip = findViewById<Chip>(R.id.notification_time_text)
 
-        val currentHour = PreferenceHelper.getNotificationHour(this)
-        val currentMinute = PreferenceHelper.getNotificationMinute(this)
+        var currentHour = PreferenceHelper.getNotificationHour(this)
+        var currentMinute = PreferenceHelper.getNotificationMinute(this)
         
         updateTimeText(timeChip, currentHour, currentMinute)
         
@@ -290,9 +292,19 @@ class SettingsActivity : BaseActivity() {
                 .build()
 
             picker.addOnPositiveButtonClickListener {
+                // Update mutable vars so subsequent picker opens use the new values
+                currentHour = picker.hour
+                currentMinute = picker.minute
+                
                 PreferenceHelper.setNotificationTime(this, picker.hour, picker.minute)
                 updateTimeText(timeChip, picker.hour, picker.minute)
                 rescheduleNotifications()
+                
+                // M3E Success feedback — Snackbar + Haptic
+                val formattedTime = timeChip.text
+                val rootView = findViewById<View>(android.R.id.content)
+                Snackbar.make(rootView, "Reminders updated to $formattedTime", Snackbar.LENGTH_SHORT).show()
+                PreferenceHelper.performSuccessHaptic(timeChip)
             }
 
             picker.show(supportFragmentManager, "NOTIFICATION_TIME_PICKER")
@@ -344,6 +356,14 @@ class SettingsActivity : BaseActivity() {
     private fun rescheduleNotifications(hour: Int? = null, minute: Int? = null) {
         val targetHour = hour ?: PreferenceHelper.getNotificationHour(this)
         val targetMinute = minute ?: PreferenceHelper.getNotificationMinute(this)
+
+        // Clear existing subscription notifications so stale ones don't linger
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.activeNotifications.forEach { sbn ->
+            if (sbn.notification.group == SubscriptionNotificationWorker.GROUP_KEY_SUBSCRIPTIONS) {
+                notificationManager.cancel(sbn.id)
+            }
+        }
 
         val currentDate = Calendar.getInstance()
         val dueDate = Calendar.getInstance().apply {

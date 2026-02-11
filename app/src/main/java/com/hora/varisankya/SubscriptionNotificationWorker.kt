@@ -113,7 +113,8 @@ class SubscriptionNotificationWorker(
             else -> "Due in $daysLeft days"
         }
 
-        val message = "${subscription.name}: ${subscription.currency} ${subscription.cost}"
+        val autopayPrefix = if (subscription.autopay) "Autopay • " else ""
+        val message = "$autopayPrefix${subscription.name}: ${subscription.currency} ${subscription.cost}"
 
         val markPaidIntent = Intent(context, NotificationActionReceiver::class.java).apply {
             action = NotificationActionReceiver.ACTION_MARK_PAID

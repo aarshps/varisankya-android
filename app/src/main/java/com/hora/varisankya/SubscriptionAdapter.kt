@@ -31,6 +31,7 @@ private var firstShape: ShapeAppearanceModel? = null
 private var middleShape: ShapeAppearanceModel? = null
 private var lastShape: ShapeAppearanceModel? = null
 
+
 class SubscriptionAdapter(
     private var subscriptions: List<Subscription>,
     private val onSubscriptionClicked: (Subscription) -> Unit
@@ -55,10 +56,7 @@ class SubscriptionAdapter(
         val subscription = subscriptions[position]
         val context = holder.itemView.context
         
-        // Entrance Animation - Removed to prevent layout glitches on item update
-        // if (position < 12) {
-        //    AnimationHelper.animateEntrance(holder.itemView, position)
-        // }
+
         
         holder.nameTextView.text = subscription.name
         
@@ -98,7 +96,8 @@ class SubscriptionAdapter(
         if (!subscription.active) {
             holder.itemView.alpha = 0.6f
             holder.nameTextView.setTextColor(MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnSurfaceVariant, Color.GRAY))
-            holder.detailsTextView.text = "Discontinued • ${subscription.recurrence}"
+            val autopayLabel = if (subscription.autopay) " • Autopay" else ""
+            holder.detailsTextView.text = "Discontinued • ${subscription.recurrence}$autopayLabel"
             holder.pillContainer.visibility = View.VISIBLE
             holder.daysLeftTextView.text = "Inactive"
             
@@ -122,7 +121,8 @@ class SubscriptionAdapter(
             holder.nameTextView.setTextColor(MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnSurface, Color.BLACK))
             
             subscription.dueDate?.let { dueDate ->
-                holder.detailsTextView.text = "Due ${DATE_FORMAT.format(dueDate)} • ${subscription.recurrence}"
+                val autopayLabel = if (subscription.autopay) " • Autopay" else ""
+                holder.detailsTextView.text = "Due ${DATE_FORMAT.format(dueDate)} • ${subscription.recurrence}$autopayLabel"
 
                 // Days left logic
                 val today = Calendar.getInstance()
