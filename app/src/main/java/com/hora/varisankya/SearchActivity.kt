@@ -15,6 +15,7 @@ import com.google.android.material.chip.ChipGroup
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.hora.varisankya.util.AnimationHelper
+import com.hora.varisankya.util.DateHelper
 
 class SearchActivity : BaseActivity() {
 
@@ -149,7 +150,14 @@ class SearchActivity : BaseActivity() {
                 .collection("subscriptions")
                 .get()
                 .addOnSuccessListener { snapshots ->
-                    allSubscriptions = snapshots.toObjects(Subscription::class.java)
+                    allSubscriptions = snapshots.toObjects(Subscription::class.java).map { sub ->
+                        val normalizedDueDate = sub.dueDate?.let { DateHelper.normalizeDueDate(it) }
+                        if (normalizedDueDate != sub.dueDate) {
+                            sub.copy(dueDate = normalizedDueDate)
+                        } else {
+                            sub
+                        }
+                    }
                     
                     val targetView = if (allSubscriptions.isEmpty()) emptyStateContainer else contentContainer
                     val otherView = if (allSubscriptions.isEmpty()) contentContainer else emptyStateContainer

@@ -211,15 +211,25 @@ class SubscriptionAdapter(
         override fun getNewListSize(): Int = newList.size
 
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            // Assuming Subscription has a unique ID, otherwise fallback to name+cost+dueDate
-            // Using logic based on available fields since ID might not be exposed or reliable in this context if not stable
             val oldItem = oldList[oldItemPosition]
             val newItem = newList[newItemPosition]
-            // Ideally compare by ID if available. Let's assume user defined ID or unique fields.
-            // If explicit ID exists, use it. Based on Subscription class usage elsewhere (Firestore), it likely has an ID.
-            // But I don't see the Subscription class definition here. I'll rely on object reference or content for now if ID is missing.
-            // SAFEST: Compare critical business keys
-            return oldItem === newItem || (oldItem.name == newItem.name && oldItem.cost == newItem.cost) 
+
+            val oldId = oldItem.id
+            val newId = newItem.id
+            if (oldId != null && newId != null) {
+                return oldId == newId
+            }
+
+            if (oldId != null || newId != null) {
+                return false
+            }
+
+            return oldItem.name == newItem.name &&
+                oldItem.cost == newItem.cost &&
+                oldItem.dueDate == newItem.dueDate &&
+                oldItem.recurrence == newItem.recurrence &&
+                oldItem.category == newItem.category &&
+                oldItem.currency == newItem.currency
         }
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {

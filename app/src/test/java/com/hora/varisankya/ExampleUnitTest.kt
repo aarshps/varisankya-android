@@ -1,4 +1,4 @@
-package com.hora.helloworld
+package com.hora.varisankya
 
 import org.junit.Test
 

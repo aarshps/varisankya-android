@@ -4,6 +4,7 @@ import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.hora.varisankya.PaymentRecord
@@ -12,6 +13,7 @@ import com.hora.varisankya.util.DateHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.util.Date
 
 class NotificationActionReceiver : BroadcastReceiver() {
@@ -28,6 +30,8 @@ class NotificationActionReceiver : BroadcastReceiver() {
             scope.launch {
                 try {
                     markAsPaid(context, subId, notifId)
+                } catch (e: Exception) {
+                    Log.e("NotificationAction", "Failed to mark subscription paid from notification", e)
                 } finally {
                     pendingResult.finish()
                 }
@@ -35,50 +39,48 @@ class NotificationActionReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun markAsPaid(context: Context, subId: String, notifId: Int) {
+    private suspend fun markAsPaid(context: Context, subId: String, notifId: Int) {
         val auth = FirebaseAuth.getInstance()
         val userId = auth.currentUser?.uid ?: return
         val firestore = FirebaseFirestore.getInstance()
 
         // 1. Fetch Subscription
         val subRef = firestore.collection("users").document(userId).collection("subscriptions").document(subId)
-        
-        subRef.get().addOnSuccessListener { snapshot ->
-            val subscription = snapshot.toObject(Subscription::class.java) ?: return@addOnSuccessListener
-            
-            // 2. Prepare Payment Record
-            val payment = PaymentRecord(
-                date = Date(),
-                amount = subscription.cost,
-                subscriptionName = subscription.name,
-                subscriptionId = subId,
-                currency = subscription.currency,
-                userId = userId
-            )
-            
-            // 3. Calculate Next Date
-            val nextDueDate = subscription.recurrence.let { recurrence ->
-                subscription.dueDate?.let { currentDue ->
-                     DateHelper.calculateNextDueDate(currentDue, recurrence)
-                }
-            }
+        val snapshot = subRef.get().await()
+        val subscription = snapshot.toObject(Subscription::class.java) ?: return
 
-            // 4. Batch Write
-            val batch = firestore.batch()
-            val paymentRef = subRef.collection("payments").document()
-            
-            batch.set(paymentRef, payment)
-            if (nextDueDate != null) {
-                batch.update(subRef, "dueDate", nextDueDate)
-            } else {
-                // If custom/no recurrence, maybe mark inactive? leaving as is for now.
+        // 2. Prepare Payment Record
+        val payment = PaymentRecord(
+            date = Date(),
+            amount = subscription.cost,
+            subscriptionName = subscription.name,
+            subscriptionId = subId,
+            currency = subscription.currency,
+            userId = userId
+        )
+
+        // 3. Calculate Next Date
+        val nextDueDate = subscription.recurrence.let { recurrence ->
+            subscription.dueDate?.let { currentDue ->
+                DateHelper.calculateNextDueDate(currentDue, recurrence)
             }
-            
-            batch.commit().addOnSuccessListener {
-                // 5. Cancel Notification
-                val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                notificationManager.cancel(notifId)
-            }
+        }
+
+        // 4. Batch Write
+        val batch = firestore.batch()
+        val paymentRef = subRef.collection("payments").document()
+
+        batch.set(paymentRef, payment)
+        if (nextDueDate != null) {
+            batch.update(subRef, "dueDate", nextDueDate)
+        }
+
+        batch.commit().await()
+
+        // 5. Cancel Notification after successful write
+        if (notifId != -1) {
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.cancel(notifId)
         }
     }
 

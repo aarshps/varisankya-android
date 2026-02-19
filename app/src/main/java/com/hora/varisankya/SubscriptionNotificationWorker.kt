@@ -15,11 +15,10 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.hora.varisankya.util.DateHelper
 import kotlinx.coroutines.tasks.await
-import java.util.Calendar
-import java.util.concurrent.TimeUnit
 import com.hora.varisankya.receiver.NotificationActionReceiver
-import android.content.ComponentName
+import java.time.ZoneId
 
 class SubscriptionNotificationWorker(
     appContext: Context,
@@ -42,25 +41,16 @@ class SubscriptionNotificationWorker(
                 .await()
 
             val subscriptions = snapshots.toObjects(Subscription::class.java)
-            val today = Calendar.getInstance()
-            today.set(Calendar.HOUR_OF_DAY, 0)
-            today.set(Calendar.MINUTE, 0)
-            today.set(Calendar.SECOND, 0)
-            today.set(Calendar.MILLISECOND, 0)
             
             // Get user preference for notification window
             val notificationWindow = PreferenceHelper.getNotificationDays(applicationContext)
+            val zoneId = ZoneId.systemDefault()
+            val todayLocalDate = java.time.LocalDate.now(zoneId)
 
             subscriptions.forEach { sub ->
                 sub.dueDate?.let { dueDate ->
-                    // Convert stored Date (UTC Instant) to LocalDate in UTC
-                    // We treat the stored date as a "canonical date" irrespective of time
-                    val dueInstant = dueDate.toInstant()
-                    val dueZoned = dueInstant.atZone(java.time.ZoneId.of("UTC"))
-                    val dueLocalDate = dueZoned.toLocalDate()
-
-                    // Get today's local date
-                    val todayLocalDate = java.time.LocalDate.now()
+                    val normalizedDueDate = DateHelper.normalizeDueDate(dueDate)
+                    val dueLocalDate = normalizedDueDate.toInstant().atZone(zoneId).toLocalDate()
 
                     // Calculate days remaining
                     val daysLeft = java.time.temporal.ChronoUnit.DAYS.between(todayLocalDate, dueLocalDate).toInt()

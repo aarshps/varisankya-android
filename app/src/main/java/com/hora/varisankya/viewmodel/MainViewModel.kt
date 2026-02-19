@@ -12,9 +12,9 @@ import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import com.hora.varisankya.Subscription
 import com.hora.varisankya.PaymentRecord
+import com.hora.varisankya.util.DateHelper
 import java.util.Calendar
 import java.util.Date
-import java.util.TimeZone
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -67,9 +67,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
                 val subs = snapshots?.toObjects(Subscription::class.java) ?: emptyList()
+                val normalizedSubs = subs.map { sub ->
+                    val normalizedDueDate = sub.dueDate?.let { DateHelper.normalizeDueDate(it) }
+                    if (normalizedDueDate != sub.dueDate) {
+                        sub.copy(dueDate = normalizedDueDate)
+                    } else {
+                        sub
+                    }
+                }
                 
                 // Sort: Active first, then by due date
-                val sortedSubscriptions = subs.sortedWith(compareByDescending<Subscription> { it.active }.thenBy { it.dueDate })
+                val sortedSubscriptions = normalizedSubs.sortedWith(
+                    compareByDescending<Subscription> { it.active }.thenBy { it.dueDate }
+                )
                 
                 subscriptions.value = sortedSubscriptions
                 calculateHeroData(sortedSubscriptions)
@@ -145,7 +155,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             userId = userId
         )
         
-        val nextDueDate = calculateNextDueDate(subscription.dueDate ?: Date(), subscription.recurrence)
+        val nextDueDate = DateHelper.calculateNextDueDate(subscription.dueDate ?: Date(), subscription.recurrence)
 
         val batch = firestore.batch()
         val subRef = firestore.collection("users").document(userId).collection("subscriptions").document(subId)
@@ -177,41 +187,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
          firestore.collection("users").document(userId).collection("subscriptions").document(subId)
             .delete()
             .addOnSuccessListener { onSuccess() }
-    }
-
-    private fun calculateNextDueDate(fromDate: Date, recurrence: String): Date? {
-        val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-        cal.time = fromDate
-        cal.set(Calendar.HOUR_OF_DAY, 0)
-        cal.set(Calendar.MINUTE, 0)
-        cal.set(Calendar.SECOND, 0)
-        cal.set(Calendar.MILLISECOND, 0)
-
-        if (recurrence == "Custom") return null
-
-        if (recurrence.startsWith("Every ")) {
-            val parts = recurrence.split(" ")
-            if (parts.size >= 3) {
-                val freq = parts[1].toIntOrNull() ?: 1
-                val unit = parts[2]
-                when (unit) {
-                    "Months", "Month" -> cal.add(Calendar.MONTH, freq)
-                    "Years", "Year" -> cal.add(Calendar.YEAR, freq)
-                    "Weeks", "Week" -> cal.add(Calendar.WEEK_OF_YEAR, freq)
-                    "Days", "Day" -> cal.add(Calendar.DAY_OF_YEAR, freq)
-                    else -> cal.add(Calendar.MONTH, freq)
-                }
-            }
-        } else {
-             when (recurrence) {
-                "Monthly" -> cal.add(Calendar.MONTH, 1)
-                "Yearly" -> cal.add(Calendar.YEAR, 1)
-                "Weekly" -> cal.add(Calendar.WEEK_OF_YEAR, 1)
-                "Daily" -> cal.add(Calendar.DAY_OF_YEAR, 1)
-                else -> cal.add(Calendar.MONTH, 1)
-            }
-        }
-        return cal.time
     }
 
     override fun onCleared() {

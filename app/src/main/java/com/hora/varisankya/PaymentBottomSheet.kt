@@ -29,6 +29,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import com.hora.varisankya.util.AnimationHelper
+import com.hora.varisankya.util.DateHelper
 
 class PaymentBottomSheet(
     private val subscription: Subscription,
@@ -87,7 +88,8 @@ class PaymentBottomSheet(
             }.start()
         }
 
-        currentDueDate = subscription.dueDate ?: Date()
+        currentDueDate = subscription.dueDate?.let { DateHelper.normalizeDueDate(it) }
+            ?: DateHelper.normalizeDueDate(Date())
         setupUI()
         loadHistory()
         calculateDates(currentDueDate!!)
@@ -145,49 +147,12 @@ class PaymentBottomSheet(
         val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
         textDueInfo.text = "Due: ${dateFormat.format(baseDate)}"
         
-        projectedNextDate = calculateNextDueDate(baseDate, subscription.recurrence)
+        projectedNextDate = DateHelper.calculateNextDueDate(baseDate, subscription.recurrence)
         projectedNextDate?.let {
             textNextPreview.text = "Next bill will be: ${dateFormat.format(it)}"
         } ?: run {
              textNextPreview.text = "Next due date: Undefined (Custom/None)"
         }
-    }
-
-    private fun calculateNextDueDate(fromDate: Date, recurrence: String): Date? {
-        // Use UTC to match MaterialDatePicker and avoid DST shifts/timezone drift
-        val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-        cal.time = fromDate
-        // Reset to Midnight UTC
-        cal.set(Calendar.HOUR_OF_DAY, 0)
-        cal.set(Calendar.MINUTE, 0)
-        cal.set(Calendar.SECOND, 0)
-        cal.set(Calendar.MILLISECOND, 0)
-
-        if (recurrence == "Custom") return null
-
-        if (recurrence.startsWith("Every ")) {
-            val parts = recurrence.split(" ")
-            if (parts.size >= 3) {
-                val freq = parts[1].toIntOrNull() ?: 1
-                val unit = parts[2]
-                when (unit) {
-                    "Months", "Month" -> cal.add(Calendar.MONTH, freq)
-                    "Years", "Year" -> cal.add(Calendar.YEAR, freq)
-                    "Weeks", "Week" -> cal.add(Calendar.WEEK_OF_YEAR, freq)
-                    "Days", "Day" -> cal.add(Calendar.DAY_OF_YEAR, freq)
-                    else -> cal.add(Calendar.MONTH, freq)
-                }
-            }
-        } else {
-             when (recurrence) {
-                "Monthly" -> cal.add(Calendar.MONTH, 1)
-                "Yearly" -> cal.add(Calendar.YEAR, 1)
-                "Weekly" -> cal.add(Calendar.WEEK_OF_YEAR, 1)
-                "Daily" -> cal.add(Calendar.DAY_OF_YEAR, 1)
-                else -> cal.add(Calendar.MONTH, 1)
-            }
-        }
-        return cal.time
     }
 
 

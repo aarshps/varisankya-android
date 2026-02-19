@@ -11,6 +11,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -25,9 +26,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.TimeZone
 import com.hora.varisankya.util.AnimationHelper
 import com.hora.varisankya.util.ChipHelper
+import com.hora.varisankya.util.DateHelper
 import com.hora.varisankya.R
 
 class AddSubscriptionBottomSheet(
@@ -101,16 +102,18 @@ class AddSubscriptionBottomSheet(
         dueDateEditText.setOnClickListener {
             addHaptic(it)
             clearCurrentFocus()
+            val initialSelection = subscription?.dueDate?.let { existingDate ->
+                DateHelper.toPickerSelectionMillis(existingDate)
+            } ?: MaterialDatePicker.todayInUtcMilliseconds()
             val datePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Select Due Date")
-                .setSelection(subscription?.dueDate?.time ?: MaterialDatePicker.todayInUtcMilliseconds())
+                .setSelection(initialSelection)
                 .build()
 
             datePicker.addOnPositiveButtonClickListener { ts ->
-                selectedDueDate = Date(ts)
+                selectedDueDate = DateHelper.fromPickerSelectionMillis(ts)
                 val format = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-                format.timeZone = TimeZone.getTimeZone("UTC")
-                dueDateEditText.setText(format.format(selectedDueDate!!))
+                dueDateEditText.setText(selectedDueDate?.let { selected -> format.format(selected) })
             }
             datePicker.show(childFragmentManager, "DATE_PICKER")
         }
@@ -160,8 +163,8 @@ class AddSubscriptionBottomSheet(
             }
 
             nameEditText.setText(subscription.name)
-            selectedDueDate = subscription.dueDate
-            subscription.dueDate?.let { date ->
+            selectedDueDate = subscription.dueDate?.let { DateHelper.normalizeDueDate(it) }
+            selectedDueDate?.let { date ->
                 val format = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
                 dueDateEditText.setText(format.format(date))
             }
@@ -200,8 +203,21 @@ class AddSubscriptionBottomSheet(
                 addStrongHaptic(it)
 
                 val userId = auth.currentUser?.uid ?: return@setOnClickListener
-                firestore.collection("users").document(userId).collection("subscriptions").document(subscription.id!!).delete()
-                dismiss()
+                val subId = subscription.id ?: return@setOnClickListener
+                firestore.collection("users")
+                    .document(userId)
+                    .collection("subscriptions")
+                    .document(subId)
+                    .delete()
+                    .addOnSuccessListener {
+                        onSave()
+                        dismiss()
+                    }
+                    .addOnFailureListener {
+                        if (isAdded) {
+                            Toast.makeText(requireContext(), "Failed to delete subscription", Toast.LENGTH_SHORT).show()
+                        }
+                    }
             }
 
             markPaidButton.visibility = View.VISIBLE
