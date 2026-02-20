@@ -16,8 +16,13 @@ import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.ViewCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.launch
+import com.hora.varisankya.SubscriptionAdapter
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.ViewCompat
 import android.view.ViewGroup
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
@@ -349,62 +354,73 @@ class MainActivity : BaseActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.subscriptions.observe(this) { subscriptions ->
-            if (subscriptions.isEmpty()) {
-                val isLoading = viewModel.isLoading.value ?: false
-                if (!isLoading) {
-                    checkReadyState()
-                    emptyStateContainer.visibility = View.VISIBLE
-                    subscriptionsRecyclerView.visibility = View.GONE
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.subscriptions.collect { subscriptions ->
+                        if (subscriptions.isEmpty()) {
+                            val isLoading = viewModel.isLoading.value
+                            if (!isLoading) {
+                                checkReadyState()
+                                emptyStateContainer.visibility = View.VISIBLE
+                                subscriptionsRecyclerView.visibility = View.GONE
+                            }
+                        } else {
+                            emptyStateContainer.visibility = View.GONE
+                            subscriptionsRecyclerView.visibility = View.VISIBLE
+                            adapter.updateData(subscriptions)
+                            checkReadyState()
+                        }
+                    }
                 }
-            } else {
-                emptyStateContainer.visibility = View.GONE
-                subscriptionsRecyclerView.visibility = View.VISIBLE
-                adapter.updateData(subscriptions)
-                checkReadyState()
-            }
-        }
-        
-        viewModel.heroState.observe(this) { state ->
-            updateHeroSection(state)
-            checkReadyState()
-        }
-        
-        viewModel.isLoading.observe(this) { loading ->
-             if (loading) {
-                 swipeRefreshLayout.isRefreshing = true
-                 // Only show skeleton on initial load when content isn't visible yet
-                 if (mainContentWrapper.visibility != View.VISIBLE) {
-                     loadingSkeleton.alpha = 1f
-                     loadingSkeleton.visibility = View.VISIBLE
-                     mainContentWrapper.visibility = View.GONE
-                     emptyStateContainer.visibility = View.GONE 
-                 }
-             } else {
-                 swipeRefreshLayout.isRefreshing = false
-                 if (loadingSkeleton.visibility == View.VISIBLE) {
-                     loadingSkeleton.visibility = View.GONE
-                     mainContentWrapper.visibility = View.VISIBLE
-                     AnimationHelper.animateReveal(mainContentWrapper)
-                     PreferenceHelper.performClickHaptic(mainContentWrapper)
-                 }
-                 
-                 val currentList = viewModel.subscriptions.value
-                 if (currentList.isNullOrEmpty()) {
-                     emptyStateContainer.visibility = View.VISIBLE
-                     subscriptionsRecyclerView.visibility = View.GONE
-                 } else {
-                     emptyStateContainer.visibility = View.GONE
-                     subscriptionsRecyclerView.visibility = View.VISIBLE
-                 }
-                 checkReadyState()
-             }
-        }
+                
+                launch {
+                    viewModel.heroState.collect { state ->
+                        updateHeroSection(state)
+                        checkReadyState()
+                    }
+                }
+                
+                launch {
+                    viewModel.isLoading.collect { loading ->
+                        if (loading) {
+                            swipeRefreshLayout.isRefreshing = true
+                            if (mainContentWrapper.visibility != View.VISIBLE) {
+                                loadingSkeleton.alpha = 1f
+                                loadingSkeleton.visibility = View.VISIBLE
+                                mainContentWrapper.visibility = View.GONE
+                                emptyStateContainer.visibility = View.GONE 
+                            }
+                        } else {
+                            swipeRefreshLayout.isRefreshing = false
+                            if (loadingSkeleton.visibility == View.VISIBLE) {
+                                loadingSkeleton.visibility = View.GONE
+                                mainContentWrapper.visibility = View.VISIBLE
+                                AnimationHelper.animateReveal(mainContentWrapper)
+                                PreferenceHelper.performClickHaptic(mainContentWrapper)
+                            }
+                            
+                            val currentList = viewModel.subscriptions.value
+                            if (currentList.isEmpty()) {
+                                emptyStateContainer.visibility = View.VISIBLE
+                                subscriptionsRecyclerView.visibility = View.GONE
+                            } else {
+                                emptyStateContainer.visibility = View.GONE
+                                subscriptionsRecyclerView.visibility = View.VISIBLE
+                            }
+                            checkReadyState()
+                        }
+                    }
+                }
 
-        viewModel.error.observe(this) { errorMsg ->
-            if (errorMsg != null) {
-                android.widget.Toast.makeText(this, errorMsg, android.widget.Toast.LENGTH_SHORT).show()
-                checkReadyState()
+                launch {
+                    viewModel.error.collect { errorMsg ->
+                        if (errorMsg != null) {
+                            android.widget.Toast.makeText(this@MainActivity, errorMsg, android.widget.Toast.LENGTH_SHORT).show()
+                            checkReadyState()
+                        }
+                    }
+                }
             }
         }
 
@@ -412,7 +428,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun checkReadyState() {
-        val isLoading = viewModel.isLoading.value ?: true
+        val isLoading = viewModel.isLoading.value
         if (!isLoading) {
              isDataLoaded = true
         }

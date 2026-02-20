@@ -3,7 +3,9 @@ package com.hora.varisankya.viewmodel
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import androidx.lifecycle.ViewModel
 
 import com.google.firebase.auth.FirebaseAuth
@@ -30,10 +32,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     
     // Unified Data Holder
-    val subscriptions = MutableLiveData<List<Subscription>>(emptyList())
+    private val _subscriptions = MutableStateFlow<List<Subscription>>(emptyList())
+    val subscriptions: StateFlow<List<Subscription>> = _subscriptions.asStateFlow()
     
-    val isLoading = MutableLiveData(true)
-    val error = MutableLiveData<String?>(null)
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+    
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error.asStateFlow()
     
     init {
         // No more tutorial observer needed
@@ -46,27 +52,28 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val overdueSubscriptions: List<Subscription> = emptyList(),
         val activeSubscriptions: List<Subscription> = emptyList()
     )
-    val heroState = MutableLiveData(HeroState())
+    private val _heroState = MutableStateFlow(HeroState())
+    val heroState: StateFlow<HeroState> = _heroState.asStateFlow()
 
     fun loadSubscriptions() {
         val userId = auth.currentUser?.uid
         if (userId == null) {
-            isLoading.value = false
+            _isLoading.value = false
             return
         }
         
         // Remove existing listener if any
         snapshotListener?.remove()
 
-        isLoading.value = true
+        _isLoading.value = true
         
         snapshotListener = firestore.collection("users").document(userId).collection("subscriptions")
             .orderBy("dueDate", Query.Direction.ASCENDING)
             .addSnapshotListener { snapshots, e ->
                 if (e != null) {
                     Log.w("MainViewModel", "Listen failed.", e)
-                    error.value = e.message
-                    isLoading.value = false
+                    _error.value = e.message
+                    _isLoading.value = false
                     return@addSnapshotListener
                 }
 
@@ -79,9 +86,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     val newHeroState = calculateHeroData(sortedSubscriptions)
                     
                     withContext(Dispatchers.Main) {
-                        subscriptions.value = sortedSubscriptions
-                        heroState.value = newHeroState
-                        isLoading.value = false
+                        _subscriptions.value = sortedSubscriptions
+                        _heroState.value = newHeroState
+                        _isLoading.value = false
                     }
                 }
             }
