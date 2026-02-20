@@ -14,14 +14,7 @@ All animations MUST use the predefined M3E tokens in `Constants.kt`. Never use h
 *   `ANIM_DURATION_SHORT` (200ms): Use for rapid snaps, such as a bouncing recovery after an interactive press.
 *   `ANIM_DURATION_MEDIUM` (400ms): Use for standard layout state changes.
 *   `ANIM_DURATION_LONG` (500ms): Use for **all** Activity/Fragment Shared Axis window transitions and large list entrances. This provides the signature "fast entrance, long Emphasized tail" feel.
-*   **Touch Physics Action:** `ANIM_DURATION_CLICK_PRESS` (50ms) and `ANIM_DURATION_CLICK_RELEASE` (200ms).
 
-## 1. Deep "Squish" Touch Physics
-
-Standard cards and buttons in Varisankya must feel "heavy".
-*   Always use `AnimationHelper.applySpringOnTouch(view)`.
-*   The scale depth must reach `0.92f` (not the standard 0.96f) on Action Down.
-*   The touch down must happen in `50ms` (instant gratification) and recover in `200ms`.
 
 ## 2. 3D Cascading List Entrances
 

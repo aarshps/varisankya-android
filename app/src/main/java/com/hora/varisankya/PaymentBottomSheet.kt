@@ -1,4 +1,4 @@
-package com.hora.varisankya
+﻿package com.hora.varisankya
 
 import android.os.Build
 import android.os.Bundle
@@ -82,9 +82,6 @@ class PaymentBottomSheet(
         
         view.findViewById<View>(R.id.drag_handle).setOnClickListener {
             PreferenceHelper.performHaptics(it, HapticFeedbackConstants.CLOCK_TICK)
-            it.animate().scaleX(0.9f).scaleY(0.9f).setDuration(Constants.ANIM_DURATION_CLICK_PRESS).setInterpolator(androidx.interpolator.view.animation.FastOutSlowInInterpolator()).withEndAction {
-                it.animate().scaleX(1f).scaleY(1f).setDuration(Constants.ANIM_DURATION_CLICK_RELEASE).setInterpolator(androidx.interpolator.view.animation.FastOutSlowInInterpolator()).start()
-            }.start()
         }
 
         currentDueDate = subscription.dueDate ?: Date()
@@ -136,7 +133,6 @@ class PaymentBottomSheet(
             PreferenceHelper.performHaptics(it, haptic)
             recordPayment(currentDueDate!!, projectedNextDate)
         }
-        AnimationHelper.applySpringOnTouch(btnPayCurrent)
 
 
     }

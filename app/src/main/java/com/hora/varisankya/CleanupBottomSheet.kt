@@ -1,4 +1,4 @@
-package com.hora.varisankya
+﻿package com.hora.varisankya
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -42,12 +42,10 @@ class CleanupBottomSheet(
             dismiss()
             onConfirm()
         }
-        AnimationHelper.applySpringOnTouch(confirmButton)
 
         cancelButton.setOnClickListener {
             PreferenceHelper.performClickHaptic(it)
             dismiss()
         }
-        AnimationHelper.applySpringOnTouch(cancelButton)
     }
 }

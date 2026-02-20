@@ -1,4 +1,4 @@
-package com.hora.varisankya
+﻿package com.hora.varisankya
 
 import android.content.DialogInterface
 import android.os.Build
@@ -62,8 +62,6 @@ class ConfirmationBottomSheet(
         }
         
         // Touch Animation
-        AnimationHelper.applySpringOnTouch(btnConfirm)
-        AnimationHelper.applySpringOnTouch(btnCancel)
         
         // Drag handle animation
         val dragHandle = view.findViewById<View>(R.id.drag_handle)

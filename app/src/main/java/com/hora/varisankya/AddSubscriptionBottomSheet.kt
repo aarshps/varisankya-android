@@ -1,4 +1,4 @@
-package com.hora.varisankya
+﻿package com.hora.varisankya
 
 import android.content.Context
 import android.os.Build
@@ -74,15 +74,9 @@ class AddSubscriptionBottomSheet(
         PreferenceHelper.attachNestedScrollHaptics(scrollView)
         
         // Expressive Buttons
-        AnimationHelper.applySpringOnTouch(saveButton)
-        AnimationHelper.applySpringOnTouch(deleteButton)
-        AnimationHelper.applySpringOnTouch(markPaidButton)
         
         dragHandle.setOnClickListener {
             PreferenceHelper.performHaptics(it, HapticFeedbackConstants.CLOCK_TICK)
-            it.animate().scaleX(0.9f).scaleY(0.9f).setDuration(Constants.ANIM_DURATION_CLICK_PRESS).setInterpolator(androidx.interpolator.view.animation.FastOutSlowInInterpolator()).withEndAction {
-                it.animate().scaleX(1f).scaleY(1f).setDuration(Constants.ANIM_DURATION_CLICK_RELEASE).setInterpolator(androidx.interpolator.view.animation.FastOutSlowInInterpolator()).start()
-            }.start()
         }
 
         titleTextView.text = if (subscription == null) "Add Subscription" else "Edit Subscription"
@@ -141,11 +135,10 @@ class AddSubscriptionBottomSheet(
 
 
 
-        // Autopay toggle — always visible, M3E haptic on change
+        // Autopay toggle â€” always visible, M3E haptic on change
 
         // Initialize Autopay Toggle
         autopaySwitch.isChecked = subscription?.autopay == true
-        AnimationHelper.applySpringOnTouch(autopaySwitch)
         autopaySwitch.setOnCheckedChangeListener { _, _ ->
             addHaptic(autopaySwitch)
         }
@@ -154,7 +147,6 @@ class AddSubscriptionBottomSheet(
         if (subscription != null) {
             activeSwitch.visibility = View.VISIBLE
             activeSwitch.isChecked = subscription.active
-            AnimationHelper.applySpringOnTouch(activeSwitch)
             
             activeSwitch.setOnCheckedChangeListener { _, _ -> 
                 addHaptic(activeSwitch)

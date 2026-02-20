@@ -1,4 +1,4 @@
-package com.hora.varisankya
+﻿package com.hora.varisankya
 
 import android.app.NotificationManager
 import android.content.Intent
@@ -146,7 +146,6 @@ class SettingsActivity : BaseActivity() {
             card.shapeAppearanceModel = ShapeAppearanceModel.builder(this, styleRes, 0).build()
             
             // Expressive Touch
-            AnimationHelper.applySpringOnTouch(card)
         }
 
 
@@ -166,7 +165,6 @@ class SettingsActivity : BaseActivity() {
         logoutCard.setOnClickListener {
             performLogout()
         }
-        AnimationHelper.applySpringOnTouch(logoutCard)
     }
 
     private fun performLogout() {
@@ -219,7 +217,6 @@ class SettingsActivity : BaseActivity() {
             }.show(supportFragmentManager, "CurrencySelection")
         }
 
-        AnimationHelper.applySpringOnTouch(currencyLayout)
     }
 
     private fun setupThemeToggle() {
@@ -304,7 +301,7 @@ class SettingsActivity : BaseActivity() {
                 updateTimeText(timeChip, picker.hour, picker.minute)
                 rescheduleNotifications()
                 
-                // M3E Success feedback — Snackbar + Haptic
+                // M3E Success feedback â€” Snackbar + Haptic
                 val formattedTime = timeChip.text
                 val rootView = findViewById<View>(android.R.id.content)
                 Snackbar.make(rootView, "Reminders updated to $formattedTime", Snackbar.LENGTH_SHORT).show()

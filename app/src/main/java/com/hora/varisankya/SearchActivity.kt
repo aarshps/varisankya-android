@@ -1,4 +1,4 @@
-package com.hora.varisankya
+﻿package com.hora.varisankya
 
 import android.os.Bundle
 import android.text.Editable
@@ -134,7 +134,6 @@ class SearchActivity : BaseActivity() {
                 }
                 
                 // Expressive Touch
-                AnimationHelper.applySpringOnTouch(this)
             }
             categoryChipGroup.addView(chip)
         }
@@ -240,7 +239,6 @@ class SearchActivity : BaseActivity() {
         chips.forEach { chip ->
             // M3E Expressive styling
             com.hora.varisankya.util.ChipHelper.styleChip(chip)
-            AnimationHelper.applySpringOnTouch(chip)
             
             chip.setOnClickListener {
                 PreferenceHelper.performHaptics(it, HapticFeedbackConstants.CLOCK_TICK)

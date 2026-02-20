@@ -19,44 +19,7 @@ object AnimationHelper {
     // M3 Emphasized Accelerate (Outgoing objects)
     val EMPHASIZED_ACCELERATE: Interpolator = PathInterpolatorCompat.create(0.3f, 0.0f, 0.8f, 0.15f)
 
-    /**
-     * Applies a tactile "Squish" spring effect when touched.
-     * M3E Style: Responsive press (Emphasized Decelerate), fluid release (Emphasized).
-     */
-    fun applySpringOnTouch(view: View) {
-        view.setOnTouchListener { v, event ->
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    v.animate()
-                        .scaleX(0.92f)
-                        .scaleY(0.92f)
-                        .setDuration(Constants.ANIM_DURATION_CLICK_PRESS)
-                        .setInterpolator(EMPHASIZED_DECELERATE)
-                        .start()
-                    // We must return true to receive ACTION_UP/CANCEL
-                    // But if it's a card/button we don't want to block the click
-                    // Solution: View must be clickable
-                    false 
-                }
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    v.animate()
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .setDuration(Constants.ANIM_DURATION_CLICK_RELEASE)
-                        .setInterpolator(EMPHASIZED)
-                        .start()
-                    false
-                }
-                else -> false
-            }
-        }
-        
-        // Ensure the view is clickable so it receives the full gesture sequence
-        if (!view.isClickable) {
-            view.isClickable = true
-            view.isFocusable = true
-        }
-    }
+
 
     /**
      * Staggered entrance animation for RecyclerView items.
