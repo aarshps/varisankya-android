@@ -51,16 +51,16 @@ class SubscriptionNotificationWorker(
             // Get user preference for notification window
             val notificationWindow = PreferenceHelper.getNotificationDays(applicationContext)
 
+            // Optimize CPU wake by extracting static values outside the loop
+            val todayLocalDate = java.time.LocalDate.now()
+            val utcZone = java.time.ZoneId.of("UTC")
+
             subscriptions.forEach { sub ->
                 sub.dueDate?.let { dueDate ->
                     // Convert stored Date (UTC Instant) to LocalDate in UTC
-                    // We treat the stored date as a "canonical date" irrespective of time
                     val dueInstant = dueDate.toInstant()
-                    val dueZoned = dueInstant.atZone(java.time.ZoneId.of("UTC"))
+                    val dueZoned = dueInstant.atZone(utcZone)
                     val dueLocalDate = dueZoned.toLocalDate()
-
-                    // Get today's local date
-                    val todayLocalDate = java.time.LocalDate.now()
 
                     // Calculate days remaining
                     val daysLeft = java.time.temporal.ChronoUnit.DAYS.between(todayLocalDate, dueLocalDate).toInt()

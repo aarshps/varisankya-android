@@ -19,3 +19,18 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# --- Aggressive R8 Optimization ---
+# Enable full mode optimizations
+-optimizations !code/simplification/arithmetic,!code/simplification/cast,!field/*,!class/merging/*
+-optimizationpasses 5
+-allowaccessmodification
+-dontusemixedcaseclassnames
+-dontskipnonpubliclibraryclasses
+-dontpreverify
+
+# Keep entry points safe while aggressively shrinking the rest
+-keepclassmembers class * {
+    @androidx.annotation.Keep <fields>;
+    @androidx.annotation.Keep <methods>;
+}

@@ -5,8 +5,14 @@ import java.util.Date
 
 object DateHelper {
 
+    // ThreadLocal caches the Calendar instance per thread, completely eliminating
+    // massive allocation overhead when this is called hundreds of times in loops
+    private val calendarPool = object : ThreadLocal<Calendar>() {
+        override fun initialValue(): Calendar = Calendar.getInstance()
+    }
+
     fun calculateNextDueDate(fromDate: Date, recurrence: String): Date? {
-        val cal = Calendar.getInstance()
+        val cal = calendarPool.get()!!
         cal.time = fromDate
         cal.set(Calendar.HOUR_OF_DAY, 12)
         cal.set(Calendar.MINUTE, 0)
