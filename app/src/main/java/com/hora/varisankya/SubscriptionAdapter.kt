@@ -1,4 +1,4 @@
-package com.hora.varisankya
+﻿package com.hora.varisankya
 
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -52,10 +52,30 @@ class SubscriptionAdapter(
         return ItemViewHolder(view)
     }
 
+    // Cached resources to eliminate allocation and resolution overhead during scroll
+    private val calendar = Calendar.getInstance()
+    private var isColorsResolved = false
+    private var colorSurfaceVariant = 0
+    private var colorOnSurfaceVariant = 0
+    private var colorPrimary = 0
+    private var colorOnPrimary = 0
+    private var colorContainerHighest = 0
+    private var colorOnSurface = 0
+
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         val subscription = subscriptions[position]
         val context = holder.itemView.context
         
+        // Resolve colors once per adapter lifecycle
+        if (!isColorsResolved) {
+            colorSurfaceVariant = ThemeHelper.getSurfaceVariantColor(context)
+            colorOnSurfaceVariant = ThemeHelper.getOnSurfaceVariantColor(context)
+            colorPrimary = ThemeHelper.getPrimaryColor(context)
+            colorOnPrimary = ThemeHelper.getOnPrimaryColor(context)
+            colorContainerHighest = ThemeHelper.getSurfaceContainerHighestColor(context)
+            colorOnSurface = ThemeHelper.getOnSurfaceColor(context)
+            isColorsResolved = true
+        }
 
         
         holder.nameTextView.text = subscription.name
@@ -101,20 +121,17 @@ class SubscriptionAdapter(
             holder.pillContainer.visibility = View.VISIBLE
             holder.daysLeftTextView.text = "Inactive"
             
-            // Inactive style: SurfaceVariant (Direct M3 Dynamic via ThemeHelper)
-            val surfaceVariant = ThemeHelper.getSurfaceVariantColor(context)
-            val onSurfaceVariant = ThemeHelper.getOnSurfaceVariantColor(context)
-            
-            holder.pillContainer.setCardBackgroundColor(surfaceVariant)
+            // Inactive style: SurfaceVariant
+            holder.pillContainer.setCardBackgroundColor(colorSurfaceVariant)
             holder.pillContainer.strokeWidth = 0
-            holder.daysLeftTextView.setTextColor(onSurfaceVariant)
+            holder.daysLeftTextView.setTextColor(colorOnSurfaceVariant)
             
             // Sync Amount Pill & Patch
-            holder.amountPill.setCardBackgroundColor(surfaceVariant)
+            holder.amountPill.setCardBackgroundColor(colorSurfaceVariant)
             holder.amountPill.strokeWidth = 0
             
             // Sync Text Color
-            holder.amountTextView.setTextColor(onSurfaceVariant)
+            holder.amountTextView.setTextColor(colorOnSurfaceVariant)
             
         } else {
             holder.itemView.alpha = 1.0f
@@ -124,22 +141,22 @@ class SubscriptionAdapter(
                 val autopayLabel = if (subscription.autopay) " • Autopay" else ""
                 holder.detailsTextView.text = "Due ${DATE_FORMAT.format(dueDate)} • ${subscription.recurrence}$autopayLabel"
 
-                // Days left logic
-                val today = Calendar.getInstance()
-                today.set(Calendar.HOUR_OF_DAY, 0)
-                today.set(Calendar.MINUTE, 0)
-                today.set(Calendar.SECOND, 0)
-                today.set(Calendar.MILLISECOND, 0)
+                // Days left logic without creating new Calendar instances
+                calendar.timeInMillis = System.currentTimeMillis()
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                val todayMillis = calendar.timeInMillis
 
-                val dueCal = Calendar.getInstance()
-                // ...
-                dueCal.time = dueDate
-                dueCal.set(Calendar.HOUR_OF_DAY, 0)
-                dueCal.set(Calendar.MINUTE, 0)
-                dueCal.set(Calendar.SECOND, 0)
-                dueCal.set(Calendar.MILLISECOND, 0)
+                calendar.time = dueDate
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                val dueMillis = calendar.timeInMillis
 
-                val diff = dueCal.timeInMillis - today.timeInMillis
+                val diff = dueMillis - todayMillis
                 val daysLeft = TimeUnit.MILLISECONDS.toDays(diff).toInt()
 
                 val text = when {
@@ -152,29 +169,13 @@ class SubscriptionAdapter(
                 holder.daysLeftTextView.text = text
                 holder.pillContainer.visibility = View.VISIBLE
 
-
-
-
-                // Resolve Colors DIRECTLY from M3 Dynamic Theme using ThemeHelper
-                // Semantic Roles:
-                // MONOCHROME: All pills use uniform gray styling regardless of status
-                // No different colors for overdue, near due, or future dates
-                
-                // M3 High-Contrast Highlights: Dynamic Primary
-                val primary = ThemeHelper.getPrimaryColor(context)
-                val onPrimary = ThemeHelper.getOnPrimaryColor(context)
-                val containerHighest = ThemeHelper.getSurfaceContainerHighestColor(context)
-                val onSurface = ThemeHelper.getOnSurfaceColor(context)
-                
                 // Urgency/Status pill uses dynamic primary (Tier 1)
-                holder.pillContainer.setCardBackgroundColor(primary)
-                holder.daysLeftTextView.setTextColor(onPrimary)
+                holder.pillContainer.setCardBackgroundColor(colorPrimary)
+                holder.daysLeftTextView.setTextColor(colorOnPrimary)
                 
                 // Amount pill uses subtle tonal surface (Tier 2/3) for "Weather" look
-                holder.amountPill.setCardBackgroundColor(containerHighest)
-                holder.amountTextView.setTextColor(onSurface)
-
-
+                holder.amountPill.setCardBackgroundColor(colorContainerHighest)
+                holder.amountTextView.setTextColor(colorOnSurface)
 
             } ?: run {
                 holder.pillContainer.visibility = View.GONE
@@ -188,7 +189,6 @@ class SubscriptionAdapter(
             onSubscriptionClicked(subscription)
         }
         // Apply Spring Feel
-        AnimationHelper.applySpringOnTouch(holder.itemView)
     }
 
     override fun getItemCount() = subscriptions.size

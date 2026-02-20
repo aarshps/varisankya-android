@@ -19,7 +19,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -68,7 +69,7 @@ dependencies {
     implementation("androidx.biometric:biometric:1.2.0-alpha05")
     
     // Images
-    implementation("com.squareup.picasso:picasso:2.8")
+    // (Picasso removed for lightweight coroutine loading)
     
     // WorkManager for Notifications
     implementation("androidx.work:work-runtime-ktx:2.9.0")

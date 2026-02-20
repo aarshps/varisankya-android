@@ -15,6 +15,10 @@ import com.hora.varisankya.PaymentRecord
 import java.util.Calendar
 import java.util.Date
 import java.util.TimeZone
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -66,18 +70,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     return@addSnapshotListener
                 }
 
-                val subs = snapshots?.toObjects(Subscription::class.java) ?: emptyList()
-                
-                // Sort: Active first, then by due date
-                val sortedSubscriptions = subs.sortedWith(compareByDescending<Subscription> { it.active }.thenBy { it.dueDate })
-                
-                subscriptions.value = sortedSubscriptions
-                calculateHeroData(sortedSubscriptions)
-                isLoading.value = false
+                viewModelScope.launch(Dispatchers.Default) {
+                    val subs = snapshots?.toObjects(Subscription::class.java) ?: emptyList()
+                    
+                    // Sort: Active first, then by due date
+                    val sortedSubscriptions = subs.sortedWith(compareByDescending<Subscription> { it.active }.thenBy { it.dueDate })
+                    
+                    val newHeroState = calculateHeroData(sortedSubscriptions)
+                    
+                    withContext(Dispatchers.Main) {
+                        subscriptions.value = sortedSubscriptions
+                        heroState.value = newHeroState
+                        isLoading.value = false
+                    }
+                }
             }
     }
     
-    private fun calculateHeroData(allSubs: List<Subscription>) {
+    private fun calculateHeroData(allSubs: List<Subscription>): HeroState {
         val activeSubs = allSubs.filter { it.active && it.dueDate != null }
         
         val today = Calendar.getInstance()
@@ -124,7 +134,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
             .minByOrNull { it.dueDate!! }
             
-        heroState.value = HeroState(
+        return HeroState(
             totalAmount = totalAmount,
             nextPayment = nextPayment,
             overdueSubscriptions = overdue,

@@ -18,6 +18,10 @@ import java.util.Locale
 import com.hora.varisankya.util.AnimationHelper
 import com.google.android.material.transition.platform.MaterialSharedAxis
 import android.view.Window
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class UnifiedHistoryActivity : BaseActivity() {
 
@@ -182,19 +186,23 @@ class UnifiedHistoryActivity : BaseActivity() {
     }
 
     private fun processPayments(allFetchedPayments: List<PaymentRecord>) {
-        // Check for invalid records (missing subscription name)
-        val invalidPayments = allFetchedPayments.filter { it.subscriptionName.isNullOrEmpty() }
-        val validPayments = allFetchedPayments.filter { !it.subscriptionName.isNullOrEmpty() }
-        
-        // Always load valid content so it's visible behind the sheet
-        onDataReady(validPayments)
-        
-        if (invalidPayments.isNotEmpty()) {
-            val cleanupSheet = CleanupBottomSheet(invalidPayments.size) {
-                deleteInvalidRecords(invalidPayments)
+        lifecycleScope.launch(Dispatchers.Default) {
+            // Check for invalid records (missing subscription name)
+            val invalidPayments = allFetchedPayments.filter { it.subscriptionName.isNullOrEmpty() }
+            val validPayments = allFetchedPayments.filter { !it.subscriptionName.isNullOrEmpty() }
+            
+            withContext(Dispatchers.Main) {
+                // Always load valid content so it's visible behind the sheet
+                onDataReady(validPayments)
+                
+                if (invalidPayments.isNotEmpty()) {
+                    val cleanupSheet = CleanupBottomSheet(invalidPayments.size) {
+                        deleteInvalidRecords(invalidPayments)
+                    }
+                    cleanupSheet.isCancelable = true
+                    cleanupSheet.show(supportFragmentManager, "CleanupBottomSheet")
+                }
             }
-            cleanupSheet.isCancelable = true
-            cleanupSheet.show(supportFragmentManager, "CleanupBottomSheet")
         }
     }
 
@@ -251,12 +259,13 @@ class UnifiedHistoryActivity : BaseActivity() {
         val globalCurrency = PreferenceHelper.getCurrency(this)
         val symbol = CurrencyHelper.getSymbol(globalCurrency)
         
-        // Aggregate by Month only (no multi-currency)
-        val grouped = allPayments.groupBy { 
-            val cal = Calendar.getInstance()
-            cal.time = it.date ?: Date()
-            String.format(Locale.US, "%d-%02d", cal.get(Calendar.YEAR), cal.get(Calendar.MONTH))
-        }
+        lifecycleScope.launch(Dispatchers.Default) {
+            val calendar = Calendar.getInstance()
+            // Aggregate by Month only (no multi-currency)
+            val grouped = allPayments.groupBy { 
+                calendar.time = it.date ?: Date()
+                String.format(Locale.US, "%d-%02d", calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH))
+            }
 
         // Sort by Time
         val sortedKeys = grouped.keys.sorted()
@@ -275,30 +284,33 @@ class UnifiedHistoryActivity : BaseActivity() {
             )
         }
 
-        // Hide Back Button
-        if (backButton.isVisible) {
-            backButton.animate().alpha(0f)
-                .setDuration(Constants.ANIM_DURATION_SHORT)
-                .setInterpolator(androidx.interpolator.view.animation.FastOutLinearInInterpolator())
-                .withEndAction {
-                    backButton.isVisible = false
-                }.start()
+            // --- EXPRESSIVE HERO UPDATE ---
+            val totalAmount = allPayments.sumOf { it.amount }
+            val activeMonthsCount = grouped.keys.size.coerceAtLeast(1)
+            val averageMonthlyAmount = totalAmount / activeMonthsCount
+
+            withContext(Dispatchers.Main) {
+                // Hide Back Button
+                if (backButton.isVisible) {
+                    backButton.animate().alpha(0f)
+                        .setDuration(Constants.ANIM_DURATION_SHORT)
+                        .setInterpolator(androidx.interpolator.view.animation.FastOutLinearInInterpolator())
+                        .withEndAction {
+                            backButton.isVisible = false
+                        }.start()
+                }
+
+                AnimationHelper.animateTextCountUp(totalSpentText, averageMonthlyAmount, "$symbol ")
+                totalSpentLabel.text = "Average Monthly Expense"
+                // -----------------------------
+                // -----------------------------
+                
+                chartView.setChartData(chartData)
+                updateList(allPayments)
+
+                scrollToEnd()
+            }
         }
-
-        // --- EXPRESSIVE HERO UPDATE ---
-        val totalAmount = allPayments.sumOf { it.amount }
-        val activeMonthsCount = grouped.keys.size.coerceAtLeast(1)
-        val averageMonthlyAmount = totalAmount / activeMonthsCount
-        
-        AnimationHelper.animateTextCountUp(totalSpentText, averageMonthlyAmount, "$symbol ")
-        totalSpentLabel.text = "Average Monthly Expense"
-        // -----------------------------
-        // -----------------------------
-        
-        chartView.setChartData(chartData)
-        updateList(allPayments)
-
-        scrollToEnd()
         
         val hScrollView = findViewById<android.widget.HorizontalScrollView>(R.id.chart_scroll_container)
         hScrollView?.let { scrollView ->
@@ -317,12 +329,13 @@ class UnifiedHistoryActivity : BaseActivity() {
     private fun showMonthDetail(level: ViewLevel.MonthDetail) {
         currentLevel = level
 
-        // Group by Day + Currency
-        val groupedDay = level.payments.groupBy { 
-            val cal = Calendar.getInstance()
-            cal.time = it.date ?: Date()
-            "${cal.get(Calendar.DAY_OF_MONTH)}|${it.currency}"
-        }
+        lifecycleScope.launch(Dispatchers.Default) {
+            val calendar = Calendar.getInstance()
+            // Group by Day + Currency
+            val groupedDay = level.payments.groupBy { 
+                calendar.time = it.date ?: Date()
+                "${calendar.get(Calendar.DAY_OF_MONTH)}|${it.currency}"
+            }
 
         val sortedKeys = groupedDay.keys.sortedWith(compareBy<String> { 
              it.split("|")[0].toInt()
@@ -349,32 +362,37 @@ class UnifiedHistoryActivity : BaseActivity() {
             )
         }
         
-        // --- EXPRESSIVE HERO UPDATE ---
-        val totalAmount = level.payments.sumOf { it.amount }
-        val currency = PreferenceHelper.getCurrency(this)
-        val symbol = CurrencyHelper.getSymbol(currency)
-        AnimationHelper.animateTextCountUp(totalSpentText, totalAmount, "$symbol ")
-        totalSpentLabel.text = "Total in ${level.monthLabel}"
-        // -----------------------------
-        // -----------------------------
+            // --- EXPRESSIVE HERO UPDATE ---
+            val totalAmount = level.payments.sumOf { it.amount }
+            
+            withContext(Dispatchers.Main) {
+                val currency = PreferenceHelper.getCurrency(this@UnifiedHistoryActivity)
+                val symbol = CurrencyHelper.getSymbol(currency)
+                AnimationHelper.animateTextCountUp(totalSpentText, totalAmount, "$symbol ")
+                totalSpentLabel.text = "Total in ${level.monthLabel}"
+                // -----------------------------
+                // -----------------------------
 
-        chartView.setChartData(chartData)
-        updateList(level.payments.sortedByDescending { it.date })
-        
-        scrollToEnd()
-        
-        // Show Back Button
-        if (!backButton.isVisible) {
-            backButton.alpha = 0f
-            backButton.isVisible = true
-            backButton.animate().alpha(1f).setDuration(200).setInterpolator(androidx.interpolator.view.animation.FastOutSlowInInterpolator()).start()
+                chartView.setChartData(chartData)
+                updateList(level.payments.sortedByDescending { it.date })
+                
+                scrollToEnd()
+                
+                // Show Back Button
+                if (!backButton.isVisible) {
+                    backButton.alpha = 0f
+                    backButton.isVisible = true
+                    backButton.animate().alpha(1f).setDuration(200).setInterpolator(androidx.interpolator.view.animation.FastOutSlowInInterpolator()).start()
+                }
+            }
         }
     }
 
     private fun showDayDetail(level: ViewLevel.DayDetail) {
         currentLevel = level
 
-        val groupedSub = level.payments.groupBy { "${it.subscriptionName}|${it.currency}" }
+        lifecycleScope.launch(Dispatchers.Default) {
+            val groupedSub = level.payments.groupBy { "${it.subscriptionName}|${it.currency}" }
         
         val chartData = groupedSub.map { entry ->
             val parts = entry.key.split("|")
@@ -393,25 +411,29 @@ class UnifiedHistoryActivity : BaseActivity() {
             )
         }
 
-        // --- EXPRESSIVE HERO UPDATE ---
-        val totalAmount = level.payments.sumOf { it.amount }
-        val currency = PreferenceHelper.getCurrency(this)
-        val symbol = CurrencyHelper.getSymbol(currency)
-        AnimationHelper.animateTextCountUp(totalSpentText, totalAmount, "$symbol ")
-        totalSpentLabel.text = "Total on ${level.dayLabel}"
-        // -----------------------------
-        // -----------------------------
+            // --- EXPRESSIVE HERO UPDATE ---
+            val totalAmount = level.payments.sumOf { it.amount }
+            
+            withContext(Dispatchers.Main) {
+                val currency = PreferenceHelper.getCurrency(this@UnifiedHistoryActivity)
+                val symbol = CurrencyHelper.getSymbol(currency)
+                AnimationHelper.animateTextCountUp(totalSpentText, totalAmount, "$symbol ")
+                totalSpentLabel.text = "Total on ${level.dayLabel}"
+                // -----------------------------
+                // -----------------------------
 
-        chartView.setChartData(chartData)
-        updateList(level.payments.sortedByDescending { it.date })
-        
-        scrollToEnd()
+                chartView.setChartData(chartData)
+                updateList(level.payments.sortedByDescending { it.date })
+                
+                scrollToEnd()
 
-        // Show Back Button
-        if (!backButton.isVisible) {
-            backButton.alpha = 0f
-            backButton.isVisible = true
-            backButton.animate().alpha(1f).setDuration(200).setInterpolator(androidx.interpolator.view.animation.FastOutSlowInInterpolator()).start()
+                // Show Back Button
+                if (!backButton.isVisible) {
+                    backButton.alpha = 0f
+                    backButton.isVisible = true
+                    backButton.animate().alpha(1f).setDuration(200).setInterpolator(androidx.interpolator.view.animation.FastOutSlowInInterpolator()).start()
+                }
+            }
         }
     }
 

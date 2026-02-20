@@ -1,4 +1,4 @@
-package com.hora.varisankya
+﻿package com.hora.varisankya
 
 import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
@@ -36,30 +36,34 @@ class PaymentAdapter(
         return ViewHolder(view)
     }
 
+    // Cached resources to eliminate allocation overhead during scroll
+    private val fullFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
+    private val dayFormat = SimpleDateFormat("dd", Locale.getDefault())
+    private var isColorsResolved = false
+    private var colorPrimary = 0
+    private var colorOnPrimary = 0
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val payment = getItem(position)
+        val context = holder.itemView.context
         
-        // Date formatting
-        val fullFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
-        val dayFormat = SimpleDateFormat("dd", Locale.getDefault())
+        if (!isColorsResolved) {
+            colorPrimary = com.hora.varisankya.util.ThemeHelper.getPrimaryColor(context)
+            colorOnPrimary = com.hora.varisankya.util.ThemeHelper.getOnPrimaryColor(context)
+            isColorsResolved = true
+        }
         
         holder.dayNumberText.text = payment.date?.let { dayFormat.format(it) } ?: "?"
         holder.dateText.text = payment.date?.let { fullFormat.format(it) } ?: "Unknown Date"
         
         holder.subNameText.text = payment.subscriptionName
         
-        // M3 High-Contrast Highlights: Dynamic Primary
-        val context = holder.itemView.context
-        
         // Use global currency
         val globalCurrency = PreferenceHelper.getCurrency(context)
         holder.amountText.text = CurrencyHelper.formatCurrency(context, payment.amount, globalCurrency)
 
-        val primary = com.hora.varisankya.util.ThemeHelper.getPrimaryColor(context)
-        val onPrimary = com.hora.varisankya.util.ThemeHelper.getOnPrimaryColor(context)
-        
-        holder.amountPill.setCardBackgroundColor(primary)
-        holder.amountText.setTextColor(onPrimary)
+        holder.amountPill.setCardBackgroundColor(colorPrimary)
+        holder.amountText.setTextColor(colorOnPrimary)
 
 
         if (onEditClicked != null) {
@@ -67,7 +71,6 @@ class PaymentAdapter(
                 PreferenceHelper.performHaptics(it, HapticFeedbackConstants.VIRTUAL_KEY)
                 onEditClicked.invoke(payment)
             }
-            com.hora.varisankya.util.AnimationHelper.applySpringOnTouch(holder.itemView)
         } else {
             holder.itemView.setOnClickListener(null)
             holder.itemView.isClickable = false

@@ -1,4 +1,4 @@
-package com.hora.varisankya
+﻿package com.hora.varisankya
 
 import android.Manifest
 import android.content.Intent
@@ -39,7 +39,11 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import com.squareup.picasso.Picasso
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.net.URL
+import android.graphics.BitmapFactory
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
@@ -270,27 +274,23 @@ class MainActivity : BaseActivity() {
             val options = android.app.ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
             startActivity(Intent(this, SettingsActivity::class.java), options)
         }
-        AnimationHelper.applySpringOnTouch(profileImage)
 
         searchTriggerLayout.setOnClickListener { view ->
             PreferenceHelper.performClickHaptic(view)
             val options = android.app.ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
             startActivity(Intent(this, SearchActivity::class.java), options)
         }
-        AnimationHelper.applySpringOnTouch(searchTriggerLayout)
 
         btnSignIn.setOnClickListener { view ->
             PreferenceHelper.performSuccessHaptic(view)
             signInWithGoogle()
         }
-        AnimationHelper.applySpringOnTouch(btnSignIn)
 
         fabAddSubscription.setOnClickListener { view ->
             PreferenceHelper.performSuccessHaptic(view)
             showAddSubscriptionSheet()
         }
         // Expressive Touch
-        AnimationHelper.applySpringOnTouch(fabAddSubscription)
 
         heroSection.setOnClickListener { view ->
             PreferenceHelper.performHaptics(view, HapticFeedbackConstants.CLOCK_TICK)
@@ -298,7 +298,6 @@ class MainActivity : BaseActivity() {
             startActivity(Intent(this, UnifiedHistoryActivity::class.java), options)
         }
         // Expressive Touch
-        AnimationHelper.applySpringOnTouch(heroSection)
 
 
         checkNotificationPermission()
@@ -657,8 +656,19 @@ class MainActivity : BaseActivity() {
             
             profileImage.visibility = View.VISIBLE
 
-            auth.currentUser?.photoUrl?.let {
-                Picasso.get().load(it).into(profileImage)
+            auth.currentUser?.photoUrl?.let { url ->
+                // Lightweight coroutine image loader instead of heavy Picasso library
+                lifecycleScope.launch(Dispatchers.IO) {
+                    try {
+                        val inputStream = URL(url.toString()).openStream()
+                        val bitmap = BitmapFactory.decodeStream(inputStream)
+                        withContext(Dispatchers.Main) {
+                            profileImage.setImageBitmap(bitmap)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
             }
         } else {
             loginContainer.visibility = View.VISIBLE
