@@ -37,6 +37,8 @@ import com.google.android.material.materialswitch.MaterialSwitch
 import com.hora.varisankya.util.BiometricAuthManager
 import com.hora.varisankya.util.AnimationHelper
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.transition.platform.MaterialSharedAxis
+import android.view.Window
 
 class SettingsActivity : BaseActivity() {
 
@@ -44,6 +46,12 @@ class SettingsActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true).apply {
+            duration = Constants.ANIM_DURATION_LONG
+        }
+        window.returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false).apply {
+            duration = Constants.ANIM_DURATION_LONG
+        }
         setContentView(R.layout.activity_settings)
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -141,11 +149,7 @@ class SettingsActivity : BaseActivity() {
             AnimationHelper.applySpringOnTouch(card)
         }
 
-        // Hero Spring & Haptic
-        findViewById<View>(R.id.card_settings_hero)?.let {
-            it.setOnClickListener { v -> PreferenceHelper.performClickHaptic(v) }
-            AnimationHelper.applySpringOnTouch(it)
-        }
+
     }
 
     private fun updateGroupShapes(group: ChipGroup) {

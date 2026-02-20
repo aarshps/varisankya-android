@@ -4,6 +4,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.animation.Interpolator
 import androidx.core.view.animation.PathInterpolatorCompat
+import com.hora.varisankya.Constants
 
 object AnimationHelper {
 
@@ -27,9 +28,9 @@ object AnimationHelper {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     v.animate()
-                        .scaleX(0.96f)
-                        .scaleY(0.96f)
-                        .setDuration(80)
+                        .scaleX(0.92f)
+                        .scaleY(0.92f)
+                        .setDuration(Constants.ANIM_DURATION_CLICK_PRESS)
                         .setInterpolator(EMPHASIZED_DECELERATE)
                         .start()
                     // We must return true to receive ACTION_UP/CANCEL
@@ -41,7 +42,7 @@ object AnimationHelper {
                     v.animate()
                         .scaleX(1f)
                         .scaleY(1f)
-                        .setDuration(300)
+                        .setDuration(Constants.ANIM_DURATION_CLICK_RELEASE)
                         .setInterpolator(EMPHASIZED)
                         .start()
                     false
@@ -65,14 +66,18 @@ object AnimationHelper {
     fun animateEntrance(view: View, position: Int) {
         view.alpha = 0f
         view.translationY = 50f // Reduced travel distance for elegance
+        view.scaleX = 0.85f // M3E Depth Entry Scale
+        view.scaleY = 0.85f
         
-        // Stagger based on position (capped at 200ms delay max)
-        val delay = (position * 25).toLong().coerceAtMost(300)
+        // Stagger based on position (capped at 300ms delay max)
+        val delay = (position * Constants.ANIM_STAGGER_BASE_DELAY).coerceAtMost(400)
         
         view.animate()
             .alpha(1f)
             .translationY(0f)
-            .setDuration(500) // M3 standard long duration
+            .scaleX(1f)
+            .scaleY(1f)
+            .setDuration(Constants.ANIM_DURATION_LONG)
             .setStartDelay(delay)
             .setInterpolator(EMPHASIZED_DECELERATE)
             .start()
@@ -90,7 +95,7 @@ object AnimationHelper {
             .alpha(1f)
             .scaleX(1f)
             .scaleY(1f)
-            .setDuration(400)
+            .setDuration(Constants.ANIM_DURATION_LONG)
             .setInterpolator(EMPHASIZED)
             .start()
     }
@@ -107,7 +112,7 @@ object AnimationHelper {
         suffix: String = ""
     ) {
         val animator = android.animation.ValueAnimator.ofFloat(0f, targetValue.toFloat())
-        animator.duration = 1200 // Slower, more deliberate
+        animator.duration = Constants.ANIM_DURATION_EXTRA_LONG
         animator.interpolator = EMPHASIZED
         
         // LTR embedding marks to handle RTL currency symbols

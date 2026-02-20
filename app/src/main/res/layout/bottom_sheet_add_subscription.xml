@@ -42,34 +42,6 @@
                     android:textAppearance="?attr/textAppearanceHeadlineSmall"
                     android:textStyle="bold" />
 
-                <!-- Autopay Icon Toggle -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_autopay"
-                    style="@style/Widget.Material3.Button.IconButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checkable="true"
-                    android:contentDescription="Autopay"
-                    android:tooltipText="Autopay"
-                    app:icon="@drawable/ic_autopay"
-                    app:iconTint="?attr/colorOnSurfaceVariant" />
-
-                <!-- Active Icon Toggle -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_active"
-                    style="@style/Widget.Material3.Button.IconButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:checkable="true"
-                    android:checked="true"
-                    android:contentDescription="Active Status"
-                    android:tooltipText="Active Status"
-                    android:visibility="gone"
-                    app:icon="@drawable/ic_power"
-                    app:iconTint="?attr/colorOnSurfaceVariant"
-                    tools:visibility="visible" />
-
             </LinearLayout>
 
 
@@ -189,7 +161,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
-                android:layout_marginBottom="24dp"
+                android:layout_marginBottom="12dp"
                 app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
                 app:cardCornerRadius="28dp"
                 app:strokeWidth="0dp">
@@ -236,6 +208,44 @@
                                 android:inputType="none" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Preferences Island -->
+            <com.google.android.material.card.MaterialCardView
+                style="?attr/materialCardViewFilledStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+                app:cardCornerRadius="28dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="12dp">
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/switch_autopay"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Autopay enabled"
+                        android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/switch_active"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Subscription active"
+                        android:textAppearance="?attr/textAppearanceBodyLarge"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

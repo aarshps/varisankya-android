@@ -15,6 +15,8 @@ import com.google.android.material.chip.ChipGroup
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.hora.varisankya.util.AnimationHelper
+import com.google.android.material.transition.platform.MaterialSharedAxis
+import android.view.Window
 
 class SearchActivity : BaseActivity() {
 
@@ -37,6 +39,12 @@ class SearchActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true).apply {
+            duration = Constants.ANIM_DURATION_LONG
+        }
+        window.returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false).apply {
+            duration = Constants.ANIM_DURATION_LONG
+        }
         setContentView(R.layout.activity_search)
         
         setSupportActionBar(findViewById(R.id.toolbar))

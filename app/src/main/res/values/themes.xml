@@ -3,6 +3,7 @@
     <style name="Theme.Varisankya" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Unified Background Color -->
         <item name="android:windowBackground">?attr/colorSurface</item>
+        <item name="android:windowActivityTransitions">true</item>
         
         <!-- Make status bar transparent -->
         <item name="android:statusBarColor">@android:color/transparent</item>

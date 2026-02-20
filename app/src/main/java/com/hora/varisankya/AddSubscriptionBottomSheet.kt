@@ -20,6 +20,7 @@ import android.content.res.ColorStateList
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
@@ -61,8 +62,8 @@ class AddSubscriptionBottomSheet(
         val frequencyEditText = view.findViewById<TextInputEditText>(R.id.edit_text_frequency)
         val tilFrequency = view.findViewById<TextInputLayout>(R.id.til_frequency)
         val categoryAutoComplete = view.findViewById<AutoCompleteTextView>(R.id.auto_complete_category)
-        val activeButton = view.findViewById<MaterialButton>(R.id.btn_active)
-        val autopayButton = view.findViewById<MaterialButton>(R.id.btn_autopay)
+        val activeSwitch = view.findViewById<MaterialSwitch>(R.id.switch_active)
+        val autopaySwitch = view.findViewById<MaterialSwitch>(R.id.switch_autopay)
         val saveButton = view.findViewById<Button>(R.id.button_save)
         val deleteButton = view.findViewById<Button>(R.id.button_delete)
         val markPaidButton = view.findViewById<Button>(R.id.button_mark_paid)
@@ -79,8 +80,8 @@ class AddSubscriptionBottomSheet(
         
         dragHandle.setOnClickListener {
             PreferenceHelper.performHaptics(it, HapticFeedbackConstants.CLOCK_TICK)
-            it.animate().scaleX(0.9f).scaleY(0.9f).setDuration(Constants.ANIM_DURATION_CLICK).setInterpolator(androidx.interpolator.view.animation.FastOutSlowInInterpolator()).withEndAction {
-                it.animate().scaleX(1f).scaleY(1f).setDuration(Constants.ANIM_DURATION_CLICK).setInterpolator(androidx.interpolator.view.animation.FastOutSlowInInterpolator()).start()
+            it.animate().scaleX(0.9f).scaleY(0.9f).setDuration(Constants.ANIM_DURATION_CLICK_PRESS).setInterpolator(androidx.interpolator.view.animation.FastOutSlowInInterpolator()).withEndAction {
+                it.animate().scaleX(1f).scaleY(1f).setDuration(Constants.ANIM_DURATION_CLICK_RELEASE).setInterpolator(androidx.interpolator.view.animation.FastOutSlowInInterpolator()).start()
             }.start()
         }
 
@@ -124,11 +125,15 @@ class AddSubscriptionBottomSheet(
         setupSelection(recurrenceAutoComplete, "Select Recurrence", recurrenceOptions, addHaptic) { selected ->
              PreferenceHelper.performHaptics(view, HapticFeedbackConstants.SEGMENT_TICK)
              if (selected == "Custom") {
-                 tilFrequency.visibility = View.VISIBLE
-                 frequencyEditText.isEnabled = true
-             } else {
                  tilFrequency.visibility = View.GONE
                  frequencyEditText.setText("")
+                 frequencyEditText.isEnabled = false
+             } else {
+                 tilFrequency.visibility = View.VISIBLE
+                 frequencyEditText.isEnabled = true
+                 if (frequencyEditText.text.isNullOrEmpty()) {
+                     frequencyEditText.setText("1")
+                 }
              }
         }
         setupSelection(categoryAutoComplete, "Select Category", categories, addHaptic)
@@ -138,25 +143,21 @@ class AddSubscriptionBottomSheet(
 
         // Autopay toggle — always visible, M3E haptic on change
 
-        // Initialize Autopay Icon Toggle
-        autopayButton.isChecked = subscription?.autopay == true
-        updateButtonStyle(autopayButton)
-        AnimationHelper.applySpringOnTouch(autopayButton)
-        autopayButton.addOnCheckedChangeListener { _, _ ->
-            addHaptic(autopayButton)
-            updateButtonStyle(autopayButton)
+        // Initialize Autopay Toggle
+        autopaySwitch.isChecked = subscription?.autopay == true
+        AnimationHelper.applySpringOnTouch(autopaySwitch)
+        autopaySwitch.setOnCheckedChangeListener { _, _ ->
+            addHaptic(autopaySwitch)
         }
 
-        // Initialize Active Icon Toggle (Edit Mode Only)
+        // Initialize Active Toggle (Edit Mode Only)
         if (subscription != null) {
-            activeButton.visibility = View.VISIBLE
-            activeButton.isChecked = subscription.active
-            updateButtonStyle(activeButton)
-            AnimationHelper.applySpringOnTouch(activeButton)
+            activeSwitch.visibility = View.VISIBLE
+            activeSwitch.isChecked = subscription.active
+            AnimationHelper.applySpringOnTouch(activeSwitch)
             
-            activeButton.addOnCheckedChangeListener { _, _ -> 
-                addHaptic(activeButton)
-                updateButtonStyle(activeButton)
+            activeSwitch.setOnCheckedChangeListener { _, _ -> 
+                addHaptic(activeSwitch)
             }
 
             nameEditText.setText(subscription.name)
@@ -172,8 +173,9 @@ class AddSubscriptionBottomSheet(
             val rec = subscription.recurrence
             if (rec == "Custom") {
                 recurrenceAutoComplete.setText("Custom", false)
-                tilFrequency.visibility = View.VISIBLE
-                frequencyEditText.isEnabled = true
+                tilFrequency.visibility = View.GONE
+                frequencyEditText.setText("")
+                frequencyEditText.isEnabled = false
             } else if (rec.startsWith("Every ")) {
                 val parts = rec.split(" ")
                 if (parts.size >= 3) {
@@ -192,7 +194,8 @@ class AddSubscriptionBottomSheet(
             } else {
                  frequencyEditText.setText("1")
                  recurrenceAutoComplete.setText(rec, false)
-                 tilFrequency.visibility = View.GONE
+                 tilFrequency.visibility = View.VISIBLE
+                 frequencyEditText.isEnabled = true
             }
 
             deleteButton.visibility = View.VISIBLE
@@ -216,7 +219,7 @@ class AddSubscriptionBottomSheet(
                     recurrence = getRecurrenceString(recurrenceAutoComplete.text.toString(), frequencyEditText.text.toString()),
                     category = categoryAutoComplete.text.toString(),
 
-                    active = activeButton.isChecked
+                    active = activeSwitch.isChecked
                 )
                 val paymentSheet = PaymentBottomSheet(currentSubscription) {
                     onSave() 
@@ -226,10 +229,11 @@ class AddSubscriptionBottomSheet(
             }
 
         } else {
-             activeButton.visibility = View.GONE
-             frequencyEditText.setText("")
-             recurrenceAutoComplete.setText("")
+             activeSwitch.visibility = View.GONE
+             frequencyEditText.setText("1")
+             recurrenceAutoComplete.setText("Monthly", false)
              tilFrequency.visibility = View.VISIBLE
+             frequencyEditText.isEnabled = true
              
              deleteButton.visibility = View.GONE
              markPaidButton.visibility = View.GONE
@@ -242,7 +246,7 @@ class AddSubscriptionBottomSheet(
             addStrongHaptic(it)
             val category = categoryAutoComplete.text.toString()
             val finalRecurrence = getRecurrenceString(recurrenceAutoComplete.text.toString(), frequencyEditText.text.toString())
-            val isActiveStatus = if (subscription != null) activeButton.isChecked else true
+            val isActiveStatus = if (subscription != null) activeSwitch.isChecked else true
 
 
 
@@ -259,7 +263,7 @@ class AddSubscriptionBottomSheet(
                 "recurrence" to finalRecurrence,
                 "category" to category,
                 "active" to isActiveStatus,
-                "autopay" to autopayButton.isChecked
+                "autopay" to autopaySwitch.isChecked
             )
 
             val collection = firestore.collection("users").document(userId).collection("subscriptions")
@@ -360,10 +364,5 @@ class AddSubscriptionBottomSheet(
             }
             bottomSheet.show(childFragmentManager, title)
         }
-    }
-    private fun updateButtonStyle(button: MaterialButton) {
-        val colorAttr = if (button.isChecked) androidx.appcompat.R.attr.colorPrimary else com.google.android.material.R.attr.colorOnSurfaceVariant
-        val color = MaterialColors.getColor(button, colorAttr)
-        button.iconTint = ColorStateList.valueOf(color)
     }
 }

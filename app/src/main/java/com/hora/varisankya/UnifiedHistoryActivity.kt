@@ -16,6 +16,8 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import com.hora.varisankya.util.AnimationHelper
+import com.google.android.material.transition.platform.MaterialSharedAxis
+import android.view.Window
 
 class UnifiedHistoryActivity : BaseActivity() {
 
@@ -48,6 +50,12 @@ class UnifiedHistoryActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true).apply {
+            duration = Constants.ANIM_DURATION_LONG
+        }
+        window.returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false).apply {
+            duration = Constants.ANIM_DURATION_LONG
+        }
         setContentView(R.layout.activity_unified_history)
 
         firestore = FirebaseFirestore.getInstance()
@@ -279,8 +287,11 @@ class UnifiedHistoryActivity : BaseActivity() {
 
         // --- EXPRESSIVE HERO UPDATE ---
         val totalAmount = allPayments.sumOf { it.amount }
-        AnimationHelper.animateTextCountUp(totalSpentText, totalAmount, "$symbol ")
-        totalSpentLabel.text = "Total Spent (All Time)"
+        val activeMonthsCount = grouped.keys.size.coerceAtLeast(1)
+        val averageMonthlyAmount = totalAmount / activeMonthsCount
+        
+        AnimationHelper.animateTextCountUp(totalSpentText, averageMonthlyAmount, "$symbol ")
+        totalSpentLabel.text = "Average Monthly Expense"
         // -----------------------------
         // -----------------------------
         

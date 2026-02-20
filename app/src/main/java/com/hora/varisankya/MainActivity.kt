@@ -16,6 +16,9 @@ import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import android.view.ViewGroup
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
@@ -43,6 +46,8 @@ import java.util.concurrent.TimeUnit
 import com.hora.varisankya.util.BiometricAuthManager
 import com.hora.varisankya.util.ThemeHelper
 import com.hora.varisankya.util.AnimationHelper
+import com.google.android.material.transition.platform.MaterialSharedAxis
+import android.view.Window
 import com.hora.varisankya.util.SubscriptionActionHelper
 import com.hora.varisankya.viewmodel.MainViewModel
 import android.widget.Toast
@@ -104,6 +109,12 @@ class MainActivity : BaseActivity() {
         }
         
         super.onCreate(savedInstanceState)
+        window.exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true).apply {
+            duration = Constants.ANIM_DURATION_LONG
+        }
+        window.reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false).apply {
+            duration = Constants.ANIM_DURATION_LONG
+        }
         setContentView(R.layout.activity_main)
 
         // Capture root view for content hiding logic
@@ -144,7 +155,7 @@ class MainActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         // Refresh adapter to pick up any settings changes (like currency)
-        subscriptionsRecyclerView?.adapter?.notifyDataSetChanged()
+        subscriptionsRecyclerView.adapter?.notifyDataSetChanged()
         // Re-observe hero state to update currency display
         viewModel.heroState.value?.let { updateHeroSection(it) }
     }
@@ -180,11 +191,35 @@ class MainActivity : BaseActivity() {
         mainContentRoot = findViewById(android.R.id.content)
         appBar = findViewById(R.id.app_bar)
         
-
-        
-
-
-
+        // Edge-to-Edge insets handling
+        ViewCompat.setOnApplyWindowInsetsListener(mainContentRoot) { _, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            
+            // Apply padding to the *NestedScrollView* so the content can scroll past the FAB
+            // FAB is ~56dp high + 16dp margin = 72dp. We use 88dp for comfortable clearance.
+            mainNestedScrollView.setPadding(
+                mainNestedScrollView.paddingLeft,
+                mainNestedScrollView.paddingTop,
+                mainNestedScrollView.paddingRight,
+                insets.bottom + (88 * resources.displayMetrics.density).toInt()
+            )
+            mainNestedScrollView.clipToPadding = false
+            
+            // Allow list itself to also have safe bottom space relative to its container
+            subscriptionsRecyclerView.setPadding(
+                subscriptionsRecyclerView.paddingLeft,
+                subscriptionsRecyclerView.paddingTop,
+                subscriptionsRecyclerView.paddingRight,
+                (24 * resources.displayMetrics.density).toInt()
+            )
+            
+            // Float the FAB above the nav bar
+            val fabParams = fabAddSubscription.layoutParams as ViewGroup.MarginLayoutParams
+            fabParams.bottomMargin = insets.bottom + (16 * resources.displayMetrics.density).toInt()
+            fabAddSubscription.layoutParams = fabParams
+            
+            windowInsets
+        }
 
         // Initialize Firebase and Credential Manager
         auth = FirebaseAuth.getInstance()
@@ -201,9 +236,6 @@ class MainActivity : BaseActivity() {
         subscriptionsRecyclerView.layoutManager = LinearLayoutManager(this)
         subscriptionsRecyclerView.adapter = adapter
         
-        // M3E Mechanical Scroll Feel - Attached to the scrolling container
-        PreferenceHelper.attachNestedScrollHaptics(mainNestedScrollView)
-
         // Check current user and update UI
         updateUI(auth.currentUser != null)
         
@@ -229,19 +261,21 @@ class MainActivity : BaseActivity() {
         // Set click listeners
         profileImage.setOnClickListener { view ->
             PreferenceHelper.performClickHaptic(view)
-            // Premium Logo Shake
-            view.animate().rotationBy(15f).setDuration(100).withEndAction {
-                view.animate().rotationBy(-30f).setDuration(200).withEndAction {
-                    view.animate().rotation(0f).setDuration(100).start()
+            // Premium Logo Shake (Slower)
+            view.animate().rotationBy(15f).setDuration(Constants.ANIM_DURATION_SHORT).withEndAction {
+                view.animate().rotationBy(-30f).setDuration(Constants.ANIM_DURATION_MEDIUM).withEndAction {
+                    view.animate().rotation(0f).setDuration(Constants.ANIM_DURATION_SHORT).start()
                 }.start()
             }.start()
-            startActivity(Intent(this, SettingsActivity::class.java))
+            val options = android.app.ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+            startActivity(Intent(this, SettingsActivity::class.java), options)
         }
         AnimationHelper.applySpringOnTouch(profileImage)
 
         searchTriggerLayout.setOnClickListener { view ->
             PreferenceHelper.performClickHaptic(view)
-            startActivity(Intent(this, SearchActivity::class.java))
+            val options = android.app.ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+            startActivity(Intent(this, SearchActivity::class.java), options)
         }
         AnimationHelper.applySpringOnTouch(searchTriggerLayout)
 
@@ -260,7 +294,8 @@ class MainActivity : BaseActivity() {
 
         heroSection.setOnClickListener { view ->
             PreferenceHelper.performHaptics(view, HapticFeedbackConstants.CLOCK_TICK)
-            startActivity(Intent(this, UnifiedHistoryActivity::class.java))
+            val options = android.app.ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+            startActivity(Intent(this, UnifiedHistoryActivity::class.java), options)
         }
         // Expressive Touch
         AnimationHelper.applySpringOnTouch(heroSection)
@@ -272,21 +307,37 @@ class MainActivity : BaseActivity() {
         appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
             swipeRefreshLayout.isEnabled = verticalOffset == 0
             
-            // Hide FAB on scroll if needed, or animate scale
+            // Show FAB when scrolled back to top
             if (verticalOffset == 0) {
                  if (fabAddSubscription.visibility != View.VISIBLE && auth.currentUser != null) fabAddSubscription.show()
             } 
         }
 
-        // Additional Scroll Listener for FAB hiding
-        subscriptionsRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                if (dy > 0 && fabAddSubscription.visibility == View.VISIBLE) {
-                     fabAddSubscription.hide()
-                } else if (dy < 0 && fabAddSubscription.visibility != View.VISIBLE) {
-                     fabAddSubscription.show()
+        // NestedScrollView Scroll Listener for FAB hiding AND M3E Haptics
+        var accumulatedDy = 0
+        val thresholdPx = (40 * resources.displayMetrics.density).toInt()
+        
+        mainNestedScrollView.setOnScrollChangeListener(androidx.core.widget.NestedScrollView.OnScrollChangeListener { v, _, scrollY, _, oldScrollY ->
+            val dy = scrollY - oldScrollY
+            
+            // 1. M3E Mechanical Scroll Haptics
+            if (PreferenceHelper.isHapticsEnabled(this)) {
+                accumulatedDy += dy
+                if (Math.abs(accumulatedDy) >= thresholdPx) {
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                        v.performHapticFeedback(android.view.HapticFeedbackConstants.CLOCK_TICK)
+                    } else {
+                        v.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP)
+                    }
+                    accumulatedDy %= thresholdPx
                 }
+            }
+
+            // 2. FAB Hiding Logic
+            if (dy > 12 && fabAddSubscription.visibility == View.VISIBLE) {
+                 fabAddSubscription.hide()
+            } else if (dy < -12 && fabAddSubscription.visibility != View.VISIBLE) {
+                 fabAddSubscription.show()
             }
         })
 
@@ -323,37 +374,20 @@ class MainActivity : BaseActivity() {
         viewModel.isLoading.observe(this) { loading ->
              if (loading) {
                  swipeRefreshLayout.isRefreshing = true
-                 loadingSkeleton.alpha = 1f
-                 loadingSkeleton.visibility = View.VISIBLE
-                 mainContentWrapper.visibility = View.GONE
-                 emptyStateContainer.visibility = View.GONE 
+                 // Only show skeleton on initial load when content isn't visible yet
+                 if (mainContentWrapper.visibility != View.VISIBLE) {
+                     loadingSkeleton.alpha = 1f
+                     loadingSkeleton.visibility = View.VISIBLE
+                     mainContentWrapper.visibility = View.GONE
+                     emptyStateContainer.visibility = View.GONE 
+                 }
              } else {
                  swipeRefreshLayout.isRefreshing = false
                  if (loadingSkeleton.visibility == View.VISIBLE) {
-                     // M3E Crossfade: Skeleton fades out, content slides up
-                     loadingSkeleton.animate()
-                         .alpha(0f)
-                         .setDuration(300)
-                         .setInterpolator(AnimationHelper.EMPHASIZED_ACCELERATE)
-                         .withEndAction {
-                             loadingSkeleton.visibility = View.GONE
-
-                             // Prepare content wrapper for entrance
-                             mainContentWrapper.alpha = 0f
-                             mainContentWrapper.translationY = 40f
-                             mainContentWrapper.visibility = View.VISIBLE
-
-                             // M3E Reveal: Content slides up + fades in
-                             mainContentWrapper.animate()
-                                 .alpha(1f)
-                                 .translationY(0f)
-                                 .setDuration(450)
-                                 .setInterpolator(AnimationHelper.EMPHASIZED_DECELERATE)
-                                 .start()
-
-                             PreferenceHelper.performClickHaptic(mainContentWrapper)
-                         }
-                         .start()
+                     loadingSkeleton.visibility = View.GONE
+                     mainContentWrapper.visibility = View.VISIBLE
+                     AnimationHelper.animateReveal(mainContentWrapper)
+                     PreferenceHelper.performClickHaptic(mainContentWrapper)
                  }
                  
                  val currentList = viewModel.subscriptions.value
