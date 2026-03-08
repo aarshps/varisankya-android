@@ -1,4 +1,4 @@
-﻿package com.hora.varisankya
+package com.hora.varisankya
 
 import android.os.Build
 import android.os.Bundle
@@ -48,6 +48,7 @@ class PaymentBottomSheet(
     private lateinit var textNoHistory: TextView
     private lateinit var progressHistory: ProgressBar
     private lateinit var btnPayCurrent: Button
+    private lateinit var btnAddPaymentOnly: Button
 
     private lateinit var textDueInfo: TextView
     private lateinit var textNextPreview: TextView
@@ -72,6 +73,7 @@ class PaymentBottomSheet(
         textNoHistory = view.findViewById(R.id.text_no_history)
         progressHistory = view.findViewById(R.id.progress_history)
         btnPayCurrent = view.findViewById(R.id.btn_pay_current)
+        btnAddPaymentOnly = view.findViewById(R.id.btn_add_payment_only)
 
         textDueInfo = view.findViewById(R.id.text_due_date_info)
         textNextPreview = view.findViewById(R.id.text_next_due_date_preview)
@@ -131,9 +133,14 @@ class PaymentBottomSheet(
         btnPayCurrent.setOnClickListener {
             val haptic = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) HapticFeedbackConstants.CONFIRM else HapticFeedbackConstants.LONG_PRESS
             PreferenceHelper.performHaptics(it, haptic)
-            recordPayment(currentDueDate!!, projectedNextDate)
+            recordPayment(Date(), projectedNextDate)
         }
 
+        btnAddPaymentOnly.setOnClickListener {
+            val haptic = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) HapticFeedbackConstants.CONFIRM else HapticFeedbackConstants.LONG_PRESS
+            PreferenceHelper.performHaptics(it, haptic)
+            promptForPaymentDateAndRecord()
+        }
 
     }
 
@@ -335,6 +342,21 @@ class PaymentBottomSheet(
             }
     }
 
+    private fun promptForPaymentDateAndRecord() {
+        val datePicker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText("Select Payment Date")
+            .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+            .build()
+
+        datePicker.addOnPositiveButtonClickListener { ts ->
+            val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+            calendar.timeInMillis = ts
+            val newDate = calendar.time
+            recordPayment(newDate, null)
+        }
+        datePicker.show(childFragmentManager, "ADD_PAY_DATE_PICKER")
+    }
+
     private fun recordPayment(paymentDate: Date, nextDueDate: Date?) {
         val userId = auth.currentUser?.uid ?: return
         
@@ -345,10 +367,11 @@ class PaymentBottomSheet(
         }
 
         btnPayCurrent.isEnabled = false
+        btnAddPaymentOnly.isEnabled = false
 
 
         val payment = PaymentRecord(
-            date = Date(), // Use today's date for payment
+            date = paymentDate,
             amount = subscription.cost,
             subscriptionName = subscription.name,
             subscriptionId = subId,
@@ -373,6 +396,7 @@ class PaymentBottomSheet(
         }.addOnFailureListener { e ->
             if (isAdded) {
                 btnPayCurrent.isEnabled = true
+                btnAddPaymentOnly.isEnabled = true
 
                 Log.e("PaymentBottomSheet", "Payment Failed", e)
             }

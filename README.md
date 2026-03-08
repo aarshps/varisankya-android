@@ -20,7 +20,7 @@ Varisankya is a modern, high-performance Android application designed to help us
 *   **Premium Charting**: Totally redesigned Payment History featuring a horizontally scrollable **Column Chart**.
     *   **Visuals**: Thick, rounded bars with "Chip" styled labels for effortless readability.
     *   **Interactive**: Auto-scrolls to the latest data and scales dynamically.
-*   **Comprehensive Tracking**: Effortlessly manage costs, currencies, recurrence cycles, and due dates.
+*   **Flexible Payments**: Record extra payments towards loans or subscriptions on custom dates without disrupting your scheduled due date cycle.
 *   **Compact Smart Data**: Amounts are intelligently formatted (e.g., "$ 1.2k") for quick scanning, with bold typography for emphasis.
 *   **Intelligent Search**: Full-screen search interface to quickly locate specific subscriptions.
 *   **Usage-Based Personalization**: The app learns from your inputs, automatically prioritizing your frequently used categories and currencies.

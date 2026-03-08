@@ -134,6 +134,16 @@
                 android:padding="16dp"
                 android:text="Mark as Paid" />
 
+            <Button
+                android:id="@+id/btn_add_payment_only"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="8dp"
+                android:padding="16dp"
+                android:text="@string/add_payment_keep_due_date" />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>

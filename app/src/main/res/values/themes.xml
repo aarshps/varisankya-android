@@ -19,8 +19,6 @@
              inject the system palette at runtime. -->
         
         <!-- M3E Mapping: Base surface is Surface -->
-        <item name="android:windowBackground">?attr/colorSurface</item>
-        <item name="android:statusBarColor">?attr/colorSurface</item>
 
 
 
