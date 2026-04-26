@@ -12,3 +12,4 @@ This repository utilizes AI agents (such as Gemini CLI, Cline, etc.) for develop
 ## Operational Workflows
 * **Execution:** Operate in a Plan -> Act -> Validate cycle.
 * **Tool Usage:** Prefer specific tools (e.g., targeted file replacement) over rewriting entire files. Run commands non-interactively where possible.
+* **CI/CD Transition:** See `CLI_RELEASE_GUIDE.md` for the roadmap on moving builds and Play Store releases to this Ubuntu environment.

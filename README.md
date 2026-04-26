@@ -59,5 +59,11 @@ The APK will be generated at: `app/build/outputs/apk/debug/app-debug.apk`
 2.  Ensure Firestore Rules allow sub-collection access.
 3.  Sync and Run from Android Studio.
 
+## 📖 Technical Documentation
+
+- [Cloud Architecture Plan](CLOUD_ARCHITECTURE_PLAN.md)
+- [Publishing Secrets Recovery](PUBLISHING_SECRETS_RECOVERY.md)
+- [CLI Build & Release Guide](CLI_RELEASE_GUIDE.md) — *Guide for Ubuntu/Headless environment setup.*
+
 ## 📜 License
 This project is licensed under the MIT License.
