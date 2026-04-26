@@ -4,12 +4,12 @@ The keystore and Firebase configuration required to build and publish the releas
 
 **Location in Bitwarden:**
 * **Folder:** `Hora`
-* **Secure Note Name:** `Android Publishing Secrets Backup`
+* **Secure Note Name:** `Varisankya Publishing Secrets`
 
 ## How to Retrieve
 1. Open Bitwarden and locate the Secure Note mentioned above.
 2. Inside the Secure Note, you will find "Custom Fields" containing Base64 encoded strings for the required files.
-3. Look for the fields starting with `varisankya/` (e.g., `varisankya/varisankya-upload-key`, `varisankya/google-services.json`, `varisankya/credentials.txt`).
+3. Look for the fields named `varisankya-upload-key`, `google-services.json`, and `credentials.txt`.
 4. Copy the Base64 value of each field.
 5. Decode the Base64 value into a file using a terminal or an online tool.
 
