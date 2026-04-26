@@ -4,7 +4,7 @@ The keystore and Firebase configuration required to build and publish the releas
 
 **Location in Bitwarden:**
 * **Folder:** `Hora`
-* **Secure Note Name:** `Varisankya Publishing Secrets`
+* **Secure Note Name:** `Varisankya`
 
 ## How to Retrieve
 1. Open Bitwarden and locate the Secure Note mentioned above.
