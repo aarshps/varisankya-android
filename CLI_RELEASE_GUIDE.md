@@ -28,6 +28,23 @@ To automate Play Store pushes, we will use the **Gradle Play Publisher (GPP)** p
 - **Release APK**: `./gradlew assembleRelease`
 - **Play Store Push (Future)**: `./gradlew publishReleaseBundle`
 
+## Phase 5: GitHub Release Formatting
+When publishing pre-releases or final releases to GitHub, always ensure the release notes are detailed and strictly formatted:
+- **Title**: `vX.Y[-alpha.Z] - Concise Feature Summary [Emoji]` (e.g., `v3.8-alpha.2 - Login Crash Fix 🩹`)
+- **Body**: Split into clear sections:
+  ```markdown
+  Brief summary of the release's purpose.
+
+  ## ✨ What's New
+  • Bullet point detailing a new feature or change.
+
+  ## 🛠 Fixes & Improvements
+  • Bullet point detailing a fix, like resolving a NullPointerException.
+  • App Version Bump updated to [Version] (Version Code [Code]).
+
+  Enjoying Varisankya? Consider leaving a star on GitHub! ⭐️
+  ```
+
 ## Current Status
 - Transitioned successfully to Ubuntu CLI on April 27, 2026.
 - Pre-release APKs can be generated and published to GitHub.

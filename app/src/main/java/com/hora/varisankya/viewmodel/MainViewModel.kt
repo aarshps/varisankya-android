@@ -110,8 +110,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val overdue = mutableListOf<Subscription>() // RESTORED
         
         for (sub in activeSubs) {
+            if (sub.dueDate == null) continue
+            
             val subDate = Calendar.getInstance()
-            subDate.time = sub.dueDate!!
+            subDate.time = sub.dueDate
             subDate.set(Calendar.HOUR_OF_DAY, 0)
             subDate.set(Calendar.MINUTE, 0)
             subDate.set(Calendar.SECOND, 0)
@@ -130,6 +132,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         
         // Next future payment
         val nextPayment = activeSubs
+            .filter { it.dueDate != null }
             .filter { 
                 val d = Calendar.getInstance()
                 d.time = it.dueDate!!

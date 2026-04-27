@@ -24,3 +24,8 @@ btnAddPaymentOnly.setOnClickListener {
 ```
 
 Never forcefully calculate and pass the *current* due date as the *next* due date. Always pass `null` to explicitly trigger the conditional skip in the batch write.
+
+## Downstream Data Handling Warning
+Because extra payments are designed to skip updating the `dueDate` by passing `null`, the `dueDate` field of a `Subscription` model object retrieved from Firestore **can be null** if a user has legacy records or if an unexpected state occurred.
+
+**Any UI logic or ViewModels (such as `MainViewModel.kt` calculating the Hero Section stats) MUST explicitly filter out or gracefully handle `Subscription` objects where `dueDate == null`.** Attempting to forcefully unwrap (`!!`) a `dueDate` in list mapping operations will lead to immediate runtime crashes upon login.
