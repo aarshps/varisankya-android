@@ -57,7 +57,14 @@ The APK will be generated at: `app/build/outputs/apk/debug/app-debug.apk`
 
 1.  Place your `google-services.json` in the `app/` folder.
 2.  Ensure Firestore Rules allow sub-collection access.
-3.  Sync and Run from Android Studio.
+3.  Retrieve build secrets securely from Bitwarden:
+    ```bash
+    ./retrieve_secrets.sh
+    ```
+4.  Build the project headlessly:
+    ```bash
+    ./gradlew assembleDebug
+    ```
 
 ## 📖 Technical Documentation
 
