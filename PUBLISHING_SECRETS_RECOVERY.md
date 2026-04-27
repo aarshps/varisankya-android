@@ -28,7 +28,7 @@ echo "BASE64_PART_1_AND_2_MERGED" | base64 --decode > app/google-services.json
 ## File Placement
 * `varisankya-upload-key`: This is the signing keystore. Place it in the project root or inject the path into `gradle.properties`.
 * `google-services.json`: Place it in `app/google-services.json`.
-* `gradle.properties`: Update your local (uncommitted) `gradle.properties` with:
+* `local.properties`: Update your local (uncommitted) `local.properties` with:
   ```properties
   RELEASE_STORE_PASSWORD=your_password
   RELEASE_KEY_ALIAS=your_alias

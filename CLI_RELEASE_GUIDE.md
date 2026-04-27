@@ -16,7 +16,7 @@ Enable fully automated creation of Debug APKs and Production App Bundles, includ
 - **Automated Script**: `./retrieve_secrets.sh` securely unlocks the vault, downloads the `Varisankya` secure note, and injects:
   1. `app/google-services.json`
   2. `varisankya-upload-key`
-  3. Release signing credentials into `gradle.properties` (non-committed).
+  3. Release signing credentials into `local.properties` (non-committed).
 
 ## Phase 3: Automation Integration (PENDING)
 To automate Play Store pushes, we will use the **Gradle Play Publisher (GPP)** plugin.

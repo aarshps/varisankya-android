@@ -16,6 +16,5 @@
 local.properties
 app/google-services.json
 varisankya-upload-key
-retrieve_secrets.sh
 bw.zip
 credentials.txt

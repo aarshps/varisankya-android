@@ -1,6 +1,15 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("com.google.gms.google-services")
+}
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(FileInputStream(localPropertiesFile))
 }
 
 android {
@@ -19,10 +28,13 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file(project.properties["RELEASE_STORE_FILE"] as String)
-            storePassword = project.properties["RELEASE_STORE_PASSWORD"] as String
-            keyAlias = project.properties["RELEASE_KEY_ALIAS"] as String
-            keyPassword = project.properties["RELEASE_KEY_PASSWORD"] as String
+            val storeFilePath = localProperties.getProperty("RELEASE_STORE_FILE")
+            if (storeFilePath != null) {
+                storeFile = file(storeFilePath)
+                storePassword = localProperties.getProperty("RELEASE_STORE_PASSWORD")
+                keyAlias = localProperties.getProperty("RELEASE_KEY_ALIAS")
+                keyPassword = localProperties.getProperty("RELEASE_KEY_PASSWORD")
+            }
         }
     }
 

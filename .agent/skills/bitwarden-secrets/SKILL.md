@@ -15,7 +15,7 @@ To pull the secrets down into the local headless Ubuntu environment, an automate
 2. Fetches the `Varisankya` secure note.
 3. Decodes and merges split Base64 properties to extract `app/google-services.json`.
 4. Decodes and merges split Base64 properties to extract `varisankya-upload-key`.
-5. Injects the `Key Alias`, `Keystore Password`, and `Key Password` directly into the local (uncommitted) `gradle.properties` file.
+5. Injects the `Key Alias`, `Keystore Password`, and `Key Password` directly into the local (uncommitted) `local.properties` file.
 
 ### When to run it:
 - If a build fails with `File google-services.json is missing`.
