@@ -104,6 +104,6 @@ dependencies {
 
 play {
     serviceAccountCredentials.set(file("play_console_key.json"))
-    track.set(project.findProperty("playTrack")?.toString() ?: "internal")
+    track.set(project.findProperty("playTrack")?.toString() ?: "alpha")
     defaultToAppBundles.set(true)
 }

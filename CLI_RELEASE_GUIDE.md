@@ -27,9 +27,8 @@ To automate Play Store pushes, we use the **Gradle Play Publisher (GPP)** plugin
 ## Phase 4: Execution
 - **Debug APK**: `./gradlew assembleDebug`
 - **Release APK**: `./gradlew assembleRelease`
-- **Play Store Push**: By default, publishing targets the **Internal** testing track. To push to a specific track, pass the `playTrack` property:
-  - Internal: `./gradlew publishBundle`
-  - Closed (Alpha): `./gradlew publishBundle -PplayTrack=alpha`
+- **Play Store Push**: By default, publishing targets the **Closed (Alpha)** testing track (since Internal testing is paused). To push to a specific track, pass the `playTrack` property:
+  - Closed (Alpha): `./gradlew publishBundle` (default)
   - Open (Beta): `./gradlew publishBundle -PplayTrack=beta`
   - Production: `./gradlew publishBundle -PplayTrack=production`
 

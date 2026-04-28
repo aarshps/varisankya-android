@@ -9,15 +9,15 @@ Choosing the right track in the Google Play Console ensures stability and proper
 
 ## Track Definitions
 
-### 1. Internal Testing ("Dev Track")
+### 1. Internal Testing ("Dev Track") - [PAUSED/NOT IN USE]
 -   **Review:** None (Instant availability).
 -   **Audience:** Restricted List (Email invite only). max 100.
--   **Use Case:** Quick sanity checks, verifying "Release" build variants, and testing hotfixes before submission.
+-   **Use Case:** This track is currently paused and no longer used for Varisankya. All new testing builds start in Closed Testing (Alpha).
 
-### 2. Closed Testing ("Alpha")
+### 2. Closed Testing ("Alpha") - [DEFAULT STARTING TRACK]
 -   **Review:** **Mandatory** (1-3 days).
 -   **Audience:** Invited Groups (Google Groups/Email lists).
--   **Use Case:** Sharing with specific trusted users/friends for feedback on new features.
+-   **Use Case:** Sharing with specific trusted users/friends for feedback on new features. This is the default target when running `./gradlew publishBundle`.
 
 ### 3. Open Testing ("Beta")
 -   **Review:** **Mandatory** (1-3 days).
