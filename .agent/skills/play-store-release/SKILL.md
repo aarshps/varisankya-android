@@ -1,6 +1,6 @@
 ---
 name: Play Store Release Management
-description: Guidelines for managing Varisankya releases across Internal, Closed, and Open tracks.
+description: Guidelines for managing Varisankya releases across Beta and Production tracks.
 ---
 
 # Play Store Release Strategy
@@ -9,21 +9,16 @@ Choosing the right track in the Google Play Console ensures stability and proper
 
 ## Track Definitions
 
-### 1. Internal Testing ("Dev Track") - [PAUSED/NOT IN USE]
--   **Review:** None (Instant availability).
--   **Audience:** Restricted List (Email invite only). max 100.
--   **Use Case:** This track is currently paused and no longer used for Varisankya. All new testing builds start in Closed Testing (Alpha).
-
-### 2. Closed Testing ("Alpha") - [DEFAULT STARTING TRACK]
--   **Review:** **Mandatory** (1-3 days).
--   **Audience:** Invited Groups (Google Groups/Email lists).
--   **Use Case:** Sharing with specific trusted users/friends for feedback on new features. This is the default target when running `./gradlew publishBundle`.
-
-### 3. Open Testing ("Beta")
+### 1. Open Testing ("Beta") - [DEFAULT PRE-RELEASE TRACK]
 -   **Review:** **Mandatory** (1-3 days).
 -   **Audience:** Public (Anyone can join via Store Listing).
--   **Use Case:** Large scale load testing.
+-   **Use Case:** Large scale load testing and beta testing. When a "pre-release" is requested, a GitHub pre-release and a Play Store Open Testing (Beta) release should be created in parallel. This is the default target when running `./gradlew publishBundle`.
 -   **UX Warning:** Users must click "Join Beta" -> Wait -> "Install". **Do not use this for marketing launches** (like Product Hunt) as it adds friction.
+
+### 2. Production ("Live")
+-   **Review:** **Mandatory**.
+-   **Audience:** Everyone.
+-   **Use Case:** Once a pre-release is tested and approved, the build is promoted to Production on the Play Store, and a corresponding final GitHub release is created.
 
 ## Release Hierarchy & Versioning
 -   **Production is King:** If a user is eligible for builds in multiple tracks (e.g., Open Testing and Production), they receive the one with the **Highest Version Code**.

@@ -27,10 +27,10 @@ To automate Play Store pushes, we use the **Gradle Play Publisher (GPP)** plugin
 ## Phase 4: Execution
 - **Debug APK**: `./gradlew assembleDebug`
 - **Release APK**: `./gradlew assembleRelease`
-- **Play Store Push**: By default, publishing targets the **Closed (Alpha)** testing track (since Internal testing is paused). To push to a specific track, pass the `playTrack` property:
-  - Closed (Alpha): `./gradlew publishBundle` (default)
-  - Open (Beta): `./gradlew publishBundle -PplayTrack=beta`
-  - Production: `./gradlew publishBundle -PplayTrack=production`
+- **Pre-release (Beta)**: When requested to do a pre-release, we create a GitHub pre-release (with the Debug APK) AND an Open Testing (Beta) release on the Play Store.
+  - Play Store Beta: `./gradlew publishBundle` (default track is `beta`)
+- **Production (Live)**: Once a pre-release is tested and approved, we promote it to Production on the Play Store and create a standard GitHub release.
+  - Play Store Production: `./gradlew publishBundle -PplayTrack=production`
 
 ## Phase 5: GitHub Release Formatting
 When publishing pre-releases or final releases to GitHub, always ensure the release notes are detailed and strictly formatted:
