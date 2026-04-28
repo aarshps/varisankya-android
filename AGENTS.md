@@ -9,6 +9,7 @@ This repository utilizes AI agents (such as Gemini CLI, Cline, etc.) for develop
    - Run `./retrieve_secrets.sh` to extract the keystore and Firebase config securely from Bitwarden CLI into the local workspace (`app/google-services.json`, `varisankya-upload-key`, and `local.properties`).
 2. **Context Efficiency:** Agents should minimize unnecessary context usage by targeting file reads and searches efficiently.
 3. **Engineering Standards:** Adhere strictly to existing workspace conventions, architectural patterns, and styling. Never bypass type systems or suppress warnings without explicit user instruction.
+   - **Firestore Models:** Ensure all data classes used with Firebase Firestore (e.g., `Subscription`, `PaymentRecord`) are explicitly preserved in `app/proguard-rules.pro` to prevent R8 serialization errors in release builds.
 4. **Validation:** Agents must empirically validate all changes (e.g., compile checks with `./gradlew assembleDebug`, linting, tests) before considering a task complete.
 
 ## Operational Workflows

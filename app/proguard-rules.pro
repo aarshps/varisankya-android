@@ -34,3 +34,7 @@
     @androidx.annotation.Keep <fields>;
     @androidx.annotation.Keep <methods>;
 }
+
+# Keep Firebase Firestore model classes
+-keep class com.hora.varisankya.Subscription { *; }
+-keep class com.hora.varisankya.PaymentRecord { *; }
