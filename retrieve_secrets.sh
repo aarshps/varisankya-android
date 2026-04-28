@@ -24,7 +24,7 @@ KPART2=$(echo "$ITEM_JSON" | jq -r '.fields[] | select(.name=="varisankya-upload
 echo "${KPART1}${KPART2}" | base64 --decode > varisankya-upload-key
 
 echo "Extracting Google Play Console Service Account key..."
-echo "$ITEM_JSON" | jq -r '.fields[] | select(.name=="credentials.txt").value' | base64 --decode > app/play_console_key.json
+echo "$ITEM_JSON" | jq -r '.fields[] | select(.name=="play_console_key.json").value' | base64 --decode > app/play_console_key.json
 
 echo "Extracting keystore alias and passwords to gradle.properties..."
 # In the JSON structure printed earlier, the alias and passwords were provided directly as separate fields:
