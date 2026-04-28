@@ -19,10 +19,10 @@ Enable fully automated creation of Debug APKs and Production App Bundles, includ
   2. `varisankya-upload-key`
   3. Release signing credentials into `local.properties` (non-committed).
 
-## Phase 3: Automation Integration (PENDING)
-To automate Play Store pushes, we will use the **Gradle Play Publisher (GPP)** plugin.
-- **Dependency**: Add `com.github.triplet.play` to `build.gradle.kts`.
-- **Auth**: A Service Account JSON key from the Google Play Console must be retrieved and stored securely on the machine (referenced by GPP).
+## Phase 3: Automation Integration (COMPLETED)
+To automate Play Store pushes, we use the **Gradle Play Publisher (GPP)** plugin.
+- **Dependency**: Added `com.github.triplet.play` (v4.0.0) to `build.gradle.kts` files.
+- **Auth**: A Service Account JSON key from the Google Play Console is securely retrieved from Bitwarden via `./retrieve_secrets.sh` and placed at `app/play_console_key.json` (ignored by Git).
 
 ## Phase 4: Execution
 - **Debug APK**: `./gradlew assembleDebug`
@@ -49,4 +49,4 @@ When publishing pre-releases or final releases to GitHub, always ensure the rele
 ## Current Status
 - Transitioned successfully to Ubuntu CLI on April 27, 2026.
 - Pre-release APKs can be generated and published to GitHub.
-- Next milestone: Phase 3 (Google Play automation).
+- Google Play automation (GPP) is integrated and ready. Run `./retrieve_secrets.sh` to extract the key, and then `./gradlew publishBundle` to push to the store.

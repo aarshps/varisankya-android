@@ -14,6 +14,7 @@ firebaseAuth = "24.0.1"
 credentials = "1.5.0"
 credentialsPlayServicesAuth = "1.5.0"
 googleid = "1.1.1"
+gpp = "4.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -33,4 +34,5 @@ googleid = { group = "com.google.android.libraries.identity.googleid", name = "g
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
+play-publisher = { id = "com.github.triplet.play", version.ref = "gpp" }
 

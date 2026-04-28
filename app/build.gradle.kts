@@ -4,6 +4,7 @@ import java.io.FileInputStream
 plugins {
     id("com.android.application")
     id("com.google.gms.google-services")
+    alias(libs.plugins.play.publisher)
 }
 
 val localProperties = Properties()
@@ -99,4 +100,10 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+}
+
+play {
+    serviceAccountCredentials.set(file("play_console_key.json"))
+    track.set("internal")
+    defaultToAppBundles.set(true)
 }
