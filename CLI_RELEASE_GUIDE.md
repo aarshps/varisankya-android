@@ -10,6 +10,7 @@ Enable fully automated creation of Debug APKs and Production App Bundles, includ
 - **Android SDK Command-line Tools**: Installed at `~/Android/Sdk` (`cmdline-tools;latest`, `platforms;android-36`, `build-tools;36.0.0`).
 - **Environment Variables**: `ANDROID_HOME` is set in `~/.bashrc`.
 - **SDK Path**: `local.properties` contains `sdk.dir=/home/aarsh/Android/Sdk`.
+- **Firebase Auth (Google Sign-In)**: The default `debug.keystore` generated on a new Linux environment has a unique SHA-1. This SHA-1 must be manually registered in the Firebase Console (or via `firebase apps:android:sha:create`) for Google Sign-In to function properly on debug builds.
 
 ## Phase 2: Secret Injection (COMPLETED)
 - **Bitwarden CLI (`bw`)**: Installed and configured.

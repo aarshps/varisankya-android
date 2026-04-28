@@ -639,11 +639,15 @@ class MainActivity : BaseActivity() {
                 firebaseAuthWithGoogle(googleIdTokenCredential.idToken)
             } catch (e: Exception) {
                 Log.e("Auth", "Credential Manager Error", e)
-                if (e is androidx.credentials.exceptions.GetCredentialCancellationException) {
-                    // User cancelled
-                } else {
-                   updateUI(false)
+                val errorMessage = when (e) {
+                    is androidx.credentials.exceptions.GetCredentialCancellationException -> "Sign-in cancelled"
+                    is androidx.credentials.exceptions.NoCredentialException -> "No accounts found. Please ensure you have a Google account on this device and that the app's SHA-1 is registered in Firebase."
+                    else -> "Sign-in error: ${e.message}"
                 }
+                if (e !is androidx.credentials.exceptions.GetCredentialCancellationException) {
+                    Toast.makeText(this@MainActivity, errorMessage, Toast.LENGTH_LONG).show()
+                }
+                updateUI(false)
             }
         }
     }
