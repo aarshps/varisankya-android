@@ -19,34 +19,20 @@
         android:paddingBottom="48dp"
         android:paddingHorizontal="24dp">
 
-        <ImageView
-            android:id="@+id/about_logo"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_marginTop="16dp"
-            android:src="@drawable/ic_launcher_monochrome" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Varisankya"
-            android:textAppearance="?attr/textAppearanceHeadlineMedium"
-            android:textStyle="bold" />
-
         <TextView
             android:id="@+id/about_version"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Version 3.8-beta.1 (44)"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
-            android:textColor="?attr/colorOnSurfaceVariant" />
+            android:layout_marginTop="16dp"
+            android:text="Version 3.8-beta.3 (46)"
+            android:textAppearance="?attr/textAppearanceTitleLarge"
+            android:textColor="?attr/colorOnSurface"
+            android:textStyle="bold" />
 
         <com.google.android.material.divider.MaterialDivider
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="24dp"
             android:layout_marginBottom="24dp" />
 
         <LinearLayout
@@ -66,7 +52,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Aarsh P (aarshps)"
+                android:text="aarshps"
                 android:textAppearance="?attr/textAppearanceBodyLarge" />
 
             <TextView
