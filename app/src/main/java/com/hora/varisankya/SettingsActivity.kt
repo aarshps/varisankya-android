@@ -69,10 +69,29 @@ class SettingsActivity : BaseActivity() {
         setupNotificationDaysSetting()
         setupHapticsToggle()
         setupPrivacyPolicy()
+        setupAboutButton()
         setupScrollHaptics()
         setupBiometricToggle()
         setupCardGrouping()
 
+    }
+    
+    private fun setupAboutButton() {
+        val aboutLayout = findViewById<View>(R.id.about_layout)
+        val subtitle = findViewById<TextView>(R.id.about_subtitle)
+        
+        // Set current version in subtitle
+        try {
+            val packageInfo = packageManager.getPackageInfo(packageName, 0)
+            subtitle.text = "v${packageInfo.versionName}"
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        aboutLayout.setOnClickListener {
+            PreferenceHelper.performClickHaptic(it)
+            AboutBottomSheet().show(supportFragmentManager, "AboutBottomSheet")
+        }
     }
     
 
