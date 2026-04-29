@@ -24,8 +24,7 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_marginTop="16dp"
-            android:src="@drawable/ic_logo_mono"
-            app:tint="?attr/colorPrimary" />
+            android:src="@drawable/ic_launcher_monochrome" />
 
         <TextView
             android:layout_width="wrap_content"
